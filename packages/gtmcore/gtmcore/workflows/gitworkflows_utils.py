@@ -3,7 +3,7 @@ import time
 import os
 import shutil
 import uuid
-from typing import Any, Optional, Callable
+from typing import Any, Optional, Callable, List
 
 from gtmcore.gitlib import RepoLocation
 from gtmcore.workflows.gitlab import GitLabManager
@@ -19,7 +19,7 @@ from gtmcore.inventory import Repository
 from gtmcore.inventory.inventory import InventoryManager
 from gtmcore.logging import LMLogger
 from gtmcore.configuration.utils import call_subprocess
-from gtmcore.inventory.branching import BranchManager, MergeConflict
+from gtmcore.inventory.branching import BranchManager, MergeError
 from gtmcore.configuration import Configuration
 from gtmcore.dispatcher import Dispatcher
 import gtmcore.dispatcher.dataset_jobs
@@ -28,11 +28,10 @@ import gtmcore.dispatcher.dataset_jobs
 logger = LMLogger.get_logger()
 
 
+MERGE_CONFLICT_STRING = "Automatic merge failed"
+
+
 class WorkflowsException(Exception):
-    pass
-
-
-class MergeError(WorkflowsException):
     pass
 
 
@@ -102,7 +101,8 @@ def publish_to_remote(repository: Repository, username: str, remote: str,
     if bm.workspace_branch != bm.active_branch:
         raise ValueError(f'Must be on branch {bm.workspace_branch} to publish')
 
-    feedback_callback(f"Preparing to publish {repository.name}")
+    current_server = repository.client_config.get_server_configuration()
+    feedback_callback(f"Preparing to publish {repository.name} to {current_server.name}")
     git_garbage_collect(repository)
 
     # Try five attempts to fetch - the remote repo could have been created just milliseconds
@@ -117,44 +117,48 @@ def publish_to_remote(repository: Repository, username: str, remote: str,
     else:
         raise ValueError(f"Timed out trying to fetch repo for {str(repository)}")
 
-    feedback_callback("Pushing up regular objects...")
-    call_subprocess(['git', 'push', '--set-upstream', 'origin', bm.workspace_branch],
-                    cwd=repository.root_dir)
+    feedback_callback(f"Pushing data to {current_server.name}. Please wait...")
+    call_git_subprocess(['git', 'push', '--progress', '--set-upstream', 'origin', bm.workspace_branch],
+                        cwd=repository.root_dir, feedback_callback=feedback_callback)
     feedback_callback(f"Publish complete.")
     repository.git.clear_checkout_context()
 
 
 # TODO #1456: Subprocess calls to Git should be consolidated in the internal Git API - currently git_fs_shim.py
 def _set_upstream_branch(repository: Repository, branch_name: str, feedback_cb: Callable):
-    # TODO(billvb) - Refactor to BranchManager
-    set_upstream_tokens = ['git', 'push', '--set-upstream', 'origin', branch_name]
-    call_subprocess(set_upstream_tokens, cwd=repository.root_dir)
+    set_upstream_tokens = ['git', 'push', '--progress', '--set-upstream', 'origin', branch_name]
+    call_git_subprocess(set_upstream_tokens, cwd=repository.root_dir, feedback_callback=feedback_cb)
 
 
 # TODO #1456: Subprocess calls to Git should be consolidated in the internal Git API - currently git_fs_shim.py
 def _pull(repository: Repository, branch_name: str, override: str, feedback_cb: Callable,
           username: Optional[str] = None) -> None:
-    # TODO(billvb) Refactor to BranchManager
-    feedback_cb(f"Pulling from remote branch \"{branch_name}\"...")
-    cp = repository.git.commit_hash
-    try:
-        call_subprocess(f'git pull'.split(), cwd=repository.root_dir)
+    current_server = repository.client_config.get_server_configuration()
+    feedback_cb(f"Pulling latest changes from {current_server.name}. Please wait...")
 
-    except subprocess.CalledProcessError as cp_error:
-        if 'Automatic merge failed' in cp_error.stdout.decode():
-            feedback_cb(f"Detected merge conflict, resolution method = {override}")
-            bm = BranchManager(repository, username='')
-            conflicted_files = bm._infer_conflicted_files(cp_error.stdout.decode())
-            if 'abort' == override:
-                call_subprocess(f'git reset --hard {cp}'.split(), cwd=repository.root_dir)
-                raise MergeConflict('Merge conflict pulling upstream', conflicted_files)
-            call_subprocess(f'git checkout --{override} {" ".join(conflicted_files)}'.split(),
-                            cwd=repository.root_dir)
-            call_subprocess('git add .'.split(), cwd=repository.root_dir)
-            call_subprocess('git commit -m "Merge"'.split(), cwd=repository.root_dir)
-            feedback_cb("Resolved merge conflict")
-        else:
-            raise
+    cp = repository.git.commit_hash
+
+    # Run a pull and if you get output, a conflict occurred
+    output = call_git_subprocess(f'git pull --progress'.split(),
+                                 cwd=repository.root_dir,
+                                 feedback_callback=feedback_cb)
+    if output:
+        feedback_cb(f"Detected merge conflict, resolution method = {override}")
+        bm = BranchManager(repository, username='')
+        conflicted_files = bm._infer_conflicted_files(output)
+        if 'abort' == override:
+            conflicted_str = "\n".join(conflicted_files)
+            feedback_cb(f'Sync aborted due to conflicts while pulling changes from the server.'
+                        f'The following files conflicted:\n\n {conflicted_str}')
+            call_subprocess(f'git reset --hard {cp}'.split(), cwd=repository.root_dir)
+            raise MergeError(f'Sync aborted due to conflicts while pulling changes from {current_server.name}')
+
+        # Resolving conflict on pull
+        call_subprocess(f'git checkout --{override} {" ".join(conflicted_files)}'.split(),
+                        cwd=repository.root_dir)
+        call_subprocess('git add .'.split(), cwd=repository.root_dir)
+        call_subprocess('git commit -m "Merge"'.split(), cwd=repository.root_dir)
+        feedback_cb("Resolved merge conflict")
 
 
 def sync_branch(repository: Repository, username: Optional[str], override: str,
@@ -164,6 +168,9 @@ def sync_branch(repository: Repository, username: Optional[str], override: str,
         return 0
 
     repository.sweep_uncommitted_changes()
+
+    current_server = repository.client_config.get_server_configuration()
+    feedback_callback(f"Preparing to sync {repository.name} with {current_server.name}.")
     repository.git.fetch()
 
     bm = BranchManager(repository)
@@ -177,21 +184,23 @@ def sync_branch(repository: Repository, username: Optional[str], override: str,
 
     if branch_name not in bm.branches_remote:
         # Branch does not exist, so push it to remote.
+        feedback_callback(f"Pushing current branch \"{branch_name}\" to {current_server.name}. Please wait...")
         _set_upstream_branch(repository, bm.active_branch, feedback_callback)
         repository.git.clear_checkout_context()
-        feedback_callback("Synced current branch up to remote")
+        feedback_callback("Sync complete")
         return 0
     else:
         pulled_updates_count = bm.get_commits_behind()
         _pull(repository, branch_name, override, feedback_callback, username=username)
         should_push = not pull_only
         if should_push:
-            feedback_callback(f"Pushing changes to remote branch \"{branch_name}\"...")
+            feedback_callback(f"Pushing changes in current branch \"{branch_name}\" to {current_server.name}. "
+                              f"Please wait...")
             # Skip pushing back up if set to pull_only
-            push_tokens = f'git push origin {branch_name}'.split()
+            push_tokens = f'git push --progress origin {branch_name}'.split()
             if branch_name not in bm.branches_remote:
                 push_tokens.insert(2, "--set-upstream")
-            call_subprocess(push_tokens, cwd=repository.root_dir)
+            call_git_subprocess(push_tokens, cwd=repository.root_dir, feedback_callback=feedback_callback)
             feedback_callback("Sync complete")
         else:
             feedback_callback("Pull complete")
@@ -246,10 +255,11 @@ def migrate_labbook_branches(labbook: LabBook) -> None:
 
     bm.create_branch(master_branch)
 
+
 # TODO #1456: Subprocess calls to Git should be consolidated in the internal Git API - currently git_fs_shim.py
 def _clone(remote_url: str, working_dir: str) -> str:
 
-    clone_tokens = f"git clone {remote_url}".split()
+    clone_tokens = f"git clone --progress {remote_url}".split()
     call_subprocess(clone_tokens, cwd=working_dir)
 
     # Affirm there is only one directory created
@@ -329,3 +339,86 @@ def process_linked_datasets(labbook: LabBook, logged_in_username: str) -> None:
         d.dispatch_task(gtmcore.dispatcher.dataset_jobs.check_and_import_dataset,
                         kwargs=kwargs,
                         metadata=metadata)
+
+
+# TODO #1456: Subprocess calls to Git should be consolidated in the internal Git API - currently git_fs_shim.py
+def call_git_subprocess(cmd_tokens: List[str], cwd: str, feedback_callback: Callable) -> Optional[str]:
+    """Execute a subprocess call to git from a background job
+
+    Args:
+        cmd_tokens: List of command tokens, e.g., ['ls', '-la']
+        cwd: Current working directory
+        feedback_callback: callback to print to UI
+
+    Returns:
+        Decoded stdout of called process after completing IF merge conflicts occurred
+
+    Raises:
+        subprocess.CalledProcessError
+    """
+    output = ""
+    with subprocess.Popen(cmd_tokens, cwd=cwd, shell=False,
+                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True) as sp:
+        for line in sp.stdout:  # type: ignore
+            # Send each line to the feedback callback when it is available and also append
+            # to the complete output (needed when a conflict occurs)
+            feedback_callback(line)
+            output = f"{output}{line}"
+
+    if sp.returncode != 0:
+        if MERGE_CONFLICT_STRING in line:
+            # This is a merge conflict that we need to handle differently.
+            # Currently, the above string MERGE_CONFLICT_STRING is used to detect when
+            # a merge conflict has occurred.
+            #
+            # When you do get a merge conflict, send the whole output back to the caller
+            # so the output can be processed to find the conflicted files.
+            return output
+        else:
+            # An error occurred
+            cmd = " ".join(cmd_tokens)
+            raise Exception(f"An error occurred while running `{cmd}`")
+    else:
+        # No error. Don't return output.
+        return None
+
+
+def handle_git_feedback(current_feedback: Optional[str], message: str) -> str:
+    """Function to handle git output in a reasonable way for UI rendering for the user
+
+    Args:
+        current_feedback: current string of feedback stored in the background job
+        message: new message output from git
+
+    Returns:
+        string containing all messages separated by newlines
+    """
+    # We manage whitespace for git feedback in this function
+    message = message.strip()
+
+    if not current_feedback:
+        # This is the first line provided as feedback so just return the message.
+        return message
+
+    # Clean up some of the output that we know we want to ignore for now
+    # that isn't super useful to sent back to the user.
+    lines_to_skip = (".git/info/lfs.locksverify true",
+                     "Locking support detected on remote",
+                     "hint:")
+    if message.startswith(lines_to_skip):
+        return current_feedback
+
+    # Check if the new message is actually an update to the previous message (e.g. a progress indicator)
+    lines = current_feedback.split('\n')
+    last_line = lines[-1]
+    msg_parts = message.split(':')
+    if len(msg_parts) > 1:
+        # You might have a progress update vs. a new message
+        last_line_parts = last_line.split(':')
+        if len(msg_parts) == len(last_line_parts):
+            if msg_parts[0] == last_line_parts[0]:
+                # It's an update! Remove last line to update instead of just append
+                _ = lines.pop()
+
+    lines.append(message)
+    return "\n".join(lines)
