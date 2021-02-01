@@ -125,7 +125,12 @@ class SmartHash(object):
         fast_hash_val = None
         if os.path.exists(abs_path):
             file_info = os.stat(abs_path)
-            fast_hash_val = f"{relative_path}||{file_info.st_size}||{file_info.st_mtime}"
+            if os.path.isdir(abs_path):
+                # Always set directory size to 0 for uniformity across file systems
+                size = 0
+            else:
+                size = file_info.st_size
+            fast_hash_val = f"{relative_path}||{size}||{file_info.st_mtime}"
         return fast_hash_val
 
     def fast_hash(self, path_list: list, save: bool = True) -> List[Optional[str]]:
