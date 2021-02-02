@@ -4,7 +4,7 @@ import os
 
 from gtmcore.configuration.utils import call_subprocess
 from gtmcore.inventory.branching import (BranchManager, InvalidBranchName, BranchWorkflowViolation,
-    BranchException, MergeConflict)
+    BranchException, MergeError, UI_MERGE_CONFLICT_STRING)
 from gtmcore.files import FileOperations
 from gtmcore.fixtures import (mock_config_file, mock_labbook, mock_labbook_lfs_disabled,
                               sample_src_file, helper_create_remote_repo as _MOCK_create_remote_repo,
@@ -160,7 +160,7 @@ class TestBranching(object):
 
     def test_merge_conflict_basic(self, mock_labbook_lfs_disabled):
         """ Test a basic merge-conflict scenario with a conflict on one file.
-            First, assert that a MergeConflict is raised when the conflict is detected
+            First, assert that a MergeError is raised when the conflict is detected
             Second, test the force flag to overwrite the conflict using the incoming branch."""
         lb = mock_labbook_lfs_disabled[2]
 
@@ -187,12 +187,15 @@ class TestBranching(object):
         # Switch back to feature branch -- make sure that failed merges rollback to state before merge.
         bm.workon_branch(feature_name)
         cp = bm.repository.git.commit_hash
+        merge_error_occurred = False
         try:
             bm.merge_from(bm.workspace_branch)
-            assert False, "merge_from should have thrown conflict"
-        except MergeConflict as m:
-            # Assert that the conflicted file(s) are as expected
-            assert m.file_conflicts == ['code/s1.txt']
+        except MergeError as err:
+            merge_error_occurred = True
+            assert UI_MERGE_CONFLICT_STRING in str(err)
+
+        assert merge_error_occurred is True, "A MergeError was not raised, but was expected"
+
         assert lb.is_repo_clean
 
         # Now try to force merge, and changes are taken from the workspace-branch

@@ -3,6 +3,8 @@
 import React, { Component } from 'react';
 // context
 import ServerContext from 'Pages/ServerContext';
+// job status
+import JobStatus from 'JS/utils/JobStatus';
 // component
 import Modal from 'Components/modal/Modal';
 import Complete from './status/Complete';
@@ -25,12 +27,14 @@ import './VisibilityModal.scss';
 type Props = {
   buttonText: string,
   header: string,
+  isVisible: boolean,
   modalStateValue: Object,
   name: string,
   owner: string,
   resetState: Function,
   resetPublishState: Function,
   setPublishingState: Function,
+  setPublishErrorState: Function,
   setRemoteSession: Function,
   setSyncingState: Function,
   toggleModal: Function,
@@ -102,18 +106,13 @@ class VisibilityModal extends Component<Props> {
       name,
       owner,
       resetPublishState,
+      setPublishErrorState,
       setPublishingState,
     } = this.props;
     if (jobKey) {
       this.setState({ jobKey });
+      this._fetchData(jobKey);
     } else {
-      this._transition(
-        ERROR,
-        {
-          failureMessage: error[0].message,
-        },
-      );
-
       if (setPublishingState) {
         setPublishingState(owner, name, false);
       }
@@ -121,6 +120,59 @@ class VisibilityModal extends Component<Props> {
       resetPublishState(false);
     }
   };
+
+
+  /**
+  * Method fetches job status and updates modal messaging
+  * @param {string} jobKey
+  */
+  _fetchData = (jobKey) => {
+    const {
+      name,
+      owner,
+      resetPublishState,
+      setPublishErrorState,
+      setPublishingState,
+      setSyncingState,
+      toggleModal,
+    } = this.props;
+
+    JobStatus.updateFooterStatus(jobKey).then((response) => {
+      const { status } = response.data.jobStatus;
+
+      if ((status === 'started') || (status === 'queued')) {
+        const { jobMetadata } = response.data.jobStatus;
+        const jobMetaDataParsed = JSON.parse(jobMetadata);
+        setTimeout(() => {
+          this._fetchData(jobKey);
+        }, 1000);
+      }
+
+      if (status === 'finished') {
+        setTimeout(() => {
+          if (setPublishingState) {
+            setPublishingState(owner, name, false);
+          }
+          setSyncingState(false);
+          resetPublishState(false);
+        }, 1000);
+      }
+
+      if (status === 'failed') {
+        const { jobMetadata } = response.data.jobStatus;
+        const jobMetaDataParsed = JSON.parse(jobMetadata);
+        const { failureMessage } = response.data.jobStatus;
+        setPublishErrorState(response.data.jobStatus.failureMessage, jobMetaDataParsed);
+        if (setPublishingState) {
+          setPublishingState(owner, name, false);
+        }
+
+        setSyncingState(false);
+
+        resetPublishState(false);
+      }
+    });
+  }
 
   /**
   * Method handles modalVisibility callback.
@@ -143,7 +195,7 @@ class VisibilityModal extends Component<Props> {
 
       setTimeout(() => {
         toggleModal();
-      }, 1000)
+      }, 1000);
     } else {
       this._transition(
         ERROR,
@@ -160,24 +212,28 @@ class VisibilityModal extends Component<Props> {
   *  @return {}
   */
   _modifyVisibility = () => {
-    const { header } = this.props;
+    const { header, toggleModal } = this.props;
     const { isPublic } = this.state;
 
     if (header === 'Publish') {
       const { currentServer } = this.context;
       const { baseUrl } = currentServer;
-      this._transition(
-        PUBLISHING,
-        {},
-      );
+      // TODO add back in when updating progress
+      // this._transition(
+      //   PUBLISHING,
+      //   {},
+      // );
       publish(baseUrl, this.props, isPublic, this._publishCallback);
     } else {
-      this._transition(
-        PUBLISHING,
-        {},
-      );
+      // TODO add back in when updating progress
+      // this._transition(
+      //   PUBLISHING,
+      //   {},
+      // );
       changeVisibility(this.props, isPublic, this._modifyVisibilityCallback);
     }
+
+    toggleModal();
   }
 
   static contextType = ServerContext;
@@ -186,6 +242,7 @@ class VisibilityModal extends Component<Props> {
     const {
       buttonText,
       header,
+      isVisible,
       modalStateValue,
       name,
       owner,
@@ -217,7 +274,7 @@ class VisibilityModal extends Component<Props> {
           modalStateValue={modalStateValue}
           modifyVisibility={this._modifyVisibility}
           setPublic={this._setPublic}
-          toggleModal={this._toggleModal}
+          toggleModal={toggleModal}
           visibility={visibility}
         />
       ),
@@ -250,6 +307,10 @@ class VisibilityModal extends Component<Props> {
         />
       ),
     };
+
+    if (!isVisible) {
+      return null;
+    }
 
     if (stateMachine) {
       return (

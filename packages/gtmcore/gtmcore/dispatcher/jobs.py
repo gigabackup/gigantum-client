@@ -13,14 +13,14 @@ from gtmcore.labbook import LabBook
 from gtmcore.gitlib import RepoLocation
 
 from gtmcore.inventory.inventory import InventoryManager, InventoryException
-from gtmcore.inventory.branching import MergeConflict
+from gtmcore.inventory.branching import MergeError
 from gtmcore.inventory import Repository
 
 from gtmcore.environment import RepositoryManager
 from gtmcore.environment.repository import RepositoryLock
 from gtmcore.logging import LMLogger
 from gtmcore.workflows import ZipExporter, LabbookWorkflow, DatasetWorkflow, MergeOverride
-from gtmcore.configuration import Configuration
+from gtmcore.workflows.gitworkflows_utils import handle_git_feedback
 
 from gtmcore.dataset.storage.backend import UnmanagedStorageBackend
 
@@ -50,7 +50,8 @@ def publish_repository(repository: Repository, username: str, access_token: str,
         if percent_complete:
             current_job.meta['percent_complete'] = percent_complete
 
-        current_job.meta['feedback'] = msg
+        current_job.meta['feedback'] = handle_git_feedback(current_job.meta.get('feedback'), msg)
+
         current_job.save_meta()
 
     update_feedback("Publish task in queue")
@@ -83,7 +84,8 @@ def sync_repository(repository: Repository, username: str, override: MergeOverri
         if percent_complete:
             current_job.meta['percent_complete'] = percent_complete
 
-        current_job.meta['feedback'] = msg
+        current_job.meta['feedback'] = handle_git_feedback(current_job.meta.get('feedback'), msg)
+
         current_job.save_meta()
 
     try:
@@ -98,9 +100,10 @@ def sync_repository(repository: Repository, username: str, override: MergeOverri
                           id_token=id_token, pull_only=pull_only)
         logger.info(f"(Job {p} Completed sync_repository with cnt={cnt}")
         return cnt
-    except MergeConflict as me:
-        logger.exception(f"(Job {p}) Merge conflict: {me}")
-        raise
+    except MergeError as err:
+        # When sending the merge error up, we must set this special string so the
+        # UI pops up the merge conflict modal
+        raise MergeError(err)
 
 
 def import_labbook_from_remote(remote_url: str, username: str) -> str:
@@ -123,10 +126,9 @@ def import_labbook_from_remote(remote_url: str, username: str) -> str:
         job = get_current_job()
         if not job:
             return
-        if 'feedback' not in job.meta:
-            job.meta['feedback'] = msg
-        else:
-            job.meta['feedback'] = job.meta['feedback'] + f'\n{msg}'
+
+        job.meta['feedback'] = handle_git_feedback(job.meta.get('feedback'), msg)
+
         job.save_meta()
 
     remote = RepoLocation(remote_url, username)
@@ -153,6 +155,9 @@ def export_labbook_as_zip(labbook_path: str, lb_export_directory: str) -> str:
         lb = InventoryManager().load_labbook_from_directory(labbook_path)
         with lb.lock():
             path = ZipExporter.export_labbook(lb.root_dir, lb_export_directory)
+
+            # Replace path so it is host filesystem oriented
+            path = path.replace("/mnt/gigantum", os.environ['HOST_WORK_DIR'])
         return path
     except Exception as e:
         logger.exception(f"(Job {p}) Error on export_labbook_as_zip: {e}")
@@ -169,6 +174,9 @@ def export_dataset_as_zip(dataset_path: str, ds_export_directory: str) -> str:
         ds = InventoryManager().load_dataset_from_directory(dataset_path)
         with ds.lock():
             path = ZipExporter.export_dataset(ds.root_dir, ds_export_directory)
+
+            # Replace path so it is host filesystem oriented
+            path = path.replace("/mnt/gigantum", os.environ['HOST_WORK_DIR'])
         return path
     except Exception as e:
         logger.exception(f"(Job {p}) Error on export_dataset_as_zip: {e}")

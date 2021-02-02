@@ -1,0 +1,31 @@
+@import '~Styles/_imports.scss';
+
+.PublishSyncErrorModal {
+  height: 30em;
+  @include flex(space-between, column);
+
+  &__p {
+    &--error {
+      color: $orange;
+    }
+  }
+
+  &__h6 {
+    &--error {
+      color: $white;
+    }
+  }
+
+  &__buttons {
+    @include flex(flex-end, row);
+  }
+
+  &__error-details {
+    background-color: $slateBlue;
+    color: $white;
+    padding: 1em;
+    max-height: 15em;
+    overflow: auto;
+    margin: 1em 0;
+  }
+}

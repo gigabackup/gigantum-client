@@ -219,8 +219,7 @@ class RemoteLabbooks extends Component<Props> {
                 toggleModal={this._toggleDeleteModal}
                 remoteDelete
               />
-            )
-          }
+            )}
 
           <LoginPrompt
             showLoginPrompt={showLoginPrompt}

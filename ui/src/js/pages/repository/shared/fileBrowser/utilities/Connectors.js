@@ -162,7 +162,7 @@ const targetSource = {
         newPath = newKey + fileName;
         fileKey = props.fileKey;
       } else {
-        prepareUpload(dndItem, props, monitor, props.mutationData, component)
+        prepareUpload(dndItem, props, monitor, props.mutationData, component);
       }
     } else {
       // root folder upload
@@ -185,9 +185,7 @@ const targetSource = {
       const item = monitor.getItem();
       // check to see if it is an upload
       if (item.files) {
-
         prepareUpload(item, props, monitor, component.state.mutationData, component);
-
       } else { // else it's a move
         const dropResult = monitor.getDropResult();
         const currentKey = item.fileData.edge.node.key;
