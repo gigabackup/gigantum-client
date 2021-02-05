@@ -13,7 +13,7 @@ from gtmcore.container import container_for_context
 from gtmcore.mitmproxy.mitmproxy import MITMProxyOperations
 from gtmcore.container.jupyter import check_jupyter_reachable, start_jupyter
 from gtmcore.container.rserver import start_rserver, check_rstudio_reachable
-from gtmcore.container.bundledapp import start_bundled_app
+from gtmcore.container.bundledapp import start_bundled_app, check_bundled_app_reachable
 from gtmcore.logging import LMLogger
 from gtmcore.activity.services import start_labbook_monitor
 from gtmcore.environment.bundledapp import BundledAppManager
@@ -179,7 +179,7 @@ class StartDevTool(graphene.relay.ClientIDMutation):
         labbook_ip = project_container.query_container_ip()
         endpoint = f'http://{labbook_ip}:{tool_port}'
 
-        route_prefix = quote_plus(bundled_app['name'])
+        route_prefix = f"/{quote_plus(bundled_app['name'])}"
 
         matched_routes = router.get_matching_routes(endpoint, route_prefix)
 
@@ -190,19 +190,32 @@ class StartDevTool(graphene.relay.ClientIDMutation):
             suffix = matched_routes[0]
             run_command = False
 
+            try:
+                check_bundled_app_reachable(bundled_app['name'], labbook_ip, tool_port, suffix, 200)
+            except GigantumException:
+                # If you get here, the Custom App didn't respond, so it's probably a stale route?
+                logger.warning(f'Detected stale route. Attempting to restart Custom App and clean up route table.')
+                # Remove stale route
+                router.remove(suffix)
+                # Try re-starting app
+                run_command = True
+
         elif len(matched_routes) > 1:
             raise ValueError(f"Multiple {bundled_app['name']} instances found in route table "
                              f"for {str(labbook)}! Restart container.")
 
         if run_command:
-            # TODO: when this feature is completed, need to be sure to update route.add due to leading slash issue
+            external_rt_prefix = f"{route_prefix}/{unique_id()}"
             logger.info(f"Adding {bundled_app['name']} to route table for {str(labbook)}.")
-            suffix, _ = router.add(endpoint, route_prefix)
-            suffix = "/" + suffix
+            suffix, _ = router.add(endpoint, external_rt_prefix)
+            suffix = f"/{suffix}"
 
             # Start app
             logger.info(f"Starting {bundled_app['name']} in {str(labbook)}.")
-            start_bundled_app(labbook, username, bundled_app['command'], tag=container_override_id)
+            start_bundled_app(labbook, username, bundled_app['command'], external_rt_prefix, tag=container_override_id)
+
+            # Wait for the app to start
+            check_bundled_app_reachable(bundled_app['name'], labbook_ip, tool_port, external_rt_prefix, 200)
 
         return suffix
 

@@ -22,6 +22,7 @@
     "react/static-property-placement": 0,
     "react/state-in-constructor": 0,
     "no-restricted-globals": 0,
+    "no-useless-escape": 0,
     "import/no-cycle": 2,
     "import/no-self-import": 2,
     "class-methods-use-this": 1,
