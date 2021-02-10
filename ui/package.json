@@ -138,7 +138,7 @@
     "simplemde": "^1.11.2",
     "uglifyjs-webpack-plugin": "^2.0.1",
     "uuid": "^3.1.0",
-    "webpack-bundle-analyzer": "^3.3.2",
+    "webpack-bundle-analyzer": "^4.0.0",
     "whatwg-encoding": "1.0.5",
     "worker-loader": "^2.0.0",
     "worker-plugin": "^3.1.0",
