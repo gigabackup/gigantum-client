@@ -10,4 +10,6 @@ class GigantumConstants(enum.Enum):
     DEFAULT_FILE_NAME = 'requirements.txt'
     HOME_DIRECTORY = '~/gigantum'
     UNTRACKED_FOLDER = 'untracked'
+    CACHE_FOLDER = '.labmanager'
+    DATASETS_FOLDER = 'datasets'
 

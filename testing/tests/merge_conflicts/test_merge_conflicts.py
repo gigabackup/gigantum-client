@@ -40,7 +40,7 @@ class TestMergeConflicts:
         assert project_list is not None, "Could not load Project Listing Page"
 
         # Get project title
-        project_title = project_list.project_menu_component.get_project_name()
+        project_title = project_list.project_menu_component.get_title()
         assert project_title is not None, "Could not get the project title"
 
         # Set project details into remote project clean up fixture
@@ -196,7 +196,7 @@ class TestMergeConflicts:
         assert is_clicked, "Could not click Gigantum Hub tab"
 
         # Verify project in Gigantum Hub page
-        is_verified = project_list.gigantum_hub_component.verify_project_in_gigantum_hub(project_title)
+        is_verified = project_list.gigantum_hub_component.verify_title_in_gigantum_hub(project_title)
         assert is_verified, "Could not verify project in Gigantum Hub"
 
         # Click import button in Gigantum Hub page
@@ -332,7 +332,7 @@ class TestMergeConflicts:
         assert is_checked, "Could not close sync conflict modal"
 
         # Check for the presence of Sync complete pop up message
-        is_checked = project_list.project_listing_component.check_sync_complete_pop_up_presence()
+        is_checked = project_list.project_menu_component.check_sync_complete_pop_up_presence()
         assert is_checked, "Could not get Sync complete pop up window"
 
         # Monitor container status to go through Stopped -> Building
@@ -436,7 +436,7 @@ class TestMergeConflicts:
         assert is_checked, "Could not close sync conflict modal"
 
         # Check for the presence of Sync complete pop up message
-        is_checked = project_list.project_listing_component.check_sync_complete_pop_up_presence()
+        is_checked = project_list.project_menu_component.check_sync_complete_pop_up_presence()
         assert is_checked, "Could not get Sync complete pop up window"
 
         # Monitor container status to go through Stopped -> Building

@@ -39,14 +39,15 @@ class TestAddProjectPublishSyncDeleteImport:
         assert project_list is not None, "Could not load Project Listing Page"
 
         # Get project title
-        project_title = project_list.project_menu_component.get_project_name()
+        project_title = project_list.project_menu_component.get_title()
         assert project_title is not None, "Could not get the project title"
 
         # Add files into code data, input data and output data
         self.add_files(project_list, project_title)
 
         # Publish project
-        self.publish_project(project_list)
+        is_success_msg = ProjectUtility().publish_project(self.driver)
+        assert is_success_msg == ProjectConstants.SUCCESS.value, is_success_msg
 
         # Update files and sync
         self.update_files_and_sync(project_list)
@@ -133,37 +134,6 @@ class TestAddProjectPublishSyncDeleteImport:
         is_dropped = project_list.code_input_output_component.drag_and_drop_text_file_in_output_file_browser('created')
         assert is_dropped, "Could not drag and drop text file in to output file browser"
 
-    def publish_project(self, project_list):
-        """Logical separation of publish project functionality
-
-        Args:
-            project_list: The page with UI elements
-
-        """
-        # Click on project publish button
-        is_clicked = project_list.project_menu_component.click_publish_button()
-        assert is_clicked, "Could not click project publish button"
-
-        # Enable private mode in project publish window
-        is_enabled = project_list.project_menu_component.enable_private_mode()
-        assert is_enabled, "Could not enable private mode in project publish window"
-
-        # Click on publish button on publish window
-        is_clicked = project_list.project_menu_component.click_publish_window_button()
-        assert is_clicked, "Could not click project publish button on project publish window"
-
-        # Monitor container status to go through Stopped -> Publishing
-        is_status_changed = project_list.monitor_container_status("Publishing", 60)
-        assert is_status_changed, "Could not get Publishing status"
-
-        # Monitor container status to go through Publishing -> Stopped
-        is_status_changed = project_list.monitor_container_status("Stopped", 60)
-        assert is_status_changed, "Could not get Stopped status"
-
-        # Check private lock icon presence
-        is_checked = project_list.project_menu_component.check_private_lock_icon_presence()
-        assert is_checked, "Could not found private lock icon presence"
-
     def update_files_and_sync(self, project_list):
         """Logical separation of updates files and sync
 
@@ -219,7 +189,7 @@ class TestAddProjectPublishSyncDeleteImport:
         assert is_clicked, "Could not click Gigantum Hub tab"
 
         # Verify project in Gigantum Hub page
-        is_verified = project_list.gigantum_hub_component.verify_project_in_gigantum_hub(project_title)
+        is_verified = project_list.gigantum_hub_component.verify_title_in_gigantum_hub(project_title)
         assert is_verified, "Could not verify project in Gigantum Hub"
 
         # Click import button in Gigantum Hub page
@@ -263,7 +233,7 @@ class TestAddProjectPublishSyncDeleteImport:
         assert is_clicked, "Could not click Gigantum Hub tab"
 
         # Verify project in Gigantum Hub page
-        is_verified = project_list.gigantum_hub_component.verify_project_in_gigantum_hub(project_title)
+        is_verified = project_list.gigantum_hub_component.verify_title_in_gigantum_hub(project_title)
         assert is_verified, "Could not verify project in Gigantum Hub"
 
         # Click delete button in Gigantum Hub page
@@ -271,11 +241,11 @@ class TestAddProjectPublishSyncDeleteImport:
         assert is_clicked, "Could not click delete button in Gigantum Hub page"
 
         # Get project title from delete project window in Gigantum Hub page
-        project_name = project_list.gigantum_hub_component.get_project_title()
+        project_name = project_list.gigantum_hub_component.get_title()
         assert project_name is not None, "Could not get project title in Gigantum Hub page"
 
         # Input project title in delete window on Gigantum Hub page
-        is_typed = project_list.gigantum_hub_component.input_project_title(project_name)
+        is_typed = project_list.gigantum_hub_component.input_title(project_name)
         assert is_typed, "Could not type project title in delete window on Gigantum Hub page"
 
         # Click delete project button in delete window on Gigantum Hub page
@@ -287,7 +257,7 @@ class TestAddProjectPublishSyncDeleteImport:
         assert is_verified, "Could not close delete modal"
 
         # Verify project is not exist in Gigantum Hub page
-        is_verified = project_list.gigantum_hub_component.verify_project_in_gigantum_hub(project_title)
+        is_verified = project_list.gigantum_hub_component.verify_title_in_gigantum_hub(project_title)
         assert not is_verified, "Project is still exist in the Gigantum Hub"
 
         # wait ~5 seconds to guarantee server side deletion completes
@@ -298,5 +268,5 @@ class TestAddProjectPublishSyncDeleteImport:
         assert is_clicked, "Could not click Gigantum Hub tab"
 
         # Verify project is not exist in Gigantum Hub page
-        is_verified = project_list.gigantum_hub_component.verify_project_in_gigantum_hub(project_title)
+        is_verified = project_list.gigantum_hub_component.verify_title_in_gigantum_hub(project_title)
         assert not is_verified, "Project is still exist in the Gigantum Hub"

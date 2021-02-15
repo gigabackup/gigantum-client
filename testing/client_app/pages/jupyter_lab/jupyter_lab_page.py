@@ -182,3 +182,70 @@ class JupyterLabPage(BasePage):
     def close_tab(self, url, parent_tab) -> bool:
         """ Closes current tab and switches to parent"""
         return self.close_current_tab(url, parent_tab)
+
+    def click_folder_path_icon(self) -> bool:
+        """ Performs click action on folder path icon
+
+        Returns: returns the result of click action
+
+        """
+        element = "//body/div[@id='main']/div[@id='jp-main-content-panel']/div[@id='jp-main-split-panel']/" \
+                  "div[@id='jp-left-stack']/div[@id='filebrowser']/div[2]/span[1]/*[1]"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            folder_path_icon = self.get_locator(LocatorType.XPath, element)
+            folder_path_icon.click()
+            return True
+        return False
+
+    def click_folder(self, folder_title: str) -> bool:
+        """ Performs click action on folder
+
+        Args:
+            folder_title: Name of the folder to be click
+
+        Returns: returns the result of click action
+
+        """
+        action = ActionChains(self.driver)
+        element = f"//li[@class='jp-DirListing-item']/span[contains(text(), '{folder_title}')]"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            folder = self.get_locator(LocatorType.XPath, element)
+            if folder is not None:
+                action.double_click(folder).perform()
+                return True
+        return False
+
+    def click_file(self, file_title: str) -> bool:
+        """ Performs click action on file
+
+        Args:
+            file_title: Name of the file to be click
+
+        Returns: returns the result of click action
+
+        """
+        action = ActionChains(self.driver)
+        element = f"//li[@class='jp-DirListing-item']/span[contains(text(), '{file_title}')]"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            file = self.get_locator(LocatorType.XPath, element)
+            if file is not None:
+                action.double_click(file).perform()
+                return True
+        return False
+
+    def verify_file_content(self, file_content) -> bool:
+        """ verify file contents
+
+        Args:
+            file_content: Content of the file to be verified
+
+        Returns: returns the result of verification
+
+        """
+        element = "//div[@class='CodeMirror-code']/div/pre/span"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            file_content_element = self.get_locator(LocatorType.XPath, element)
+            if file_content_element is not None:
+                if file_content == file_content_element.get_text().strip():
+                    return True
+        return False

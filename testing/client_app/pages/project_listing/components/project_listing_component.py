@@ -75,25 +75,4 @@ class ProjectListingComponent(BaseComponent):
                         return True
         return False
 
-    def check_sync_complete_pop_up_presence(self) -> bool:
-        """ Check for the presence of sync complete pop up message
-
-        Returns: returns True if the element is present
-
-        """
-        element = "//p[contains(text(), 'Sync complete')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
-            return True
-        return False
-
-    def check_sync_complete_pop_up_absence(self) -> bool:
-        """ Check for the absence of sync complete pop up message
-
-        Returns: returns True if the element is not present
-
-        """
-        element = "//p[contains(text(), 'Sync complete')]"
-        if self.check_element_absence(LocatorType.XPath, element, 30):
-            return True
-        return False
 

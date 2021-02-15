@@ -15,17 +15,17 @@ class ProjectMenuComponent(BaseComponent):
     def __init__(self, driver: webdriver, component_data: ComponentModel) -> None:
         super(ProjectMenuComponent, self).__init__(driver, component_data)
 
-    def get_project_name(self) -> str:
-        """ Get the current project name
+    def get_title(self) -> str:
+        """ Get the title from the listing page
 
-        Returns: returns project name
+        Returns: returns title
 
         """
         element = "//div[@class='TitleSection__namespace-title']"
-        project_title = self.get_locator(LocatorType.XPath, element)
-        if project_title is not None:
-            project_title = project_title.get_text().split('/')[-1].strip()
-            return project_title
+        title = self.get_locator(LocatorType.XPath, element)
+        if title is not None:
+            title = title.get_text().split('/')[-1].strip()
+            return title
 
     def click_code_data_tab(self) -> bool:
         """ Performs click event on code data tab.
@@ -33,7 +33,7 @@ class ProjectMenuComponent(BaseComponent):
         Returns: returns the result of click action
 
         """
-        element = f"//li[@id='code']"
+        element = "//li[@id='code']"
         if self.check_element_presence(LocatorType.XPath, element, 30):
             code_data_tab = self.get_locator(LocatorType.XPath, element)
             code_data_tab.click()
@@ -46,7 +46,7 @@ class ProjectMenuComponent(BaseComponent):
         Returns: returns the result of click action
 
         """
-        element = f"//li[@id='inputData']"
+        element = "//li[@id='inputData']"
         if self.check_element_presence(LocatorType.XPath, element, 30):
             input_data_tab = self.get_locator(LocatorType.XPath, element)
             input_data_tab.click()
@@ -59,7 +59,7 @@ class ProjectMenuComponent(BaseComponent):
         Returns: returns the result of click action
 
         """
-        element = f"//li[@id='outputData']"
+        element = "//li[@id='outputData']"
         if self.check_element_presence(LocatorType.XPath, element, 30):
             output_data_tab = self.get_locator(LocatorType.XPath, element)
             output_data_tab.click()
@@ -149,7 +149,7 @@ class ProjectMenuComponent(BaseComponent):
         Returns: returns the result of click action
 
         """
-        element = f"//button[contains(text(), 'Delete Project')]"
+        element = "//button[contains(text(), 'Delete Project')]"
         menu_project_delete = self.get_locator(LocatorType.XPath, element)
         if menu_project_delete is not None:
             menu_project_delete.click()
@@ -162,9 +162,68 @@ class ProjectMenuComponent(BaseComponent):
         Returns: returns the result of click action
 
         """
-        element = f"//button[contains(text(), 'Collaborators')]"
+        element = "//button[contains(text(), 'Collaborators')]"
         btn_collaborators = self.get_locator(LocatorType.XPath, element)
         if btn_collaborators is not None:
             btn_collaborators.click()
+            return True
+        return False
+
+    def check_upload_complete_pop_up_presence(self) -> bool:
+        """ Check for the presence of upload complete pop up message
+
+        Returns: returns True if the element is present
+
+        """
+        element = "//p[@class='FooterMessage__title FooterMessage__title--collapsed' and " \
+                  "text()='Upload complete!']"
+        if self.check_element_presence(LocatorType.XPath, element, 40):
+            return True
+        return False
+
+    def check_upload_complete_pop_up_absence(self) -> bool:
+        """ Check for the absence of upload complete pop up message
+
+        Returns: returns True if the element is not present
+
+        """
+        element = "//p[@class='FooterMessage__title FooterMessage__title--collapsed' and " \
+                  "text()='Upload complete!']"
+        if self.check_element_absence(LocatorType.XPath, element, 40):
+            return True
+        return False
+
+    def check_sync_complete_pop_up_presence(self) -> bool:
+        """ Check for the presence of sync complete pop up message
+
+        Returns: returns True if the element is present
+
+        """
+        element = "//p[contains(text(), 'Sync complete')]"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            return True
+        return False
+
+    def check_sync_complete_pop_up_absence(self) -> bool:
+        """ Check for the absence of sync complete pop up message
+
+        Returns: returns True if the element is not present
+
+        """
+        element = "//p[contains(text(), 'Sync complete')]"
+        if self.check_element_absence(LocatorType.XPath, element, 30):
+            return True
+        return False
+
+    def click_projects_menu(self) -> bool:
+        """Performs click action on projects menu
+
+        Returns: returns the result of click action
+
+        """
+        element = "//a[contains(text(), 'Projects')]"
+        projects_menu = self.get_locator(LocatorType.XPath, element)
+        if projects_menu is not None:
+            projects_menu.click()
             return True
         return False
