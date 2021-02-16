@@ -116,6 +116,7 @@ class VisibilityModal extends Component<Props> {
       if (setPublishingState) {
         setPublishingState(owner, name, false);
       }
+      setPublishErrorState('Project failed to publish', error[0].message);
 
       resetPublishState(false);
     }

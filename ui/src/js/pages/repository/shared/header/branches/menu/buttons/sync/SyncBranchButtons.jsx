@@ -51,6 +51,7 @@ type Props = {
   disableDropdown: boolean,
   handleSyncButton: Function,
   isLocked: boolean,
+  publishSyncError: boolean,
   showPullOnly: boolean,
   syncTooltip: string,
   upToDate: boolean,
@@ -66,6 +67,7 @@ const SyncBranchButtons = (props: Props) => {
     disableDropdown,
     handleSyncButton,
     isLocked,
+    publishSyncError,
     showPullOnly,
     syncTooltip,
     upToDate,
@@ -83,7 +85,8 @@ const SyncBranchButtons = (props: Props) => {
    || backupInProgress;
   const isCommitsOutOfSync = !upToDate && allowSync
     && (activeBranch.commitsAhead !== undefined)
-    && (activeBranch.commitsAhead !== null);
+    && (activeBranch.commitsAhead !== null)
+    && !publishSyncError;
 
   // declare functions here
   /**
@@ -125,11 +128,12 @@ const SyncBranchButtons = (props: Props) => {
   });
   const syncCSS = classNames({
     'Btn--branch Btn--action SyncBranchButtons__btn': true,
-    'SyncBranchButtons__btn--publish': !defaultRemote,
-    'SyncBranchButtons__btn--pull': showPullOnly,
+    'SyncBranchButtons__btn--publish': !defaultRemote && !publishSyncError,
+    'SyncBranchButtons__btn--pull': showPullOnly && !publishSyncError,
     'SyncBranchButtons__btn--upToDate': defaultRemote
       && (upToDate || (activeBranch.commitsAhead === undefined) || isLocked)
-      && !showPullOnly,
+      && !showPullOnly && !publishSyncError,
+    'SyncBranchButtons__btn--error': publishSyncError,
     'Tooltip-data': !commitsHovered,
   });
   return (
@@ -168,6 +172,8 @@ const SyncBranchButtons = (props: Props) => {
                )}
            </div>
          )}
+        { publishSyncError
+            && <div className="SyncBranchButtons__icon SyncBranchButtons__icon--error" />}
         <div className="Btn--branch--text">{syncButtonText}</div>
       </button>
 

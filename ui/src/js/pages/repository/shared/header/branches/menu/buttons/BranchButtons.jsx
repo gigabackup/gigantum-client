@@ -25,6 +25,7 @@ type Props = {
   isLocked: boolean,
   name: string,
   owner: string,
+  publishSyncError: boolean,
   section: Object,
   sectionType: string,
   setBranchUptodate: Function,
@@ -49,6 +50,7 @@ const BranchButtons = (props: Props) => {
     isLocked,
     name,
     owner,
+    publishSyncError,
     section,
     sectionType,
     setBranchUptodate,
@@ -110,6 +112,7 @@ const BranchButtons = (props: Props) => {
             disableDropdown={disableDropdown}
             handleSyncButton={handleSyncButton}
             isLocked={isLocked}
+            publishSyncError={publishSyncError}
             showPullOnly={showPullOnly}
             syncTooltip={syncTooltip}
             upToDate={upToDate}

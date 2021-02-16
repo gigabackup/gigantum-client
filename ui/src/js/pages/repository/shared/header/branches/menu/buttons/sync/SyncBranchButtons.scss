@@ -149,4 +149,14 @@ $dropBoxWidth: 250px;
       }
     }
   }
+
+  &__icon {
+    height: 24px;
+    width: 24px;
+    &--error {
+      background: url(~Images/icons/exclamation-orange.svg) no-repeat center center;
+      background-size: 20px;
+    }
+
+  }
 }

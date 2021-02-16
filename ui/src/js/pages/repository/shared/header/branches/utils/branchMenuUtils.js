@@ -12,6 +12,25 @@ const extractActiveBranch = (branches) => {
 };
 
 /**
+  Method returns sync/publish button state based on,
+  if there is a remote available or user only has pull access
+  @param {String} defaultRemote
+  @param {Boolean} isPullOnly
+  @return {String}
+*/
+const getSyncOrPublish = (defaultRemote, isPullOnly) => {
+  if (defaultRemote) {
+    return 'Sync';
+  }
+
+  if (isPullOnly) {
+    return 'Pull';
+  }
+
+  return 'Publish';
+};
+
+/**
   @param {Object} props
   @param {Object} data
   Gets sync tooltip
@@ -32,8 +51,7 @@ const getSyncTooltip = (data, currentServer) => {
   const sectionCollabs = (collaborators && collaborators[section.name]) || null;
   const isPullOnly = defaultRemote && !hasWriteAccess && sectionCollabs;
 
-  let syncOrPublish = defaultRemote ? 'Sync' : 'Publish';
-  syncOrPublish = isPullOnly ? 'Pull' : syncOrPublish;
+  const syncOrPublish = getSyncOrPublish(defaultRemote, syncOrPublish);
   const { backupInProgress, name } = currentServer;
   const repositoryType = isDataset ? 'Dataset' : 'Project';
 
@@ -124,14 +142,16 @@ const checkForWriteAccess = (
 
 export {
   checkForWriteAccess,
-  getLocalDatasets,
-  getSyncTooltip,
   extractActiveBranch,
+  getLocalDatasets,
+  getSyncOrPublish,
+  getSyncTooltip,
 };
 
 export default {
   checkForWriteAccess,
-  getLocalDatasets,
-  getSyncTooltip,
   extractActiveBranch,
+  getLocalDatasets,
+  getSyncOrPublish,
+  getSyncTooltip,
 };
