@@ -22,7 +22,7 @@ import Branches from 'Pages/repository/shared/sidePanel/Branches';
 import VisibilityModal from 'Pages/repository/shared/modals/visibility/VisibilityModal';
 import PublishDatasetsModal from 'Pages/repository/shared/modals/publishDataset/PublishDatasetsModal';
 import LoginPrompt from 'Pages/repository/shared/modals/LoginPrompt';
-import SyncWarning from 'Components/modal/syncWarning/SyncWarning';
+import SyncWarning from 'Pages/repository/shared/modals/syncWarning/SyncWarning';
 import PublishSyncErrorModal from './modal/PublishSyncErrorModal';
 // utils
 import BranchMutations from '../../utils/BranchMutations';
@@ -626,7 +626,6 @@ class BranchMenu extends Component<Props> {
     overrideLock,
   ) => {
     // TODO refactor this function
-
     const {
       defaultRemote,
       section,
@@ -643,7 +642,7 @@ class BranchMenu extends Component<Props> {
       return;
     }
 
-    if (isLocked && !overrideLock) {
+    if (isLocked && (sectionType === 'labbook') && !overrideLock) {
       const warningAction = defaultRemote ? 'sync' : 'publish';
       this.setState({ showSyncWarning: true, warningAction });
       return;
@@ -873,7 +872,7 @@ class BranchMenu extends Component<Props> {
     && (activeBranch.commitsBehind === 0);
    const allowSync = !((activeBranch.branchName !== 'master') && !defaultRemote)
     && hasWriteAccess && !isLockedSync;
-   const allowSyncPull = !((activeBranch.branchName !== 'master') && !defaultRemote) && !isLockedSync
+   const allowSyncPull = !((activeBranch.branchName !== 'master') && !defaultRemote) && (!isLockedSync)
     && defaultRemote;
    const allowReset = !isLocked
     && !upToDate
@@ -957,16 +956,7 @@ class BranchMenu extends Component<Props> {
    return (
      <div className={branchMenuCSS}>
        <div className="BranchMenu__dropdown">
-         {
-            showSyncWarning
-            && (
-              <SyncWarning
-                toggleSyncWarningModal={this._toggleSyncWarningModal}
-                handleSync={() => this._handleSyncButton(showPullOnly, allowSync, allowSyncPull, null, isLocked, true)}
-                warningAction={warningAction}
-              />
-            )
-          }
+
          <div
            onClick={() => this._toggleBranchSwitch()}
            data-tooltip={switchTooltip}
@@ -1107,7 +1097,7 @@ class BranchMenu extends Component<Props> {
                <button
                  className={syncCSS}
                  disabled={syncButtonDisabled}
-                 onClick={() => { this._handleSyncButton(showPullOnly, allowSync, allowSyncPull, null, isLocked); }}
+                 onClick={() => { this._handleSyncButton(showPullOnly, allowSync, allowSyncPull, null, isLocked, false); }}
                  data-tooltip={syncTooltip}
                  type="button"
                >
@@ -1268,6 +1258,18 @@ class BranchMenu extends Component<Props> {
          data={publishSyncErrorData}
          isVisible={isPublishSyncErroModalVisible}
          remoteOperationPerformed={syncOrPublish}
+       />
+
+
+       <SyncWarning
+         allowSync={allowSync}
+         allowSyncPull={allowSyncPull}
+         handleSync={this._handleSyncButton}
+         isLocked={isLocked}
+         isVisible={showSyncWarning}
+         showPullOnly={showPullOnly}
+         toggleSyncWarningModal={this._toggleSyncWarningModal}
+         warningAction={warningAction}
        />
      </div>
 

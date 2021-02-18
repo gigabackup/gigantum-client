@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1656"
+changelog:
+  - type: NON_USER_FACING
+    description: Fixes dataset publishing bugs caused by project publish during running updates.

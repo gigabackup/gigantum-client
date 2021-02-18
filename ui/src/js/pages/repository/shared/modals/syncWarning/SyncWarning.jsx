@@ -6,17 +6,31 @@ import Modal from 'Components/modal/Modal';
 import './SyncWarning.scss';
 
 type Props = {
+  allowSync: boolean,
+  allowSyncPull: boolean,
   handleSync: Function,
+  isLocked: boolean,
+  isVisible: boolean,
+  showPullOnly: boolean,
   toggleSyncWarningModal: Function,
   warningAction: string,
 }
 
 const SyncWarning = ({
+  allowSync,
+  allowSyncPull,
   handleSync,
+  isLocked,
+  isVisible,
+  showPullOnly,
   toggleSyncWarningModal,
   warningAction,
 }: Props) => {
   const capitalWarningAction = warningAction.charAt(0).toUpperCase() + warningAction.slice(1);
+
+  if (!isVisible) {
+    return null;
+  }
 
   return (
     <Modal
@@ -72,7 +86,7 @@ const SyncWarning = ({
           </button>
           <button
             className="Btn Btn--primary"
-            onClick={handleSync}
+            onClick={() => handleSync(showPullOnly, allowSync, allowSyncPull, null, isLocked, true)}
             type="button"
           >
             Continue
