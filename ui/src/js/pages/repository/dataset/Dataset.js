@@ -309,6 +309,7 @@ class Dataset extends Component<Props> {
               dataset={dataset}
               sectionType="dataset"
               isLocked={isLocked}
+              isLockedSync={isLocked}
               {...this.props}
               owner={owner}
               name={name}

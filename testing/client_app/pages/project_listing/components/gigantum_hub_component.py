@@ -27,23 +27,23 @@ class GigantumHubComponent(BaseComponent):
             return True
         return False
 
-    def verify_project_in_gigantum_hub(self, project_title) -> bool:
-        """ Verify whether the project is present in the Gigantum Hub page or not
+    def verify_title_in_gigantum_hub(self, title_text) -> bool:
+        """ Verify whether the title is present in the Gigantum Hub page or not
 
         Args:
-            project_title: Title of the current project
+            title_text: Title of the current project or dataset
 
-        Returns: returns the result of project verification
+        Returns: returns the result of title verification
 
         """
         element = "//div[@data-selenium-id='RemoteLabbookPanel']"
         if self.check_element_presence(LocatorType.XPath, element, 30):
-            projects_list = self.driver.find_elements_by_xpath(element)
-            if projects_list is not None:
-                for project in projects_list:
-                    project_name = project.find_element_by_xpath\
+            title_list = self.driver.find_elements_by_xpath(element)
+            if title_list is not None:
+                for title in title_list:
+                    title_name = title.find_element_by_xpath\
                         (".//div[@class='RemoteLabbooks__row RemoteLabbooks__row--text']/div[1]")
-                    if project_title == project_name.get_text().strip():
+                    if title_text == title_name.get_text().strip():
                         return True
         return False
 
@@ -93,30 +93,30 @@ class GigantumHubComponent(BaseComponent):
                             return True
         return False
 
-    def get_project_title(self) -> str:
-        """ Fetch project title from the delete project window
+    def get_title(self) -> str:
+        """ Fetch title from the delete window
 
-        Returns: returns project title
+        Returns: returns title
 
         """
         element = "//div[@class='Modal__sub-container']/div[1]"
         if self.check_element_presence(LocatorType.XPath, element, 30):
             div_text = self.get_locator(LocatorType.XPath, element)
-            project_title = div_text.find_element_by_xpath(".//b")
-            return project_title.get_text().strip()
+            title = div_text.find_element_by_xpath(".//b")
+            return title.get_text().strip()
 
-    def input_project_title(self, project_title) -> bool:
-        """Input project title for deletion
+    def input_title(self, title) -> bool:
+        """Input title for deletion
 
         Args:
-            project_title: Title of the current project
+            title: Title of the current project or dataset
 
-        Returns:
+        Returns:returns the result of input action
 
         """
         delete_input = self.get_locator(LocatorType.XPath, "//input[@id='deleteInput']")
         if delete_input is not None:
-            delete_input.send_keys(project_title)
+            delete_input.send_keys(title)
             return True
         return False
 
@@ -135,7 +135,7 @@ class GigantumHubComponent(BaseComponent):
         return False
 
     def verify_delete_modal_closed(self, wait_time: int) -> bool:
-        """ Verify delete modal close after project deletion
+        """ Verify delete modal close after project / dataset deletion
 
         Args:
             wait_time: Time period for which the wait should continue

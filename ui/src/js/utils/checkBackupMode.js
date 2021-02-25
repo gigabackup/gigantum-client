@@ -12,7 +12,6 @@ import { pollForServerAvalability } from './currentServerStatus';
 const checkBackupMode = () => {
   const callback = (currentServer, error) => {
     const { backupInProgress, id } = currentServer;
-    console.log(currentServer);
     updateCurrentServer(id, backupInProgress, environment);
   };
 

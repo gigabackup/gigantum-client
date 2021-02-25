@@ -198,7 +198,7 @@ class ContainerStatus extends Component<Props> {
     const constainerStatus = (status === 'Rebuild') ? 'Stopped' : status;
     const cssClass = ((status === 'Building') && (state.status === 'Canceling'))
       ? 'Canceling'
-      : cssClass;
+      : status;
 
     return { constainerStatus, cssClass };
   }

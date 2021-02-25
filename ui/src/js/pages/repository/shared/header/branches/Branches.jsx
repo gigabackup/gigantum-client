@@ -20,6 +20,7 @@ import ForceSync from 'Pages/repository/shared/modals/force/ForceSync';
 import VisibilityModal from 'Pages/repository/shared/modals/visibility/VisibilityModal';
 import PublishDatasetsModal from 'Pages/repository/shared/modals/publishDataset/PublishDatasetsModal';
 import LoginPrompt from 'Pages/repository/shared/modals/LoginPrompt';
+import SyncWarning from 'Pages/repository/shared/modals/syncWarning/SyncWarning';
 import BranchMenu from './menu/BranchMenu';
 import BranchesSidePanel from './panel/BranchesSidePanel';
 import PublishSyncErrorModal from './modal/PublishSyncErrorModal';
@@ -35,14 +36,13 @@ import {
 } from './utils/branchMenuUtils';
 
 
-
-
 type Props = {
   branches: string,
   collaborators: Object,
   defaultRemote: string,
   isExporting: boolean,
   isLocked: boolean,
+  isLockedSync: boolean,
   section: {
     name: string,
     owner: string,
@@ -68,7 +68,9 @@ class Branches extends Component<Props> {
     publishSyncErrorData: null,
     pullOnly: false,
     showLoginPrompt: false,
+    showSyncWarning: false,
     switchingBranch: false,
+    warningAction: '',
   };
 
   branchMutations = new BranchMutations({
@@ -109,6 +111,7 @@ class Branches extends Component<Props> {
   *  @param {Boolean} - allowSync
   *  @param {Boolean} - allowSyncPull
   *  @param {Function} - passedSuccessCall
+  *  @param {Boolean} - overrideLock
   *  handles syncing or publishing the project
   *  @return {}
   */
@@ -117,11 +120,13 @@ class Branches extends Component<Props> {
     allowSync,
     allowSyncPull,
     passedSuccessCall,
+    overrideLock,
   ) => {
     // TODO refactor this function
 
     const {
       defaultRemote,
+      isLocked,
       section,
       sectionType,
       setBranchUptodate,
@@ -136,6 +141,14 @@ class Branches extends Component<Props> {
       return;
     }
 
+
+    if (isLocked && (sectionType === 'labbook') && !overrideLock) {
+      const warningAction = defaultRemote ? 'sync' : 'publish';
+      this.setState({ showSyncWarning: true, warningAction });
+      return;
+    }
+    this.setState({ syncMenuVisible: false, showSyncWarning: false });
+
     if (allowSync || (pullOnly && allowSyncPull)) {
       if (!defaultRemote) {
         this._togglePublishModal(!isDataset, false);
@@ -144,7 +157,7 @@ class Branches extends Component<Props> {
         const self = this;
         const data = {
           successCall: () => {
-            if (sectionType === 'labbook') {
+            if ((sectionType === 'labbook') && !isLocked) {
               buildImage((response, error) => {
                 if (error) {
                   console.error(error);
@@ -475,6 +488,13 @@ class Branches extends Component<Props> {
     });
   }
 
+  /**
+ * sets state for sync warning modal
+ */
+ _toggleSyncWarningModal = () => {
+   this.setState({ showSyncWarning: false });
+ }
+
 
   static contextType = ServerContext;
 
@@ -485,6 +505,7 @@ class Branches extends Component<Props> {
       collaborators,
       defaultRemote,
       isLocked,
+      isLockedSync,
       section,
       sectionId,
       sectionType,
@@ -503,6 +524,8 @@ class Branches extends Component<Props> {
       publishSyncErrorData,
       pullOnly,
       showLoginPrompt,
+      showSyncWarning,
+      warningAction,
     } = this.state;
     const {
       activeBranch,
@@ -523,10 +546,11 @@ class Branches extends Component<Props> {
     const upToDate = (activeBranch.commitsAhead === 0)
       && (activeBranch.commitsBehind === 0);
     const allowSync = !((activeBranch.branchName !== 'master') && !defaultRemote)
-      && !isLocked && hasWriteAccess;
-    const allowSyncPull = !((activeBranch.branchName !== 'master') && !defaultRemote) && !isLocked && defaultRemote;
+      && hasWriteAccess && !isLockedSync;
+    const allowSyncPull = !((activeBranch.branchName !== 'master') && !defaultRemote)
+      && defaultRemote && !isLockedSync;
     const showPullOnly = defaultRemote && !hasWriteAccess && !waitingOnCollabs;
-    const disableDropdown = !allowSyncPull || !defaultRemote || showPullOnly;
+    const disableDropdown = !allowSyncPull || !defaultRemote || showPullOnly || publishSyncError;
 
     const syncTooltip = this._getTooltipText(activeBranch, hasWriteAccess, upToDate);
     return (
@@ -543,6 +567,7 @@ class Branches extends Component<Props> {
           handleSyncButton={this._handleSyncButton}
           isableDropdown={disableDropdown}
           isDataset={isDataset}
+          isLockedSync={isLockedSync}
           publishSyncError={publishSyncError}
           showLoginPrompt={showLoginPrompt}
           showPullOnly={showPullOnly}
@@ -635,6 +660,17 @@ class Branches extends Component<Props> {
           data={publishSyncErrorData}
           isVisible={isPublishSyncErroModalVisible}
           remoteOperationPerformed={syncOrPublish}
+        />
+
+        <SyncWarning
+          allowSync={allowSync}
+          allowSyncPull={allowSyncPull}
+          handleSync={this._handleSyncButton}
+          isLocked={isLocked}
+          isVisible={showSyncWarning}
+          showPullOnly={showPullOnly}
+          toggleSyncWarningModal={this._toggleSyncWarningModal}
+          warningAction={warningAction}
         />
       </>
     );

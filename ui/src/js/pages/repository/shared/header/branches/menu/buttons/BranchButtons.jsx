@@ -23,6 +23,7 @@ type Props = {
   disableDropdown: boolean,
   handleSyncButton: Function,
   isLocked: boolean,
+  isLockedSync: boolean,
   name: string,
   owner: string,
   publishSyncError: boolean,
@@ -48,6 +49,7 @@ const BranchButtons = (props: Props) => {
     disableDropdown,
     handleSyncButton,
     isLocked,
+    isLockedSync,
     name,
     owner,
     publishSyncError,
@@ -112,6 +114,7 @@ const BranchButtons = (props: Props) => {
             disableDropdown={disableDropdown}
             handleSyncButton={handleSyncButton}
             isLocked={isLocked}
+            isLockedSync={isLockedSync}
             publishSyncError={publishSyncError}
             showPullOnly={showPullOnly}
             syncTooltip={syncTooltip}

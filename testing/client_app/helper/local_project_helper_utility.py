@@ -6,7 +6,6 @@ from configuration.configuration import ConfigurationManager
 from framework.factory.models_enums.constants_enums import LoginUser
 from client_app.constant_enums.constants_enums import GigantumConstants
 from collections import namedtuple
-from typing import Optional
 from string import Template
 import requests
 
@@ -51,7 +50,7 @@ class ProjectHelperUtility(object):
         Args:
             directory_name: Name of the directory to remove
         """
-        project_folder_names = self.__get_folder_names()
+        project_folder_names = self.get_folder_names()
         user_directory = project_folder_names.home_dir / GigantumConstants.SERVERS_FOLDER.value / project_folder_names.\
             default_server / project_folder_names.username / project_folder_names.username / directory_name
         user_projects = user_directory.glob('p-*')
@@ -70,7 +69,7 @@ class ProjectHelperUtility(object):
         Returns: returns the result of verification
 
         """
-        project_folder_names = self.__get_folder_names()
+        project_folder_names = self.get_folder_names()
         user_directory = project_folder_names.home_dir / GigantumConstants.SERVERS_FOLDER.value / project_folder_names.\
             default_server / project_folder_names.username / project_folder_names.username / GigantumConstants.\
             PROJECTS_FOLDER.value
@@ -102,13 +101,13 @@ class ProjectHelperUtility(object):
         """ Move file to untracked folder
 
         Args:
-            folder_name:
-            project_title:
+            folder_name: Name of the folder
+            project_title: Title of the current project
 
         Returns: returns the result of file move
 
         """
-        project_folder_names = self.__get_folder_names()
+        project_folder_names = self.get_folder_names()
         file_path = project_folder_names.home_dir / GigantumConstants.SERVERS_FOLDER.value / project_folder_names.\
             default_server / project_folder_names.username / project_folder_names.username/ GigantumConstants.\
             PROJECTS_FOLDER.value / project_title / folder_name
@@ -126,7 +125,7 @@ class ProjectHelperUtility(object):
 
         """
         directories = ['code', 'input', 'output']
-        project_folder_names = self.__get_folder_names()
+        project_folder_names = self.get_folder_names()
         user_directory = project_folder_names.home_dir / GigantumConstants.SERVERS_FOLDER.value / project_folder_names.\
             default_server / project_folder_names.username / project_folder_names.username / GigantumConstants.\
             PROJECTS_FOLDER.value / project_title
@@ -148,7 +147,7 @@ class ProjectHelperUtility(object):
         Returns:
 
         """
-        project_folder_names = self.__get_folder_names()
+        project_folder_names = self.get_folder_names()
         if is_collaborator:
             collaborator_credentials = ConfigurationManager.getInstance().get_user_credentials(LoginUser.User2)
             username = collaborator_credentials.user_name
@@ -163,7 +162,7 @@ class ProjectHelperUtility(object):
             return False
         return True
 
-    def __get_folder_names(self) -> namedtuple:
+    def get_folder_names(self) -> namedtuple:
         """ Return folder names for project path creation
 
         Returns: returns folder names as namedtuple
@@ -189,8 +188,6 @@ class ProjectHelperUtility(object):
             project_title: name of the Project to delete
             driver: driver instance
 
-        Returns:
-            bool
         """
         if ConfigurationManager.getInstance().get_app_setting("api_url"):
             api_url = ConfigurationManager.getInstance().get_app_setting("api_url")

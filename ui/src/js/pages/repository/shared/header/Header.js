@@ -49,6 +49,7 @@ const getBranches = (props) => {
 };
 
 type Props = {
+  auth: Object,
   branchName: string,
   branchesOpen: string,
   dataset: {
@@ -61,17 +62,17 @@ type Props = {
   isPublishing: boolean,
   isSticky: boolean,
   isSyncing: boolean,
+  isLocked: boolean,
+  isLockedSync: boolean,
   labbook: {
     name: string,
     owner: string,
   },
+  mergeFilter: boolean,
   modalVisible: boolean,
   sectionType: string,
-  toggleBranchesView: Function,
-  mergeFilter: boolean,
-  auth: Object,
-  isLocked: boolean,
   setBranchUptodate: Function,
+  toggleBranchesView: Function,
 };
 
 class Header extends Component<Props> {
@@ -202,6 +203,7 @@ class Header extends Component<Props> {
       mergeFilter,
       auth,
       isLocked,
+      isLockedSync,
       setBranchUptodate,
     } = this.props;
     const {
@@ -252,6 +254,7 @@ class Header extends Component<Props> {
                   branchesOpen={branchesOpen}
                   defaultRemote={section.defaultRemote}
                   isLocked={isLocked}
+                  isLockedSync={isLockedSync}
                   isSticky={isSticky}
                   mergeFilter={mergeFilter}
                   section={section}

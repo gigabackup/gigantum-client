@@ -29,6 +29,7 @@ type Props = {
   disableDropdown: boolean,
   handleSyncButton: Function,
   isLocked: boolean,
+  isLockedSync: boolean,
   isSticky: boolean,
   publishSyncError: boolean,
   section: {
@@ -61,6 +62,7 @@ const BranchMenu = (
     disableDropdown,
     handleSyncButton,
     isLocked,
+    isLockedSync,
     isSticky,
     publishSyncError,
     section,
@@ -112,6 +114,7 @@ const BranchMenu = (
         disableDropdown={disableDropdown}
         handleSyncButton={handleSyncButton}
         isLocked={isLocked}
+        isLockedSync={isLockedSync}
         publishSyncError={publishSyncError}
         section={section}
         sectionType={sectionType}

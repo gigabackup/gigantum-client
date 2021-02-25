@@ -94,7 +94,7 @@ const SyncBranchButtons = (props: Props) => {
   * @param {boolean} isPullOnly
   */
   const handleSync = (isPullOnly) => {
-    handleSyncButton(isPullOnly, allowSync, allowSyncPull);
+    handleSyncButton(isPullOnly, allowSync, allowSyncPull, null, false);
     updateMenuVisible(false);
   };
 
@@ -143,7 +143,7 @@ const SyncBranchButtons = (props: Props) => {
     >
       <button
         className={syncCSS}
-        onClick={() => { handleSyncButton(showPullOnly, allowSync, allowSyncPull); }}
+        onClick={() => { handleSyncButton(showPullOnly, allowSync, allowSyncPull, null, false); }}
         disabled={syncButtonDisabled}
         data-tooltip={syncTooltip}
         type="button"

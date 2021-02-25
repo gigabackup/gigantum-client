@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1661"
+changelog:
+  - type: NON_USER_FACING
+    description: Remove old npm install from fossa test, as it is not needed and was causing failures.

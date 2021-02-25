@@ -33,7 +33,7 @@ class ProjectDeleteComponent(BaseComponent):
         Args:
             project_title: Title of the current project
 
-        Returns:
+        Returns: returns the result of input action
 
         """
         delete_input = self.get_locator(LocatorType.XPath, "//input[@id='deleteInput']")
@@ -54,4 +54,15 @@ class ProjectDeleteComponent(BaseComponent):
             if btn_delete_project is not None and btn_delete_project.element_to_be_clickable():
                 btn_delete_project.execute_script("arguments[0].click();")
                 return True
+        return False
+
+    def check_delete_window_closed(self) -> bool:
+        """ Check for the absence of project delete window
+
+        Returns: returns the result of delete window presence check
+
+        """
+        element = "//div[@class='Icon Icon--delete']"
+        if self.check_element_absence(LocatorType.XPath, element, 30):
+            return True
         return False

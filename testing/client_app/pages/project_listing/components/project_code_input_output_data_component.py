@@ -107,3 +107,94 @@ class ProjectCodeInputOutputDataComponent(BaseComponent):
             return True
         return False
 
+    def click_link_dataset_button(self) -> bool:
+        """ Performs click action on link dataset button
+
+        Returns: returns the result of click action
+
+        """
+        element = "//button[contains(text(), 'Link Dataset')]"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            link_dataset_button = self.get_locator(LocatorType.XPath, element)
+            link_dataset_button.execute_script("arguments[0].click();")
+            return True
+        return False
+
+    def select_dataset(self, dataset_title):
+        """ Select dataset from the link dataset window
+
+        Args:
+            dataset_title: Title of the dataset to be linked
+
+        Returns: returns the result of dataset selection
+
+        """
+        element = "//div[@class='LinkModal__wrapper']"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            dataset_div_list = self.driver.find_elements_by_xpath(element)
+            for dataset_div in dataset_div_list:
+                dataset_title_element = dataset_div.find_element_by_xpath(".//h6[@class='LinkCard__header']/b")
+                if dataset_title == dataset_title_element.get_text().strip():
+                    dataset_div.execute_script("arguments[0].click();")
+                    return True
+        return False
+
+    def click_link_dataset_button_on_link_dataset_window(self):
+        """ Performs click action on link dataset button on link dataset window
+
+        Returns: returns the result of click action
+
+        """
+        element = "//button[@class='Btn ButtonLoader Btn Btn--last']"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            dataset_link_button = self.get_locator(LocatorType.XPath, element)
+            dataset_link_button.execute_script("arguments[0].click();")
+            return True
+        return False
+
+    def check_link_dataset_window_closed(self) -> bool:
+        """ Check for the absence of link dataset window
+
+        Returns: returns True if the element is not present
+
+        """
+        element = "//h4[@class='LinkModal__header-text' and text()='Link Dataset']"
+        if self.check_element_absence(LocatorType.XPath, element, 40):
+            return True
+        return False
+
+    def click_input_download_all_button(self):
+        """ Performs click action on download all button on input data tab
+
+        Returns: returns the result of click action
+
+        """
+        element = "//button[contains(text(), 'Download All')]"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            download_all_button = self.get_locator(LocatorType.XPath, element)
+            download_all_button.execute_script("arguments[0].click();")
+            return True
+        return False
+
+    def check_download_complete_pop_up_presence(self):
+        """ Check for the presence of download complete pop up
+
+        Returns: returns the result of pop up presence check
+
+        """
+        element = "//p[contains(text(), 'Download complete!')]"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            return True
+        return False
+
+    def verify_files_are_downloaded(self):
+        """ Verify files are downloaded or not
+
+        Returns: returns the result of click action
+
+        """
+        element = "//button[contains(text(), 'Downloaded')]"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            return True
+        return False
+

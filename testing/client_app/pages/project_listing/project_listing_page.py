@@ -212,7 +212,7 @@ class ProjectListingPage(BasePage):
     def click_submit_button(self) -> bool:
         """Click action for new project submit"""
         if self.__new_project_submit.is_enabled():
-            self.__new_project_submit.click()
+            self.__new_project_submit.execute_script("arguments[0].click();")
             return True
         return False
 
