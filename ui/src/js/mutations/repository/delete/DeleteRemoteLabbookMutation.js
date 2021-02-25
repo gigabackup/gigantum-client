@@ -59,11 +59,10 @@ export default function DeleteRemoteLabbookMutation(
         if (error) {
           console.log(error);
         }
-
         callback(response, error);
       },
       updater: (store, response) => {
-        if (parentID) {
+        if (parentID && response.deleteRemoteLabbook) {
           sharedUpdater(store, parentID, nodeID, connection);
         }
       },

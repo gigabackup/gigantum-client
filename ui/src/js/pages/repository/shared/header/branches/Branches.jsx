@@ -133,7 +133,8 @@ class Branches extends Component<Props> {
       setSyncingState,
     } = this.props;
     const { owner } = section;
-    const { isDataset, publishSyncError } = this.state;
+    const isDataset = sectionType === 'dataset';
+    const { publishSyncError } = this.state;
     const { buildImage } = this.branchMutations;
 
     if (publishSyncError) {

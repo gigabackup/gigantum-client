@@ -115,7 +115,7 @@ class Routes extends Component<Props> {
     @param {} -
   */
   _pollForBackupStatus = () => {
-    const callback = (currentServer, error) => {
+    const callback = (currentServer) => {
       const { relay } = this.props;
       const { environment } = relay;
       const { id, backupInProgress } = currentServer;

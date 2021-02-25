@@ -1,0 +1,5 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1653"
+changelog:
+  - type: NEW
+    description: Adds check for backup-in-progress to remote dataset and projects listings pages. Blocks and alerts about failing import and deletion.
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1589

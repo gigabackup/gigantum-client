@@ -5,13 +5,18 @@ import uuidv4 from 'uuid/v4';
 import Highlighter from 'react-highlight-words';
 import classNames from 'classnames';
 import Moment from 'moment';
+// context
+import ServerContext from 'Pages/ServerContext';
 // components
 import RepositoryTitle from 'Pages/dashboard/shared/title/RepositoryTitle';
+import ImportButton from 'Pages/dashboard/shared/buttons/import/ImportButton';
 // muations
 import ImportRemoteLabbookMutation from 'Mutations/repository/import/ImportRemoteLabbookMutation';
 import BuildImageMutation from 'Mutations/container/BuildImageMutation';
 // store
 import { setWarningMessage, setMultiInfoMessage } from 'JS/redux/actions/footer';
+// utils
+import { checkBackupMode } from 'JS/utils/checkBackupMode';
 // queries
 import UserIdentity from 'JS/Auth/UserIdentity';
 // components
@@ -102,12 +107,11 @@ class RemoteLabbookPanel extends Component<Props> {
               };
               setMultiInfoMessage(owner, labbookName, mulitMessageData);
 
-
               BuildImageMutation(
                 owner,
                 labbookName,
                 false,
-                (response, error) => {
+                (buildResponse, error) => {
                   if (error) {
                     const buildMessageData = {
                       id,
@@ -134,9 +138,13 @@ class RemoteLabbookPanel extends Component<Props> {
                 message: 'ERROR: Could not import remote Project',
                 isLast: null,
                 error: true,
-                messageBody: error,
+                messageBody: Array.isArray(error) ? error : [{ message: error }],
               };
-              setMultiInfoMessage(owner, labbookName, failureMessageData);
+              if (error.indexOf('backup in progress') > -1) {
+                checkBackupMode();
+              } else {
+                setMultiInfoMessage(owner, labbookName, failureMessageData);
+              }
             };
             self.setState({ isImporting: true });
 
@@ -229,102 +237,93 @@ class RemoteLabbookPanel extends Component<Props> {
     });
 
     return (
-      <div
-        key={edge.node.name}
-        className="Card Card--225 column-4-span-3 flex flex--column justify--space-between"
-      >
-        <div className="RemoteLabbooks__row RemoteLabbooks__row--icon">
-          { !(edge.node.visibility === 'local')
-            && (
-            <div
-              data-tooltip={`${edge.node.visibility}`}
-              className={`Tooltip-Listing RemoteLabbooks__${edge.node.visibility} Tooltip-data Tooltip-data--small`}
-            />
-            )}
-          { existsLocally
-            ? (
-              <button
-                type="button"
-                className="Btn__dashboard Btn--action Btn__dashboard--cloud Btn__Tooltip-data"
-                data-tooltip="This Project has already been imported"
-                disabled
-              >
-                Imported
-              </button>
-            )
-            : (
-              <button
-                type="button"
-                disabled={isImporting}
-                className="Btn__dashboard Btn--action Btn__dashboard--cloud-download"
-                onClick={() => this._importLabbook(edge.node.owner, edge.node.name)}
-              >
-                Import
-              </button>
-            )}
-
-          <button
-            type="button"
-            className={deleteCSS}
-            data-tooltip={deleteTooltipText}
-            disabled={deleteDisabled}
-            onClick={() => this._handleDelete(edge)}
+      <ServerContext.Consumer>
+        {value => (
+          <div
+            key={edge.node.name}
+            className="Card Card--225 column-4-span-3 flex flex--column justify--space-between"
           >
-            Delete
-          </button>
+            <div className="RemoteLabbooks__row RemoteLabbooks__row--icon">
+              { !(edge.node.visibility === 'local')
+                && (
+                <div
+                  data-tooltip={`${edge.node.visibility}`}
+                  className={`Tooltip-Listing RemoteLabbooks__${edge.node.visibility} Tooltip-data Tooltip-data--small`}
+                />
+                )}
 
-        </div>
+              <ImportButton
+                currentServer={value.currentServer}
+                edge={edge}
+                existsLocally={existsLocally}
+                importRepository={this._importLabbook}
+                isImporting={isImporting}
+              />
 
-        <div className={descriptionCss}>
+              <button
+                type="button"
+                className={deleteCSS}
+                data-tooltip={deleteTooltipText}
+                disabled={deleteDisabled || value.currentServer.backupInProgress}
+                onClick={() => this._handleDelete(edge)}
+              >
+                Delete
+              </button>
 
-          <div className="RemoteLabbooks__row RemoteLabbooks__row--title">
-            <RepositoryTitle
-              action={() => {}}
-              name={edge.node.name}
-              section="RemoteLabbooks"
-              filterText={filterText}
+            </div>
+
+            <div className={descriptionCss}>
+
+              <div className="RemoteLabbooks__row RemoteLabbooks__row--title">
+                <RepositoryTitle
+                  action={() => {}}
+                  name={edge.node.name}
+                  section="RemoteLabbooks"
+                  filterText={filterText}
+                />
+              </div>
+
+              <p className="RemoteLabbooks__paragraph RemoteLabbooks__paragraph--owner">{edge.node.owner}</p>
+              <p className="RemoteLabbooks__paragraph RemoteLabbooks__paragraph--metadata">
+                <span className="bold">Created:</span>
+                {' '}
+                {Moment(edge.node.creationDateUtc).format('MM/DD/YY')}
+              </p>
+              <p className="RemoteLabbooks__paragraph RemoteLabbooks__paragraph--metadata">
+                <span className="bold">Modified:</span>
+                {' '}
+                {Moment(edge.node.modifiedDateUtc).fromNow()}
+              </p>
+
+              <p className="RemoteLabbooks__paragraph RemoteLabbooks__paragraph--description">
+                { (edge.node.description && edge.node.description.length)
+                  ? (
+                    <Highlighter
+                      highlightClassName="LocalLabbooks__highlighted"
+                      searchWords={[filterText]}
+                      autoEscape={false}
+                      caseSensitive={false}
+                      textToHighlight={edge.node.description}
+                    />
+                  )
+                  : 'No description provided'}
+              </p>
+            </div>
+
+            { isImporting
+              && (
+                <div className="RemoteLabbooks__loader">
+                  <Loader />
+                </div>
+              )}
+
+            <LoginPrompt
+              showLoginPrompt={showLoginPrompt}
+              closeModal={this._closeLoginPromptModal}
             />
           </div>
-
-          <p className="RemoteLabbooks__paragraph RemoteLabbooks__paragraph--owner">{edge.node.owner}</p>
-          <p className="RemoteLabbooks__paragraph RemoteLabbooks__paragraph--metadata">
-            <span className="bold">Created:</span>
-            {' '}
-            {Moment(edge.node.creationDateUtc).format('MM/DD/YY')}
-          </p>
-          <p className="RemoteLabbooks__paragraph RemoteLabbooks__paragraph--metadata">
-            <span className="bold">Modified:</span>
-            {' '}
-            {Moment(edge.node.modifiedDateUtc).fromNow()}
-          </p>
-
-          <p className="RemoteLabbooks__paragraph RemoteLabbooks__paragraph--description">
-            { (edge.node.description && edge.node.description.length)
-              ? (
-                <Highlighter
-                  highlightClassName="LocalLabbooks__highlighted"
-                  searchWords={[filterText]}
-                  autoEscape={false}
-                  caseSensitive={false}
-                  textToHighlight={edge.node.description}
-                />
-              )
-              : 'No description provided'}
-          </p>
-        </div>
-
-        { isImporting
-          && (
-            <div className="RemoteLabbooks__loader">
-              <Loader />
-            </div>
-          )}
-
-        <LoginPrompt
-          showLoginPrompt={showLoginPrompt}
-          closeModal={this._closeLoginPromptModal}
-        />
-      </div>
+        )}
+      </ServerContext.Consumer>
     );
   }
 }
