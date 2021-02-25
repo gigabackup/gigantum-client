@@ -161,12 +161,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Build frontend production code
-          command: |
-            cd /home/circleci/repo/ui
-            npm install
-            npm install relay
-      - run:
           name: Run Fossa
           command: fossa
           working_directory: /home/circleci/repo/
