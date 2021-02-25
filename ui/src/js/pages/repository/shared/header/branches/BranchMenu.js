@@ -13,15 +13,17 @@ import { setSidepanelVisible } from 'JS/redux/actions/labbook/labbook';
 // queries
 import UserIdentity from 'JS/Auth/UserIdentity';
 import LinkedLocalDatasetsQuery from 'Pages/repository/shared/header/actionsSection/queries/LinkedLocalDatasetsQuery';
+// context
+import ServerContext from 'Pages/ServerContext';
 // componenets
 import CreateBranch from 'Pages/repository/shared/modals/CreateBranch';
 import ForceSync from 'Pages/repository/shared/modals/ForceSync';
 import Branches from 'Pages/repository/shared/sidePanel/Branches';
-import VisibilityModal from 'Pages/repository/shared/modals/VisibilityModal';
+import VisibilityModal from 'Pages/repository/shared/modals/visibility/VisibilityModal';
 import PublishDatasetsModal from 'Pages/repository/shared/modals/publishDataset/PublishDatasetsModal';
 import LoginPrompt from 'Pages/repository/shared/modals/LoginPrompt';
-// context
-import ServerContext from 'Pages/ServerContext';
+import SyncWarning from 'Pages/repository/shared/modals/syncWarning/SyncWarning';
+import PublishSyncErrorModal from './modal/PublishSyncErrorModal';
 // utils
 import BranchMutations from '../../utils/BranchMutations';
 // assets
@@ -54,27 +56,42 @@ const extraxtActiveBranch = (branches) => {
   Gets sync tooltip
   @return {String}
 */
-const getSyncTooltip = (props, data, currentServer, isDataset) => {
+const getSyncTooltip = (
+  props,
+  data,
+  currentServer,
+  isDataset,
+  publishSyncError,
+) => {
   const {
     hasWriteAccess,
     syncOrPublish,
     sectionCollabs,
     activeBranch,
   } = data;
+  const {
+    defaultRemote,
+    isLockedSync,
+  } = props;
   const repositoryType = isDataset ? 'Dataset' : 'Project';
   let syncTooltip = !hasWriteAccess ? 'Pull changes from Gignatum Hub' : `Sync changes to ${currentServer.name}`;
-  syncTooltip = !props.defaultRemote
+  syncTooltip = !defaultRemote
     ? `Click Publish to push branch to ${currentServer.name}`
     : syncTooltip;
-  syncTooltip = props.isLocked
+  syncTooltip = isLockedSync
     ? `Cannot ${syncOrPublish} while ${repositoryType} is in use`
     : syncTooltip;
-  syncTooltip = (activeBranch.branchName !== 'master' && !props.defaultRemote)
+  syncTooltip = (activeBranch.branchName !== 'master' && !defaultRemote)
     ? 'Must publish Master branch first'
     : syncTooltip;
-  syncTooltip = props.defaultRemote && !sectionCollabs
+  syncTooltip = defaultRemote && !sectionCollabs
     ? `Please wait while ${repositoryType} data is being fetched`
     : syncTooltip;
+
+  syncTooltip = publishSyncError
+    ? `An error occured during ${syncOrPublish}ing, click to see more detail.`
+    : syncTooltip;
+
 
   return syncTooltip;
 };
@@ -147,6 +164,41 @@ const checkForWriteAccess = (activeBranch, defaultRemote, collaborators, section
   return true;
 };
 
+/**
+* Method returns text for publish sync button
+*  @param {string} defaultRemote
+*  @param {boolean} publishSyncError
+*  @param {boolean} showPullOnly
+
+*  @return {string}
+*/
+const getPublishSyncText = (
+  defaultRemote,
+  publishSyncError,
+  showPullOnly,
+) => {
+  const syncButtonText = defaultRemote
+    ? showPullOnly
+      ? 'Pull'
+      : 'Sync'
+    : 'Publish';
+  if (defaultRemote) {
+    if (publishSyncError) {
+      return 'Sync Error';
+    }
+    if (showPullOnly) {
+      return 'Pull';
+    }
+
+    return 'Sync';
+  }
+
+  if (publishSyncError) {
+    return 'Publish Error';
+  }
+  return 'Publish';
+};
+
 
 type Props = {
   branches: string,
@@ -154,6 +206,7 @@ type Props = {
   defaultRemote: string,
   isExporting: boolean,
   isLocked: boolean,
+  isLockedSync: boolean,
   isSticky: boolean,
   name: string,
   owner: string,
@@ -179,15 +232,20 @@ class BranchMenu extends Component<Props> {
       name: this.props.section.name,
       owner: this.props.section.owner,
     }),
-    switchingBranch: false,
+    isPublishSyncErroModalVisible: false,
     forceSyncModalVisible: false,
     publishModalVisible: false,
     publishDatasetsModalVisible: false,
     publishDatasetsModalAction: 'Publish',
+    publishSyncError: false,
+    publishSyncErrorData: null,
     syncMenuVisible: false,
     showLoginPrompt: false,
+    showSyncWarning: false,
+    switchingBranch: false,
     isDataset: (this.props.sectionType !== 'labbook'),
     action: null,
+    warningAction: 'publish',
   };
 
 
@@ -554,12 +612,20 @@ class BranchMenu extends Component<Props> {
   *  @param {Boolean} - allowSync
   *  @param {Boolean} - allowSyncPull
   *  @param {Function} - passedSuccessCall
+  *  @param {Boolean} - isLocked
+  *  @param {Boolean} - overrideLock
   *  handles syncing or publishing the project
   *  @return {}
   */
-  _handleSyncButton = (pullOnly, allowSync, allowSyncPull, passedSuccessCall) => {
+  _handleSyncButton = (
+    pullOnly,
+    allowSync,
+    allowSyncPull,
+    passedSuccessCall,
+    isLocked,
+    overrideLock,
+  ) => {
     // TODO refactor this function
-
     const {
       defaultRemote,
       section,
@@ -568,9 +634,21 @@ class BranchMenu extends Component<Props> {
       setSyncingState,
     } = this.props;
     const { owner } = section;
-    const { isDataset } = this.state;
+    const { isDataset, publishSyncError } = this.state;
     const { buildImage } = this.state.branchMutations;
-    this.setState({ syncMenuVisible: false });
+
+    if (publishSyncError) {
+      this.setState({ isPublishSyncErroModalVisible: true });
+      return;
+    }
+
+    if (isLocked && (sectionType === 'labbook') && !overrideLock) {
+      const warningAction = defaultRemote ? 'sync' : 'publish';
+      this.setState({ showSyncWarning: true, warningAction });
+      return;
+    }
+    this.setState({ syncMenuVisible: false, showSyncWarning: false });
+
 
     if (allowSync || (pullOnly && allowSyncPull)) {
       if (!defaultRemote) {
@@ -581,28 +659,32 @@ class BranchMenu extends Component<Props> {
         const data = {
           successCall: () => {
             if (sectionType === 'labbook') {
-              buildImage((response, error) => {
-                if (error) {
-                  console.error(error);
-                  const messageData = {
-                    id: uuidv4(),
-                    message: `ERROR: Failed to build ${section.name}`,
-                    isLast: null,
-                    error: true,
-                    messageBody: error,
-                  };
-                  setMultiInfoMessage(owner, section.name, messageData);
-                }
-              });
+              if (!isLocked) {
+                buildImage((response, error) => {
+                  if (error) {
+                    console.error(error);
+                    const messageData = {
+                      id: uuidv4(),
+                      message: `ERROR: Failed to build ${section.name}`,
+                      isLast: null,
+                      error: true,
+                      messageBody: error,
+                    };
+                    setMultiInfoMessage(owner, section.name, messageData);
+                  }
+                });
+              }
               setBranchUptodate();
             }
             setSyncingState(false);
           },
-          failureCall: (errorMessage) => {
+          failureCall: (errorMessage, reportedFailureMessage) => {
             setSyncingState(false);
             if (errorMessage.indexOf('Merge conflict') > -1) {
               self._toggleSyncModal();
               this.setState({ pullOnly });
+            } else {
+              this._setPublishErrorState(errorMessage, reportedFailureMessage);
             }
           },
           pullOnly: pullOnly || false,
@@ -629,10 +711,11 @@ class BranchMenu extends Component<Props> {
     *  @param {Object} activeBranch
     *  @param {Boolean} hasWriteAccess
     *  @param {Boolean} upToDate
+    *  @param {Boolean} publishSyncError
     *  returns tooltip info
     *  @return {string}
     */
-  _getTooltipText = (activeBranch, hasWriteAccess, upToDate) => {
+  _getTooltipText = (activeBranch, hasWriteAccess, upToDate, publishSyncError) => {
     // destructure here
     const { props, state } = this;
     const {
@@ -676,12 +759,19 @@ class BranchMenu extends Component<Props> {
     };
     // TODO FIX this, nesting ternary operations is bad
     return {
-      syncTooltip: getSyncTooltip(props, data, currentServer, state.isDataset),
+      syncTooltip: getSyncTooltip(
+        props,
+        data,
+        currentServer,
+        state.isDataset,
+        publishSyncError,
+      ),
       manageTooltip: getManagedToolip(props, data),
       createTooltip,
       resetTooltip,
       switchTooltip,
       commitTooltip,
+      syncOrPublish,
     };
   }
 
@@ -700,23 +790,67 @@ class BranchMenu extends Component<Props> {
    });
  }
 
+  /**
+  * sets state for sync warning modal
+  */
+  _toggleSyncWarningModal = () => {
+    this.setState({ showSyncWarning: false });
+  }
+
+  /**
+  * Method sets error state on button error state for the SyncErrorModal
+  * @param {string} errorMessage
+  * @param {string} reportedFailureMessage
+  *
+  */
+  _setPublishErrorState = (errorMessage, reportedFailureMessage) => {
+    this.setState({
+      publishSyncError: true,
+      publishSyncErrorData: {
+        header: errorMessage,
+        message: reportedFailureMessage,
+      },
+    });
+  }
+
+  /**
+  * Method clears error state
+  *
+  */
+  _clearSyncErorrState = () => {
+    this.setState({
+      isPublishSyncErroModalVisible: false,
+      publishSyncError: false,
+      publishSyncErrorData: null,
+    });
+  }
+
  static contextType = ServerContext;
 
  render() {
    const { props, state } = this;
    const {
+     collaborators,
      branches,
      defaultRemote,
      owner,
      name,
      isLocked,
+     isLockedSync,
      isSticky,
      section,
-     collaborators,
      setSyncingState,
    } = this.props;
    const {
+     forceSyncModalVisible,
+     publishModalVisible,
+     publishSyncErrorData,
+     publishDatasetsModalVisible,
+     isPublishSyncErroModalVisible,
+     publishSyncError,
      showLoginPrompt,
+     showSyncWarning,
+     warningAction,
    } = this.state;
    const {
      activeBranch,
@@ -737,9 +871,9 @@ class BranchMenu extends Component<Props> {
    const upToDate = (activeBranch.commitsAhead === 0)
     && (activeBranch.commitsBehind === 0);
    const allowSync = !((activeBranch.branchName !== 'master') && !defaultRemote)
-    && !isLocked && hasWriteAccess;
-   const allowSyncPull = !((activeBranch.branchName !== 'master') && !defaultRemote)
-    && !isLocked && defaultRemote;
+    && hasWriteAccess && !isLockedSync;
+   const allowSyncPull = !((activeBranch.branchName !== 'master') && !defaultRemote) && (!isLockedSync)
+    && defaultRemote;
    const allowReset = !isLocked
     && !upToDate
     && activeBranch.isRemote
@@ -748,10 +882,7 @@ class BranchMenu extends Component<Props> {
      ? 'Local & Remote'
      : 'Local only';
    const showPullOnly = defaultRemote && !hasWriteAccess && !waitingOnCollabs;
-   const disableDropdown = !allowSyncPull || !defaultRemote || showPullOnly;
-   const syncButtonDisabled = (showPullOnly && !allowSyncPull)
-    || (!defaultRemote && !allowSync)
-    || (defaultRemote && !allowSync && !showPullOnly);
+   const disableDropdown = !allowSyncPull || !defaultRemote || showPullOnly || publishSyncError;
    const {
      syncTooltip,
      manageTooltip,
@@ -759,12 +890,12 @@ class BranchMenu extends Component<Props> {
      resetTooltip,
      switchTooltip,
      commitTooltip,
-   } = this._getTooltipText(activeBranch, hasWriteAccess, upToDate);
-   const syncButtonText = defaultRemote
-     ? showPullOnly
-     ? 'Pull'
-     : 'Sync'
-     : 'Publish';
+     syncOrPublish,
+   } = this._getTooltipText(activeBranch, hasWriteAccess, upToDate, publishSyncError);
+   const syncButtonText = getPublishSyncText(defaultRemote, publishSyncError, showPullOnly);
+   const syncButtonDisabled = (showPullOnly && !allowSyncPull)
+    || (!defaultRemote && !allowSync)
+    || (defaultRemote && !allowSync && !showPullOnly);
 
    // declare css here
    const switchDropdownCSS = classNames({
@@ -799,10 +930,11 @@ class BranchMenu extends Component<Props> {
    });
    const syncCSS = classNames({
      'Btn--branch Btn--action Btn--branch--sync': true,
-     'Btn--branch--sync--publish': !defaultRemote,
-     'Btn--branch--sync--pull': showPullOnly,
-     'Btn--branch--sync--upToDate': defaultRemote && (upToDate || (activeBranch.commitsAhead === undefined) || isLocked) && !showPullOnly,
+     'Btn--branch--sync--publish': !defaultRemote && !publishSyncError,
+     'Btn--branch--sync--pull': showPullOnly && !publishSyncError,
+     'Btn--branch--sync--upToDate': defaultRemote && (upToDate || (activeBranch.commitsAhead === undefined) || isLocked) && !showPullOnly && !publishSyncError,
      'Tooltip-data': !state.commitsHovered,
+     'Btn--branch--error': publishSyncError,
    });
    const manageCSS = classNames({
      'Btn--branch Btn--action Btn--branch--manage': true,
@@ -824,6 +956,7 @@ class BranchMenu extends Component<Props> {
    return (
      <div className={branchMenuCSS}>
        <div className="BranchMenu__dropdown">
+
          <div
            onClick={() => this._toggleBranchSwitch()}
            data-tooltip={switchTooltip}
@@ -847,12 +980,10 @@ class BranchMenu extends Component<Props> {
            >
              { activeBranch.isLocal
                ? <div className="BranchMenu__status--local" />
-               : <div />
-             }
+               : <div />}
              { activeBranch.isRemote
                ? <div className="BranchMenu__status--remote" />
-               : <div />
-             }
+               : <div />}
            </div>
          </div>
          <div className={switchDropdownCSS}>
@@ -884,12 +1015,10 @@ class BranchMenu extends Component<Props> {
                    </div>
                  </li>
                );
-             })
-             }
+             })}
 
              { (otherBranchCount > 0)
-               && <div className="BranchMenu__other-text">{`+${otherBranchCount} others` }</div>
-             }
+               && <div className="BranchMenu__other-text">{`+${otherBranchCount} others` }</div>}
 
              { (filteredBranches.length === 0)
                 && (
@@ -906,8 +1035,7 @@ class BranchMenu extends Component<Props> {
                       Create a new branch?
                     </button>
                   </li>
-                )
-              }
+                )}
            </ul>
            <div className="BranchMenu__menu-button">
              <button
@@ -968,12 +1096,12 @@ class BranchMenu extends Component<Props> {
              <div className="BranchMenu__sync-container">
                <button
                  className={syncCSS}
-                 onClick={() => { this._handleSyncButton(showPullOnly, allowSync, allowSyncPull); }}
                  disabled={syncButtonDisabled}
+                 onClick={() => { this._handleSyncButton(showPullOnly, allowSync, allowSyncPull, null, isLocked, false); }}
                  data-tooltip={syncTooltip}
                  type="button"
                >
-                 { (!upToDate && allowSync
+                 { (!upToDate && allowSync && !publishSyncError
                    && (activeBranch.commitsAhead !== undefined)
                    && (activeBranch.commitsAhead !== null))
                   && (
@@ -989,19 +1117,19 @@ class BranchMenu extends Component<Props> {
                           <div className="BranchMenu__sync-status--commits-behind">
                             { activeBranch.commitsBehind }
                           </div>
-                        )
-                      }
+                        )}
                       { ((activeBranch.commitsAhead !== 0)
                         && (activeBranch.commitsAhead !== null))
                         && (
                           <div className="BranchMenu__sync-status--commits-ahead">
                             { activeBranch.commitsAhead }
                           </div>
-                        )
-                      }
+                        )}
                     </div>
-                  )
-                 }
+                  )}
+
+                 { publishSyncError
+                    && <div className="BranchMenu__icon BranchMenu__icon--error" />}
                  <div className="Btn--branch--text">{syncButtonText}</div>
                </button>
 
@@ -1019,16 +1147,15 @@ class BranchMenu extends Component<Props> {
                       && (
                       <li
                         className="BranchMenu__list-item"
-                        onClick={() => this._handleSyncButton(false, allowSync, allowSyncPull)}
+                        onClick={() => this._handleSyncButton(false, allowSync, allowSyncPull, null, isLocked)}
                         role="presentation"
                       >
                         Sync (Pull then Push)
                       </li>
-                      )
-                   }
+                      )}
                    <li
                      className="BranchMenu__list-item"
-                     onClick={() => this._handleSyncButton(true, allowSync, allowSyncPull)}
+                     onClick={() => this._handleSyncButton(true, allowSync, allowSyncPull, null, isLocked)}
                      role="presentation"
                    >
                      Pull (Pull-only)
@@ -1038,8 +1165,7 @@ class BranchMenu extends Component<Props> {
              </div>
            </div>
          )
-         : <div className="BranchMenu__action">{state.action}</div>
-       }
+         : <div className="BranchMenu__action">{state.action}</div>}
 
        <CreateBranch
          owner={owner}
@@ -1071,67 +1197,82 @@ class BranchMenu extends Component<Props> {
          owner={owner}
          name={name}
        />
-       {
-        state.publishModalVisible
-        && (
-          <VisibilityModal
-            {...this.props}
-            owner={section.owner}
-            name={section.name}
-            labbookId={props.sectionId}
-            remoteUrl={defaultRemote}
-            buttonText="Publish"
-            header="Publish"
-            modalStateValue="visibilityModalVisible"
-            checkSessionIsValid={this._checkSessionIsValid}
-            toggleModal={this._togglePublishModal}
-            resetState={this._resetState}
-            resetPublishState={this._resetPublishState}
-            setRemoteSession={this._setRemoteSession}
-            setSyncingState={setSyncingState}
-          />
-        )
-       }
-       { state.publishDatasetsModalVisible
-        && (
-          <PublishDatasetsModal
-            {...this.props}
-            owner={props.section.owner}
-            name={props.section.name}
-            labbookId={props.sectionId}
-            buttonText="Publish All"
-            header={state.publishDatasetsModalAction}
-            pullOnly={state.pullOnly}
-            modalStateValue="visibilityModalVisible"
-            toggleSyncModal={this._toggleSyncModal}
-            checkSessionIsValid={this._checkSessionIsValid}
-            toggleModal={this._togglePublishModal}
-            resetState={this._resetState}
-            resetPublishState={this._resetPublishState}
-            setRemoteSession={this._setRemoteSession}
-            handleSync={this._handleSyncButton}
-            localDatasets={state.localDatasets || []}
-          />
-        )
-       }
 
-       { state.forceSyncModalVisible
-        && (
-          <ForceSync
-            {...this.props}
-            toggleSyncModal={this._toggleSyncModal}
-            pullOnly={state.pullOnly}
-            owner={owner}
-            name={name}
-          />
-        )
-       }
+       <VisibilityModal
+         {...this.props}
+         isVisible={publishModalVisible}
+         owner={section.owner}
+         name={section.name}
+         labbookId={props.sectionId}
+         remoteUrl={defaultRemote}
+         buttonText="Publish"
+         header="Publish"
+         modalStateValue="visibilityModalVisible"
+         checkSessionIsValid={this._checkSessionIsValid}
+         toggleModal={this._togglePublishModal}
+         resetState={this._resetState}
+         resetPublishState={this._resetPublishState}
+         setPublishErrorState={this._setPublishErrorState}
+         setRemoteSession={this._setRemoteSession}
+         setSyncingState={setSyncingState}
+       />
+
+       <PublishDatasetsModal
+         {...this.props}
+         isVisible={publishDatasetsModalVisible}
+         owner={props.section.owner}
+         name={props.section.name}
+         labbookId={props.sectionId}
+         buttonText="Publish All"
+         header={state.publishDatasetsModalAction}
+         pullOnly={state.pullOnly}
+         modalStateValue="visibilityModalVisible"
+         toggleSyncModal={this._toggleSyncModal}
+         checkSessionIsValid={this._checkSessionIsValid}
+         toggleModal={this._togglePublishModal}
+         resetState={this._resetState}
+         resetPublishState={this._resetPublishState}
+         setRemoteSession={this._setRemoteSession}
+         handleSync={this._handleSyncButton}
+         localDatasets={state.localDatasets || []}
+         setPublishErrorState={this._setPublishErrorState}
+       />
+
+       <ForceSync
+         {...this.props}
+         isVisible={forceSyncModalVisible}
+         name={name}
+         owner={owner}
+         pullOnly={state.pullOnly}
+         toggleSyncModal={this._toggleSyncModal}
+         setPublishErrorState={this._setPublishErrorState}
+       />
 
        <LoginPrompt
          showLoginPrompt={showLoginPrompt}
          closeModal={this._closeLoginPromptModal}
        />
+
+       <PublishSyncErrorModal
+         closeModal={this._clearSyncErorrState}
+         data={publishSyncErrorData}
+         isVisible={isPublishSyncErroModalVisible}
+         remoteOperationPerformed={syncOrPublish}
+       />
+
+
+       <SyncWarning
+         allowSync={allowSync}
+         allowSyncPull={allowSyncPull}
+         handleSync={this._handleSyncButton}
+         isLocked={isLocked}
+         isVisible={showSyncWarning}
+         showPullOnly={showPullOnly}
+         toggleSyncWarningModal={this._toggleSyncWarningModal}
+         warningAction={warningAction}
+       />
      </div>
+
    );
  }
 }

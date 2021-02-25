@@ -6,7 +6,7 @@ from client_app.pages.jupyter_lab.jupyter_lab_page import JupyterLabPage
 
 
 class ProjectUtility:
-    def create_project(self, driver: webdriver) -> str:
+    def create_project(self, driver: webdriver, is_guide: bool = True) -> str:
         """Logical separation of create package functionality"""
         # Create a project
         # Load Project Listing Page
@@ -14,10 +14,11 @@ class ProjectUtility:
         if not project_list:
             return "Could not load Project Listing Page"
 
-        # Closes the guide
-        is_guide_close_msg = self.__close_guide(project_list)
-        if is_guide_close_msg != ProjectConstants.SUCCESS.value:
-            return is_guide_close_msg
+        if is_guide:
+            # Closes the guide
+            is_guide_close_msg = self.close_guide(project_list)
+            if is_guide_close_msg != ProjectConstants.SUCCESS.value:
+                return is_guide_close_msg
 
         # Click on "Create New"
         is_clicked = project_list.click_create_button()
@@ -63,7 +64,7 @@ class ProjectUtility:
 
         return ProjectConstants.SUCCESS.value
 
-    def __close_guide(self, project_list) -> str:
+    def close_guide(self, project_list) -> str:
         """ Logical separation of closing the guide after log in
 
         Args:
@@ -133,7 +134,6 @@ class ProjectUtility:
             else:
                 jupyter_notebook_output = jupyter_lab_page.is_jupyter_notebook_output_only_exist(
                     command.output, index+1)
-
             # Return message if output verification is failed
             if not jupyter_notebook_output:
                 return command.error_message
@@ -153,3 +153,89 @@ class ProjectUtility:
 
         return ProjectConstants.SUCCESS.value
 
+    def delete_project(self, driver: webdriver) -> str:
+        """ Logical separation of delete project functionality
+
+        Args:
+            driver: webdriver instance
+        """
+        # Delete a local project
+        # Load Project Listing Page
+        project_list = ProjectListingPage(driver)
+        if not project_list:
+            return "Could not load Project Listing Page"
+
+        # Click project menu button
+        is_clicked = project_list.project_menu_component.click_project_menu_button()
+        if not is_clicked:
+            return "Could not click project menu button"
+
+        # Click delete project menu
+        is_checked = project_list.project_menu_component.click_delete_project_menu()
+        if not is_checked:
+            return "Could not click delete project menu"
+
+        # Get project title from delete project window
+        project_title = project_list.project_delete_component.get_project_title()
+        if project_title is None:
+            return "Could not get project title"
+
+        # Input project title
+        is_typed = project_list.project_delete_component.input_project_title(project_title)
+        if not is_typed:
+            return "Could not type project title"
+
+        # Click delete project button
+        is_clicked = project_list.project_delete_component.click_delete_button()
+        if not is_clicked:
+            return "Could not click delete project button"
+
+        # Check delete window closed
+        is_checked = project_list.project_delete_component.check_delete_window_closed()
+        if not is_checked:
+            return "Delete project window is not closed"
+
+        return ProjectConstants.SUCCESS.value
+
+    def publish_project(self, driver: webdriver):
+        """Logical separation of publish project functionality
+
+        Args:
+            driver: webdriver instance
+        """
+        # Load Project Listing Page
+        project_list = ProjectListingPage(driver)
+        if not project_list:
+            return "Could not load Project Listing Page"
+
+        # Click on project publish button
+        is_clicked = project_list.project_menu_component.click_publish_button()
+        if not is_clicked:
+            return "Could not click project publish button"
+
+        # Enable private mode in project publish window
+        is_enabled = project_list.project_menu_component.enable_private_mode()
+        if not is_enabled:
+            return "Could not enable private mode in project publish window"
+
+        # Click on publish button on publish window
+        is_clicked = project_list.project_menu_component.click_publish_window_button()
+        if not is_clicked:
+            return "Could not click project publish button on project publish window"
+
+        # Monitor container status to go through Stopped -> Publishing
+        is_status_changed = project_list.monitor_container_status("Publishing", 60)
+        if not is_status_changed:
+            return "Could not get Publishing status"
+
+        # Monitor container status to go through Publishing -> Stopped
+        is_status_changed = project_list.monitor_container_status("Stopped", 60)
+        if not is_status_changed:
+            return "Could not get Stopped status"
+
+        # Check private lock icon presence
+        is_checked = project_list.project_menu_component.check_private_lock_icon_presence()
+        if not is_checked:
+            return "Could not found private lock icon presence"
+
+        return ProjectConstants.SUCCESS.value

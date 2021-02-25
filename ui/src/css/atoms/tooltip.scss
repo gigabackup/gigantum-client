@@ -69,6 +69,13 @@
       @include triangle('left', 7px, $slateBlue);
     }
 
+    &--wide {
+      &::after {
+        width: 300px !important;
+        white-space: pre-line !important;
+      }
+    }
+
 
     &--right:hover::after {
       top: calc(50% - 10px);

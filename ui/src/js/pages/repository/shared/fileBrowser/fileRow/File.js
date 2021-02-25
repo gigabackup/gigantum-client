@@ -2,7 +2,7 @@
 // vendor
 import React, { Component } from 'react';
 import Moment from 'moment';
-import fileIconsJs from 'file-icons-js';
+import { getClass } from 'file-icons-js';
 import classNames from 'classnames';
 import { DragSource } from 'react-dnd';
 import ReactTooltip from 'react-tooltip';
@@ -16,7 +16,7 @@ import { setErrorMessage, setInfoMessage, setWarningMessage } from 'JS/redux/act
 import StartContainerMutation from 'Mutations/container/StartContainerMutation';
 import StartDevToolMutation from 'Mutations/container/StartDevToolMutation';
 // components
-import PopupBlocked from 'Components/shared/modals/PopupBlocked';
+import PopupBlocked from 'Components/modal/popup/PopupBlocked';
 import ActionsMenu from './ActionsMenu';
 import DatasetActionsMenu from './dataset/DatasetActionsMenu';
 // utils
@@ -467,7 +467,7 @@ class File extends Component<Props> {
           }
           <div className={textIconsCSS}>
 
-            <div className={`File__icon ${fileIconsJs.getClass(filename)}`} />
+            <div className={`File__icon ${getClass(filename)}`} />
 
             <div
               className="File__text"

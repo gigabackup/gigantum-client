@@ -151,9 +151,10 @@ const FooterUtils = {
               }
             // executes when job status has failed
             } else if (response.data.jobStatus.status === 'failed') {
-              let reportedFailureMessage = response.data.jobStatus.failureMessage;
-              let errorMessage = response.data.jobStatus.failureMessage;
+              const errorMessage = response.data.jobStatus.failureMessage;
               hideModal();
+
+              const metaData = JSON.parse(response.data.jobStatus.jobMetadata);
 
               if (footerCallback && footerCallback.failed) {
                 const callbackData = {
@@ -161,19 +162,24 @@ const FooterUtils = {
                   failureCall,
                   mutations,
                 };
-                ({ errorMessage, reportedFailureMessage } = footerCallback.failed(callbackData));
+                // footerCallback.failed(callbackData);
+                if (failureCall) {
+                  failureCall(errorMessage, metaData);
+                } else {
+                  footerCallback.failed(callbackData);
+                }
               } else if (callback) {
                 callback(response);
               }
 
-              const errorHTML = `${html}\n<span style="color:rgb(255,85,85)">${reportedFailureMessage}</span>`;
               const messageData = {
                 id: responseId,
                 message: errorMessage,
                 isLast: true,
                 status: response.data.jobStatus.status,
                 error: true,
-                messageBody: [{ message: errorHTML }],
+                messageListOpen: true,
+                messageBody: [{ message: html }],
                 buildProgress: type === 'buildImage',
               };
               setMultiInfoMessage(owner, name, messageData);

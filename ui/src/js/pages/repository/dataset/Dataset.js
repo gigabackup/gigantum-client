@@ -1,3 +1,4 @@
+// @flow
 // vendor
 import React, { Component } from 'react';
 import { Route, Switch } from 'react-router-dom';
@@ -11,8 +12,6 @@ import Loadable from 'react-loadable';
 import store from 'JS/redux/store';
 import { setStickyState } from 'JS/redux/actions/dataset/dataset';
 import { setCallbackRoute } from 'JS/redux/actions/routes';
-// config
-import Config from 'JS/config';
 // utils
 import { getFilesFromDragEvent } from 'JS/utils/html-dir-content';
 // components
@@ -63,7 +62,38 @@ const getIsLocked = (props) => {
   return isLocked;
 };
 
-class Dataset extends Component {
+
+type Props = {
+  activityRecords: Array,
+  auth: {
+    isAuthenticated: Function,
+  },
+  dataset: {
+    activeBranch: string,
+    description: string,
+    id: string,
+    name: string,
+    owner: string,
+    datasetType: {
+      isManaged: boolean,
+    }
+  },
+  datasetName: string,
+  detailMode: string,
+  diskLow: boolean,
+  globalIsUploading: boolean,
+  location: {
+    pathname: string,
+  },
+  match: {
+    path: string,
+  },
+  relay: {
+    refetch: Function,
+  }
+}
+
+class Dataset extends Component<Props> {
   constructor(props) {
     super(props);
     const { name, owner } = props.dataset;
@@ -75,10 +105,11 @@ class Dataset extends Component {
   }
 
   state = {
-    overviewSkip: true,
     activitySkip: true,
-    dataSkip: true,
+    uploadAllowed: false,
     datasetSkip: true,
+    dataSkip: true,
+    overviewSkip: true,
   };
 
   /**
@@ -144,29 +175,34 @@ class Dataset extends Component {
    refetch dataset
    */
   _refetchDataset = (section) => {
-    const { props, state } = this;
+    const { dataset, relay } = this.props;
+    const {
+      activitySkip,
+      dataSkip,
+      overviewSkip,
+    } = this.state;
     const currentSection = `${section}Skip`;
     const currentState = {
-      overviewSkip: state.overviewSkip,
-      activitySkip: state.activitySkip,
-      dataSkip: state.dataSkip,
+      activitySkip,
+      overviewSkip,
+      dataSkip,
     };
     const sections = ['overview', 'activity', 'data'];
     const queryVariables = {
-      datasetID: props.dataset.id,
+      datasetID: dataset.id,
       [currentSection]: false,
     };
     const renderVariables = {
-      datasetID: props.dataset.id,
+      datasetID: dataset.id,
       ...currentState,
       [currentSection]: false,
     };
     const remainingQueryVariables = {
-      datasetID: props.dataset.id,
+      datasetID: dataset.id,
       datasetSkip: false,
     };
     const remainingRenderVariables = {
-      datasetID: props.dataset.id,
+      datasetID: dataset.id,
       datasetSkip: false,
     };
     const newState = {
@@ -187,7 +223,7 @@ class Dataset extends Component {
 
     const refetchCallback = () => {
       this.setState({ [currentSection]: false });
-      props.relay.refetch(
+      relay.refetch(
         remainingQueryVariables,
         remainingRenderVariables,
         () => {
@@ -197,21 +233,66 @@ class Dataset extends Component {
       );
     };
 
-    if (state[currentSection]) {
-      props.relay.refetch(queryVariables, renderVariables, refetchCallback, options);
+    if (this.state[currentSection]) {
+      relay.refetch(queryVariables, renderVariables, refetchCallback, options);
     }
   }
 
+  /**
+  *  @param {Object} props
+  *
+  *  checks to see if user can upload files
+  */
+  allowFileUpload = (collaboratorProps) => {
+    const { dataset } = this.props;
+    const { uploadAllowed } = this.state;
+    if (
+      collaboratorProps
+      && collaboratorProps.dataset
+      && collaboratorProps.dataset.collaborators
+    ) {
+      const { collaborators } = collaboratorProps.dataset;
+      if (collaborators.length) {
+        collaborators.forEach((collaborator) => {
+          const username = localStorage.getItem('username');
+          if (
+            (username === collaborator.collaboratorUsername)
+            && (collaborator.permission !== 'READ_ONLY')
+            && !uploadAllowed
+          ) {
+            this.setState({ uploadAllowed: true });
+          }
+        });
+      }
+
+      if (dataset && (dataset.defaultRemote === null) && !uploadAllowed) {
+        this.setState({ uploadAllowed: true });
+      }
+    }
+  };
+
   render() {
-    const { props, state } = this;
-    const { owner, name } = props.dataset;
-    if (props.dataset) {
-      const { dataset, diskLow } = props;
-      const isLocked = getIsLocked(props);
+    const {
+      activityRecords,
+      auth,
+      dataset,
+      datasetName,
+      detailMode,
+      diskLow,
+      globalIsUploading,
+      match,
+    } = this.props;
+    const { owner, name } = dataset;
+    const {
+      authenticated,
+      uploadAllowed,
+    } = this.state;
+    if (dataset) {
+      const isLocked = getIsLocked(this.props);
       // declare css here
       const datasetCSS = classNames({
         Dataset: true,
-        'Dataset--detail-mode': props.detailMode,
+        'Dataset--detail-mode': detailMode,
         'Dataset--disk-low': diskLow,
       });
 
@@ -221,13 +302,15 @@ class Dataset extends Component {
           <div className="Dataset__spacer flex flex--column">
 
             <Header
+              allowFileUpload={this.allowFileUpload}
               description={dataset.description}
               toggleBranchesView={() => {}}
               branchName=""
               dataset={dataset}
               sectionType="dataset"
               isLocked={isLocked}
-              {...props}
+              isLockedSync={isLocked}
+              {...this.props}
               owner={owner}
               name={name}
             />
@@ -237,11 +320,11 @@ class Dataset extends Component {
               <Switch>
                 <Route
                   exact
-                  path={`${props.match.path}`}
+                  path={`${match.path}`}
                   render={() => (
                     <ErrorBoundary type="datasetSectionError" key="overview">
                       <Overview
-                        key={`${props.datasetName}_overview`}
+                        key={`${datasetName}_overview`}
                         dataset={dataset}
                         isManaged={dataset.datasetType.isManaged}
                         datasetId={dataset.id}
@@ -256,12 +339,12 @@ class Dataset extends Component {
                   )}
                 />
 
-                <Route path={`${props.match.path}/:datasetMenu`}>
+                <Route path={`${match.path}/:datasetMenu`}>
 
                   <Switch>
 
                     <Route
-                      path={`${props.match.path}/overview`}
+                      path={`${match.path}/overview`}
                       render={() => (
                         <ErrorBoundary
                           type="datasetSectionError"
@@ -269,7 +352,7 @@ class Dataset extends Component {
                         >
 
                           <Overview
-                            key={`${props.datasetName}_overview`}
+                            key={`${datasetName}_overview`}
                             dataset={dataset}
                             isManaged={dataset.datasetType.isManaged}
                             datasetId={dataset.id}
@@ -286,31 +369,31 @@ class Dataset extends Component {
                     />
 
                     <Route
-                      path={`${props.match.path}/activity`}
+                      path={`${match.path}/activity`}
                       render={() => (
                         <ErrorBoundary
                           type="datasetSectionError"
                           key="activity"
                         >
                           <Activity
-                            key={`${props.datasetName}_activity`}
+                            key={`${datasetName}_activity`}
                             dataset={dataset}
-                            diskLow={props.diskLow}
-                            activityRecords={props.activityRecords}
+                            diskLow={diskLow}
+                            activityRecords={activityRecords}
                             datasetId={dataset.id}
                             activeBranch={dataset.activeBranch}
                             sectionType="dataset"
                             refetch={this._refetchDataset}
                             owner={owner}
                             name={name}
-                            {...props}
+                            {...this.props}
                           />
                         </ErrorBoundary>
                       )}
                     />
 
                     <Route
-                      path={`${props.match.url}/data`}
+                      path={`${match.url}/data`}
                       render={() => (
                         <ErrorBoundary
                           type="datasetSectionError"
@@ -326,7 +409,8 @@ class Dataset extends Component {
                             type="dataset"
                             section="data"
                             refetch={this._refetchDataset}
-                            lockFileBrowser={props.globalIsUploading || isLocked}
+                            lockFileBrowser={globalIsUploading || isLocked}
+                            uploadAllowed={uploadAllowed}
                           />
 
                         </ErrorBoundary>
@@ -349,11 +433,11 @@ class Dataset extends Component {
       );
     }
 
-    if (state.authenticated) {
+    if (authenticated) {
       return (<Loader />);
     }
 
-    return (<Login auth={props.auth} />);
+    return (<Login auth={auth} />);
   }
 }
 

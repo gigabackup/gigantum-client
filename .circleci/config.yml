@@ -3,7 +3,7 @@ version: 2.1
 executors:
   gig_client:
     docker:
-      - image: gigantum/circleci-client:22729ee812-2020-07-14
+      - image: gigantum/circleci-client:0ab01940cd-2021-01-29
 
 orbs:
     codecov: codecov/codecov@1.1.0
@@ -89,7 +89,6 @@ jobs:
             python3 /home/circleci/repo/packages/gtmcore/gtmcore/dispatcher/worker.py &
             pytest --cov=lmsrvlabbook --cov=lmsrvcore packages/gtmapi/lmsrvlabbook
             pytest --cov=lmsrvlabbook --cov=lmsrvcore --cov-append packages/gtmapi/lmsrvcore
-            pytest --cov=lmsrvlabbook --cov=lmsrvcore --cov-append packages/gtmapi/lmsrvlabbook/tests/int_labbook_mutations.py
       - codecov/upload:
           flags: api
 
@@ -154,19 +153,13 @@ jobs:
           no_output_timeout: 15m
           command: |
             cd /home/circleci/repo/ui
-            jest --maxWorkers=2 shared/fileBrowser activity dashboard -u
+            TZ='Europe/London' jest --maxWorkers=2 src -u
 
   fossa:
     executor: gig_client
     working_directory: ~/repo
     steps:
       - checkout
-      - run:
-          name: Build frontend production code
-          command: |
-            cd /home/circleci/repo/ui
-            npm install
-            npm install relay
       - run:
           name: Run Fossa
           command: fossa
@@ -251,4 +244,3 @@ workflows:
           requires:
             - mypy-gtmcore
             - mypy-gtmapi
-

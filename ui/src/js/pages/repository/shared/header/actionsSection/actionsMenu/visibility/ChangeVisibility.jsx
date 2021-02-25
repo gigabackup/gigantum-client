@@ -2,7 +2,7 @@
 // vendor
 import React, { Component } from 'react';
 import ReactTooltip from 'react-tooltip';
-import VisibilityModal from 'Pages/repository/shared/modals/VisibilityModal';
+import VisibilityModal from 'Pages/repository/shared/modals/visibility/VisibilityModal';
 // css
 import './ChangeVisibility.scss';
 
@@ -61,17 +61,14 @@ class ChangeVisibility extends Component<Props> {
             Change Visibility
           </button>
 
-          { visibilityModalVisible
-            && (
-              <VisibilityModal
-                {...this.props}
-                toggleModal={this._toggleModal}
-                buttonText="Save"
-                header="Change Visibility"
-                modalStateValue="visibilityModalVisible"
-              />
-            )
-          }
+          <VisibilityModal
+            {...this.props}
+            isVisible={visibilityModalVisible}
+            toggleModal={this._toggleModal}
+            buttonText="Save"
+            header="Change Visibility"
+            modalStateValue="visibilityModalVisible"
+          />
 
         </div>
 
@@ -82,8 +79,7 @@ class ChangeVisibility extends Component<Props> {
               id="Tooltip--noCache"
               delayShow={500}
             />
-          )
-        }
+          )}
       </li>
     );
   }

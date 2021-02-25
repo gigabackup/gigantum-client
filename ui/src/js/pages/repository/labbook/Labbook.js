@@ -1,12 +1,11 @@
 // vendor
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import {
   createRefetchContainer,
   graphql,
 } from 'react-relay';
 import { DragDropContext } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 // store
@@ -15,33 +14,31 @@ import { setContainerMenuWarningMessage } from 'JS/redux/actions/labbook/environ
 import {
   setMergeMode,
   setBuildingState,
-  setStickyDate,
+  setStickyState,
   updateTransitionState,
 } from 'JS/redux/actions/labbook/labbook';
 import { setCallbackRoute } from 'JS/redux/actions/routes';
-import { setInfoMessage } from 'JS/redux/actions/footer';
 // utils
-import { getFilesFromDragEvent } from 'JS/utils/html-dir-content';
 import BranchMutations from 'Pages/repository/shared/utils/BranchMutations';
 // mutations
 import LabbookContainerStatusMutation from 'Mutations/repository/labbook/LabbookContainerStatusMutation';
 import LabbookLookupMutation from 'Mutations/repository/labbook/LabbookLookupMutation';
-import MigrateProjectMutation from 'Mutations/repository/migrate/MigrateProjectMutation';
 // components
 import Loader from 'Components/loader/Loader';
 import Login from 'Pages/login/Login';
 import ErrorBoundary from 'Components/errorBoundary/ErrorBoundary';
 import Header from 'Pages/repository/shared/header/Header';
-import ButtonLoader from 'Components/buttonLoader/ButtonLoader';
-import Modal from 'Components/modal/Modal';
 import Activity from './activity/LabbookActivityContainer';
 import Overview from './overview/LabbookOverviewContainer';
 import Environment from './environment/Environment';
 import Code from './code/Code';
 import InputData from './inputData/Input';
 import OutputData from './outputData/Output';
+import MigrationModal from './modals/migration/MigrationModal';
 // query
 import fetchMigrationInfoQuery from './queries/fetchMigrationInfoQuery';
+// backend
+import backend from './labbookBackend';
 // assets
 import './Labbook.scss';
 
@@ -56,10 +53,11 @@ const scrollToTop = () => {
 
 /**
    @param {Object} props
+   @param {Boolean} ignoreContainer
    determines if project is locked
    @return {Boolean}
   */
-const determineIsLocked = (props) => {
+const determineIsLocked = (props, ignoreContainer) => {
   const {
     labbook,
     isBuilding,
@@ -70,7 +68,7 @@ const determineIsLocked = (props) => {
   } = props;
 
   return (
-    (labbook.environment.containerStatus !== 'NOT_RUNNING')
+    ((labbook.environment.containerStatus !== 'NOT_RUNNING') || ignoreContainer)
     || (labbook.environment.imageStatus === 'BUILD_IN_PROGRESS')
     || (labbook.environment.imageStatus === 'BUILD_QUEUED')
     || isBuilding
@@ -83,30 +81,51 @@ const determineIsLocked = (props) => {
 
 
 type Props = {
+  activityRecords: Array,
   auth: {
     isAuthenticated: Function,
   },
-  diskLow: boolean,
+  branchesOpen: Boolean,
+  detailMode: string,
+  diskLow: Boolean,
+  isBuilding: Boolean,
+  isPublishing: Boolean,
+  isSticky: Boolean,
+  isSyncing: Boolean,
   labbook: {
     activeBranchName: string,
     branches: Array<Object>,
-    canManageCollaborators: boolean,
+    defaultRemote: string,
+    description: string,
+    canManageCollaborators: Boolean,
     collaborators: Array<Object>,
+    environment: {
+      containerStatus: string,
+      imageStatus: string,
+      base: {
+        developmentTools: Array
+      },
+    },
     id: string,
     name: string,
     owner: string,
   },
+  labbookName: string,
   location: {
     pathname: string,
   },
+  match: Object,
   relay: {
     refetch: Function,
   },
+  sectionType: string,
+  sidePanelVisible: Boolean,
 }
 
 class Labbook extends Component<Props> {
   state = {
     isLocked: determineIsLocked(this.props),
+    isLockedSync: determineIsLocked(this.props, true),
     collaborators: this.props.labbook.collaborators,
     canManageCollaborators: this.props.labbook.canManageCollaborators,
     branches: this.props.labbook.branches,
@@ -120,7 +139,6 @@ class Labbook extends Component<Props> {
     }),
     isDeprecated: null,
     shouldMigrate: null,
-    buttonState: '',
     packageLatestVersions: [],
     isFetchingPackages: false,
     queuePackageFetch: false,
@@ -164,9 +182,8 @@ class Labbook extends Component<Props> {
     branchMap.forEach((branch) => {
       mergedBranches.push(branch);
     });
-    const isLocked = (nextProps.labbook
-      && nextProps.labbook.environment.containerStatus !== 'NOT_RUNNING')
-      || (nextProps.labbook.environment.imageStatus === 'BUILD_IN_PROGRESS')
+    const isLockedSync = (nextProps.labbook
+      && (nextProps.labbook.environment.imageStatus === 'BUILD_IN_PROGRESS'))
       || (nextProps.labbook.environment.imageStatus === 'BUILD_QUEUED')
       || nextProps.isBuilding
       || nextProps.isSyncing
@@ -175,6 +192,9 @@ class Labbook extends Component<Props> {
       || nextProps.globalIsUploading
       || (transitionState === 'Starting')
       || (transitionState === 'Exporting');
+
+    const isLocked = isLockedSync
+      || (nextProps.labbook.environment.containerStatus !== 'NOT_RUNNING');
 
     const canManageCollaborators = nextProps.labbook
       ? nextProps.labbook.canManageCollaborators
@@ -194,6 +214,7 @@ class Labbook extends Component<Props> {
       canManageCollaborators,
       collaborators,
       isLocked,
+      isLockedSync,
       lockFileBrowser,
     };
   }
@@ -487,71 +508,18 @@ class Labbook extends Component<Props> {
   }
 
   /**
-    migrates project
-  */
-  _migrateProject = () => {
-    const { props, state } = this;
-    const { owner, name } = props.labbook;
-
-    this.setState({ buttonState: 'loading' });
-    MigrateProjectMutation(owner, name, (response, error) => {
-      if (error) {
-        console.log(error);
-        this.setState({ buttonState: 'error' });
-        setTimeout(() => {
-          this.setState({ buttonState: '' });
-        }, 2000);
-      } else {
-        this.setState({
-          isDeprecated: false,
-          shouldMigrate: false,
-        });
-        const oldBranches = props.labbook.branches.filter((branch => branch.branchName.startsWith('gm.workspace')));
-        oldBranches.forEach(({ branchName }, index) => {
-          const data = {
-            branchName,
-            deleteLocal: true,
-            deleteRemote: true,
-          };
-
-          state.branchMutations.deleteBranch(data, (deleteResponse, delteError) => {
-            if (delteError) {
-              this.setState({ buttonState: 'error' });
-
-              setTimeout(() => {
-                this.setState({ buttonState: '' });
-              }, 2000);
-            }
-
-            if (index === oldBranches.length - 1) {
-              this.setState({
-                migrateComplete: true,
-                buttonState: 'finished',
-              });
-              setInfoMessage(owner, name, 'Project migrated successfully');
-              setTimeout(() => {
-                this.setState({ buttonState: '' });
-              }, 2000);
-            }
-          });
-        });
-      }
-    });
-  }
-
-  /**
     @param {}
     dispatches sticky state to redux to update state
   */
   _setStickHeader = () => {
-    const { props } = this;
-    const { owner, name } = props[props.sectionType];
+    const { isSticky, sectionType } = this.props;
+    const { owner, name } = this.props[sectionType];
     const sticky = 50;
-    const isSticky = window.pageYOffset >= sticky;
+    const isPageOffsetAtThreshold = window.pageYOffset >= sticky;
 
     this.offsetDistance = window.pageYOffset;
-    if (props.isSticky !== isSticky) {
-      setStickyDate(owner, name, isSticky);
+    if (isSticky !== isPageOffsetAtThreshold) {
+      setStickyState(owner, name, window.pageYOffset >= sticky);
     }
 
     if (isSticky) {
@@ -560,13 +528,13 @@ class Labbook extends Component<Props> {
   }
 
   /**
-    @param {boolean} branchesOpen
-    @param {boolean} mergeFilter
+    @param {Boolean} branchesOpen
+    @param {Boolean} mergeFilter
     updates branchOpen state
   */
   _toggleBranchesView = (branchesOpen, mergeFilter) => {
-    const { props } = this;
-    const { owner, name } = props[props.sectionType];
+    const { sectionType } = this.props;
+    const { owner, name } = this.props[sectionType];
     if (store.getState().containerStatus.status !== 'Running') {
       setMergeMode(owner, name, branchesOpen, mergeFilter);
     } else {
@@ -615,45 +583,76 @@ class Labbook extends Component<Props> {
     return { showMigrationButton, migrationText };
   }
 
+  /**
+  * @param {Object} state
+  * allows child component to update state
+  */
+  _setState = (state) => {
+    this.setState(state);
+  }
+
   // TODO move migration code into it's own component
   render() {
-    const { props, state } = this;
     const {
+      activityRecords,
+      auth,
+      branchesOpen,
+      detailMode,
       diskLow,
       isBuilding,
       isPublishing,
       isSyncing,
-    } = props;
-    const { owner, name } = props.labbook;
+      isSticky,
+      labbook,
+      labbookName,
+      match,
+      sidePanelVisible,
+    } = this.props;
+    const { owner, name } = labbook;
     const isLocked = isBuilding
       || isSyncing
       || isPublishing
-      || state.isLocked;
+      || this.state.isLocked;
+    const isLockedSync = isBuilding
+      || isSyncing
+      || isPublishing
+      || this.state.isLockedSync;
 
-    if (props.labbook) {
-      const { labbook, branchesOpen } = props;
-      const sidePanelVisible = !isLocked && props.sidePanelVisible;
+    if (labbook) {
+      const {
+        branches,
+        branchMutations,
+        buttonState,
+        canManageCollaborators,
+        collaborators,
+        isDeprecated,
+        lockFileBrowser,
+        migrateComplete,
+        migrationInProgress,
+        migrationModalVisible,
+        packageLatestVersions,
+      } = this.state;
+      const isSidePanelVisible = !isLocked && sidePanelVisible;
       const branchName = '';
       const { migrationText, showMigrationButton } = this._getMigrationInfo();
-      const oldBranches = labbook.branches.filter((branch => branch.branchName.startsWith('gm.workspace') && branch.branchName !== labbook.activeBranchName));
-      const migrationModalType = state.migrateComplete ? 'large' : 'large-long';
-      const { containerStatus } = props.labbook.environment;
+      const { containerStatus, imageStatus } = labbook.environment;
+      // declare css here
       const labbookCSS = classNames({
         Labbook: true,
-        'Labbook--detail-mode': props.detailMode,
+        'Labbook--detail-mode': detailMode,
         'Labbook--branch-mode': branchesOpen,
         'Labbook--disk-low': diskLow,
-        'Labbook--deprecated': state.isDeprecated,
-        'Labbook--disk-low--deprecated': state.isDeprecated && diskLow,
-        'Labbook--sidePanelVisible': sidePanelVisible,
-        'Labbook--locked': state.isLocked,
+        'Labbook--deprecated': isDeprecated,
+        'Labbook--disk-low--deprecated': isDeprecated && diskLow,
+        'Labbook--sidePanelVisible': isSidePanelVisible,
+        'Labbook--locked': isLocked,
       });
       const deprecatedCSS = classNames({
         Labbook__deprecated: true,
         'Labbook__deprecated--disk-low': diskLow,
       });
       const migrationButtonCSS = classNames({
-        'Tooltip-data': state.isLocked,
+        'Tooltip-data': isLocked,
       });
 
       return (
@@ -662,7 +661,7 @@ class Labbook extends Component<Props> {
             <Loader />
           </div>
           <div className="Labbook__spacer flex flex--column">
-            { state.isDeprecated
+            { isDeprecated
               && (
               <div className={deprecatedCSS}>
                 {migrationText}
@@ -683,10 +682,10 @@ class Labbook extends Component<Props> {
                     <button
                       className="Button Labbook__deprecated-action"
                       onClick={() => this._toggleMigrationModal()}
-                      disabled={state.migrationInProgress || state.isLocked}
+                      disabled={migrationInProgress || isLocked}
                       type="button"
                     >
-                    Migrate
+                      Migrate
                     </button>
                   </div>
                   )
@@ -694,161 +693,51 @@ class Labbook extends Component<Props> {
               </div>
               )
             }
-            {
-              (state.migrationModalVisible)
-              && (
-              <Modal
-                header="Project Migration"
-                handleClose={() => this._toggleMigrationModal()}
-                size={migrationModalType}
-                renderContent={() => (
-                  <div className="Labbook__migration-modal">
-                    {
-                    !state.migrateComplete
-                      ? (
-                        <div className="Labbook__migration-container">
-                          <div className="Labbook__migration-content">
-                            <p className="Labbook__migration-p"><b>Migration will rename the current branch to 'master' and delete all other branches.</b></p>
-                            <p>Before migrating, you should:</p>
-                            <ul>
-                              <li>
-                          Make sure you are on the branch with your latest changes. This is most likely
-                                <b style={{ whiteSpace: 'nowrap' }}>
-                                  {` gm.workspace-${localStorage.getItem('username')}`}
-                                </b>
-                          . If you just imported this project from a zip file, you should migrate from
-                                <b style={{ whiteSpace: 'nowrap' }}> gm.workspace</b>
-                          .
-                              </li>
-                              <li>Export the project to a zip file as a backup, if desired.</li>
-                            </ul>
-                            <p>
-                              <b>
-                          Branch to be migrated:
-                              </b>
-                              {` ${labbook.activeBranchName}`}
-                            </p>
-                            <b>Branches to be deleted:</b>
-                            {
-                        oldBranches.length
-                          ? (
-                            <ul>
-                              {
-                            oldBranches.map(({ branchname }) => (
-                              <li key={branchname}>{branchname}</li>
-                            ))
-                          }
-                            </ul>
-                          )
-                          : (
-                            <ul>
-                              <li>No other branches to delete.</li>
-                            </ul>
-                          )
-                      }
-                          </div>
-                          <div className="Labbook__migration-buttons">
-                            <button
-                              onClick={() => this._toggleMigrationModal()}
-                              className="Btn--flat"
-                              type="button"
-                            >
-                            Cancel
-                            </button>
-                            <ButtonLoader
-                              buttonState={this.state.buttonState}
-                              buttonText="Migrate Project"
-                              className=""
-                              params={{}}
-                              buttonDisabled={false}
-                              clicked={() => this._migrateProject()}
-                            />
-                          </div>
-                        </div>
-                      )
-                      : (
-                        <div className="Labbook__migration-container">
-                          <div className="Labbook__migration-content">
-                            <div className="Labbook__migration-center">
-                              {
-                          labbook.defaultRemote
-                            ? (
-                              <Fragment>
-                            You should now click
-                                <b> sync </b>
-                            to push the new
-                                <b> master </b>
-                            branch to the cloud. This is the new primary branch to work from.
-                              </Fragment>
-                            )
-                            : (
-                              <Fragment>
-                            Your work has been migrated to the
-                                <b> master </b>
-                            branch. This is the new primary branch to work from.
-                              </Fragment>
-                            )
-                          }
-                              <a
-                                target="_blank"
-                                href="https://docs.gigantum.com/docs/project-migration"
-                                rel="noopener noreferrer"
-                              >
-                                Learn More.
-                              </a>
-                              <p>Remember to notify collaborators that this project has been migrated. They may need to re-import the project.</p>
-                            </div>
-                            <div className="Labbook__migration-buttons">
-                              <button
-                                type="button"
-                                className="Labbook__migration--dismiss"
-                                onClick={() => this._toggleMigrationModal()}
-                              >
-                              Dismiss
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      )
-                    }
-                  </div>
-                )
-                }
-              />
-              )
-            }
+
+            <MigrationModal
+              branchMutations={branchMutations}
+              buttonState={buttonState}
+              labbook={labbook}
+              migrationModalVisible={migrationModalVisible}
+              migrateComplete={migrateComplete}
+              setParentState={this._setState}
+              toggleMigrationModal={this._toggleMigrationModal}
+            />
+
             <Header
-              {...props}
+              {...this.props}
               owner={owner}
               name={name}
               ref={header => header}
               description={labbook.description}
               toggleBranchesView={this._toggleBranchesView}
               sectionType="labbook"
-              containerStatus={labbook.environment.containerStatus}
-              imageStatus={labbook.environment.imageStatus}
+              containerStatus={containerStatus}
+              imageStatus={imageStatus}
               isLocked={isLocked}
-              collaborators={state.collaborators}
-              canManageCollaborators={state.canManageCollaborators}
+              isLockedSync={isLockedSync}
+              isSticky={isSticky}
+              collaborators={collaborators}
+              canManageCollaborators={canManageCollaborators}
               visibility={labbook.visibility}
               defaultRemote={labbook.defaultRemote}
-              branches={state.branches}
+              branches={branches}
               setBranchUptodate={this._setBranchUptodate}
-              isDeprecated={state.isDeprecated}
+              isDeprecated={isDeprecated}
               updateMigationState={this._updateMigationState}
-              sidePanelVisible={sidePanelVisible}
+              sidePanelVisible={isSidePanelVisible}
               showMigrationButton={showMigrationButton}
             />
             <div className="Labbook__routes flex flex-1-0-auto">
               <Switch>
                 <Route
                   exact
-                  path={`${props.match.path}`}
+                  path={`${match.path}`}
                   render={() => (
                     <ErrorBoundary type="labbookSectionError">
                       <Overview
-                        {...props}
-                        key={`${props.labbookName}_overview`}
+                        {...this.props}
+                        key={`${labbookName}_overview`}
                         labbook={labbook}
                         labbookId={labbook.id}
                         refetch={this._refetchSection}
@@ -862,12 +751,12 @@ class Labbook extends Component<Props> {
                   )}
                 />
 
-                <Route path={`${props.match.path}/:labbookMenu`}>
+                <Route path={`${match.path}/:labbookMenu`}>
 
                   <Switch>
 
                     <Route
-                      path={`${props.match.path}/overview`}
+                      path={`${match.path}/overview`}
                       render={() => (
 
                         <ErrorBoundary
@@ -875,8 +764,8 @@ class Labbook extends Component<Props> {
                           key="overview"
                         >
                           <Overview
-                            {...props}
-                            key={`${props.labbookName}_overview`}
+                            {...this.props}
+                            key={`${labbookName}_overview`}
                             labbook={labbook}
                             description={labbook.description}
                             labbookId={labbook.id}
@@ -892,18 +781,19 @@ class Labbook extends Component<Props> {
                     />
 
                     <Route
-                      path={`${props.match.path}/activity`}
+                      path={`${match.path}/activity`}
                       render={() => (
                         <ErrorBoundary
                           type="labbookSectionError"
                           key="activity"
                         >
                           <Activity
-                            key={`${props.labbookName}_activity`}
+                            {...this.props}
+                            key={`${labbookName}_activity`}
                             labbook={labbook}
-                            diskLow={props.diskLow}
+                            diskLow={diskLow}
                             refetch={this._refetchSection}
-                            activityRecords={props.activityRecords}
+                            activityRecords={activityRecords}
                             labbookId={labbook.id}
                             branchName={branchName}
                             description={labbook.description}
@@ -911,24 +801,24 @@ class Labbook extends Component<Props> {
                             isMainWorkspace={branchName === 'master'}
                             sectionType="labbook"
                             isLocked={isLocked}
-                            isDeprecated={state.isDeprecated}
+                            isDeprecated={isDeprecated}
                             owner={owner}
                             name={name}
-                            {...props}
                           />
                         </ErrorBoundary>
                       )}
                     />
 
                     <Route
-                      path={`${props.match.url}/environment`}
+                      path={`${match.url}/environment`}
                       render={() => (
                         <ErrorBoundary
                           type="labbookSectionError"
                           key="environment"
                         >
                           <Environment
-                            key={`${props.labbookName}_environment`}
+                            {...this.props}
+                            key={`${labbookName}_environment`}
                             labbook={labbook}
                             owner={owner}
                             name={name}
@@ -936,17 +826,16 @@ class Labbook extends Component<Props> {
                             refetch={this._refetchSection}
                             overview={labbook.overview}
                             isLocked={isLocked}
-                            packageLatestVersions={state.packageLatestVersions}
+                            packageLatestVersions={packageLatestVersions}
                             packageLatestRefetch={this._packageLatestRefetch}
                             cancelRefetch={this._cancelRefetch}
-                            {...props}
                           />
                         </ErrorBoundary>
                       )}
                     />
 
                     <Route
-                      path={`${props.match.url}/code`}
+                      path={`${match.url}/code`}
                       render={() => (
                         <ErrorBoundary
                           type="labbookSectionError"
@@ -960,7 +849,7 @@ class Labbook extends Component<Props> {
                             isLocked={isLocked}
                             containerStatus={containerStatus}
                             section="code"
-                            lockFileBrowser={state.lockFileBrowser}
+                            lockFileBrowser={lockFileBrowser}
                             owner={labbook.owner}
                             name={labbook.name}
                           />
@@ -970,7 +859,7 @@ class Labbook extends Component<Props> {
                     />
 
                     <Route
-                      path={`${props.match.url}/inputData`}
+                      path={`${match.url}/inputData`}
                       render={() => (
                         <ErrorBoundary
                           type="labbookSectionError"
@@ -982,7 +871,7 @@ class Labbook extends Component<Props> {
                             isLocked={isLocked}
                             refetch={this._refetchSection}
                             containerStatus={containerStatus}
-                            lockFileBrowser={state.lockFileBrowser}
+                            lockFileBrowser={lockFileBrowser}
                             owner={labbook.owner}
                             name={labbook.name}
                             section="input"
@@ -992,7 +881,7 @@ class Labbook extends Component<Props> {
                     />
 
                     <Route
-                      path={`${props.match.url}/outputData`}
+                      path={`${match.url}/outputData`}
                       render={() => (
                         <ErrorBoundary
                           type="labbookSectionError"
@@ -1004,7 +893,7 @@ class Labbook extends Component<Props> {
                             isLocked={isLocked}
                             refetch={this._refetchSection}
                             containerStatus={containerStatus}
-                            lockFileBrowser={state.lockFileBrowser}
+                            lockFileBrowser={lockFileBrowser}
                             owner={labbook.owner}
                             name={labbook.name}
                             section="output"
@@ -1026,12 +915,12 @@ class Labbook extends Component<Props> {
         </div>
       );
     }
-
-    if (state.authenticated) {
+    const { authenticated } = this.state;
+    if (authenticated) {
       return (<Loader />);
     }
 
-    return (<Login auth={props.auth} />);
+    return (<Login auth={auth} />);
   }
 }
 
@@ -1086,6 +975,11 @@ const LabbookFragmentContainer = createRefetchContainer(
            isLocal
            isRemote
          }
+         environment {
+           bundledApps {
+             appName
+           }
+         }
           ...Environment_labbook
           ...LabbookOverviewContainer_labbook
           ...LabbookActivityContainer_labbook
@@ -1112,23 +1006,5 @@ const LabbookFragmentContainer = createRefetchContainer(
   `,
 );
 
-/** *
-  * @param {Object} manager
-  * data object for reactDND
-*/
-
-const backend = (manager) => {
-  const backend = HTML5Backend(manager);
-  const orgTopDropCapture = backend.handleTopDropCapture;
-
-  backend.handleTopDropCapture = (e) => {
-    if (backend.currentNativeSource) {
-      orgTopDropCapture.call(backend, e);
-      backend.currentNativeSource.item.dirContent = getFilesFromDragEvent(e, { recursive: true }); // returns a promise
-    }
-  };
-
-  return backend;
-};
 
 export default DragDropContext(backend)(LabbookFragmentContainer);

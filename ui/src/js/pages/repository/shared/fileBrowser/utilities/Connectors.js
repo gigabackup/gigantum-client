@@ -1,5 +1,8 @@
 // store
 import store from 'JS/redux/store';
+import {
+  setWarningMessage,
+} from 'JS/redux/actions/footer';
 // utilities
 import FileBrowserMutations from './FileBrowserMutations';
 import prepareUpload from './PrepareUpload';
@@ -28,7 +31,6 @@ const dragSource = {
     if (!monitor.didDrop()) {
       return;
     }
-
     const dropResult = monitor.getDropResult();
     const fileNameParts = props.fileData.edge.node.key.split('/');
     const fileName = fileNameParts[fileNameParts.length - 1];
@@ -138,6 +140,10 @@ const targetSource = {
     // TODO: clean up this code, some of this logic is being duplicated. make better use of functions
     const dndItem = monitor.getItem();
     const { section } = props.section ? props : props.mutationData;
+    if ((section === 'data') && !props.uploadAllowed) {
+      setWarningMessage(props.owner, props.name, 'You do not have adequate permissions to modify this dataset');
+      return;
+    }
     const promptType = props.section
       ? props.section
       : ((props.mutationData) && (props.mutationData.section))
@@ -156,7 +162,7 @@ const targetSource = {
         newPath = newKey + fileName;
         fileKey = props.fileKey;
       } else {
-        prepareUpload(dndItem, props, monitor, props.mutationData, component)
+        prepareUpload(dndItem, props, monitor, props.mutationData, component);
       }
     } else {
       // root folder upload
@@ -179,9 +185,7 @@ const targetSource = {
       const item = monitor.getItem();
       // check to see if it is an upload
       if (item.files) {
-
         prepareUpload(item, props, monitor, component.state.mutationData, component);
-
       } else { // else it's a move
         const dropResult = monitor.getDropResult();
         const currentKey = item.fileData.edge.node.key;

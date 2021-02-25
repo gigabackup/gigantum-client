@@ -301,8 +301,9 @@ class CreateBranchModal extends Component<Props> {
             size="large"
             header={branchModalTitle}
             icon={icon}
-            renderContent={() => (
-              <div className="CreateBranch">
+          >
+            <div className="CreateBranch">
+              <div>
                 <div className="CreateBranch__name">
                   <label
                     htmlFor="CreateBranchName"
@@ -342,34 +343,32 @@ class CreateBranchModal extends Component<Props> {
                   </label>
                   <p className={`CreateBranch__warning ${textWarning}`}>{`${textLength} characters remaining`}</p>
                 </div>
+              </div>
+              <div className="CreateBranch_nav">
+                <div className="CreateBranch__buttons">
+                  <button
+                    type="submit"
+                    disabled={inputsDisabled}
+                    onClick={() => { this._hideModal(); }}
+                    className="CreateBranch__btn--progress Btn--flat"
+                  >
+                    Cancel
+                  </button>
 
-                <div className="CreateBranch_nav">
-                  <div className="CreateBranch__buttons">
-                    <button
-                      type="submit"
-                      disabled={inputsDisabled}
-                      onClick={() => { this._hideModal(); }}
-                      className="CreateBranch__btn--progress Btn--flat"
-                    >
-                      Cancel
-                    </button>
-
-                    <ButtonLoader
-                      className="Btn--last"
-                      buttonState={buttonLoaderCreateBranch}
-                      buttonText="Create"
-                      params={{}}
-                      buttonDisabled={createDisabled}
-                      clicked={this._createNewBranch}
-                    />
-                  </div>
+                  <ButtonLoader
+                    className="Btn--last"
+                    buttonState={buttonLoaderCreateBranch}
+                    buttonText="Create"
+                    params={{}}
+                    buttonDisabled={createDisabled}
+                    clicked={this._createNewBranch}
+                  />
                 </div>
               </div>
-            )
-          }
-          />
-          )
-        }
+            </div>
+
+          </Modal>
+          )}
       </div>
 
     );

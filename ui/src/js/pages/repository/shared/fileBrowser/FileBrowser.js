@@ -495,7 +495,6 @@ class FileBrowser extends Component {
     const deletedKeys = [];
 
     Object.keys(state.childrenState).forEach((key) => {
-
       if (state.childrenState[key].isSelected) {
         const { edge } = state.childrenState[key];
         delete this.state.childrenState[key];
@@ -820,7 +819,7 @@ class FileBrowser extends Component {
   _getFilePromptText = () => {
     const { section } = this.props;
     const size = (section === 'code') ? '100MB' : '500MB';
-    return `Click 'Continue' to upload all files under the ${size} limit. \nFiles over the limit will be ignored.`
+    return `Click 'Continue' to upload all files under the ${size} limit. \nFiles over the limit will be ignored.`;
   }
 
   /**
@@ -954,6 +953,7 @@ class FileBrowser extends Component {
       owner,
       relay,
       section,
+      uploadAllowed,
     } = this.props;
     const { isSelected } = this._checkChildState();
     const allFilesLocal = checkLocalAll(files);
@@ -962,7 +962,7 @@ class FileBrowser extends Component {
     const folderKeys = this._getKeys(files, 'folder');
     const fileKeys = this._getKeys(files, 'files');
     const childrenKeys = folderKeys.concat(fileKeys);
-    const readOnly = section === 'data' && !isManaged;
+    const readOnly = section === 'data' && (!isManaged || !uploadAllowed);
     const downloadList = getDownloadList(props, state);
     const downloadDisabled = isLocked || downloadingEdges || downloadingAll;
     const { fileTooLarge, filePrompted } = getQueuedFiles(uploadData);
@@ -1039,8 +1039,7 @@ class FileBrowser extends Component {
                 name={name}
                 owner={owner}
               />
-            )
-          }
+            )}
           { fileSizePromptVisible
              && (
                <FileSizePromptModal
@@ -1054,8 +1053,7 @@ class FileBrowser extends Component {
                  owner={owner}
                  section={section}
                />
-             )
-           }
+             )}
 
           <h4 className="margin--0 regular">Files</h4>
 
@@ -1074,6 +1072,7 @@ class FileBrowser extends Component {
             mutations={mutations}
             name={name}
             owner={owner}
+            uploadAllowed={uploadAllowed}
           />
 
           {
@@ -1191,6 +1190,7 @@ class FileBrowser extends Component {
                     refetch={this._refetch}
                     name={name}
                     owner={owner}
+                    uploadAllowed={uploadAllowed}
                   />
                 );
               } if (isFile) {
@@ -1234,8 +1234,7 @@ class FileBrowser extends Component {
                 <div className="FileBrowser__empty">
                   <h5>No files match your search.</h5>
                 </div>
-                )
-            }
+                )}
 
             { showDropzone
                 && (
@@ -1264,8 +1263,7 @@ class FileBrowser extends Component {
                       />
                     </label>
                   </div>
-                )
-            }
+                )}
             {
               initialLoad
               && (
@@ -1281,8 +1279,7 @@ class FileBrowser extends Component {
                 <div className="FileBrowser__lock">
                   <span />
                 </div>
-              )
-            }
+              )}
           </div>
         </div>,
       )

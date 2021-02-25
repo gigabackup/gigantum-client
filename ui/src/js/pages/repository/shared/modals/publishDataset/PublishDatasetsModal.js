@@ -25,11 +25,13 @@ type Props = {
   checkSessionIsValid: Function,
   handleSync: Function,
   header: string,
+  isVisible: boolean,
   localDatasets: Array,
   name: string,
   owner: string,
   resetPublishState: Function,
   resetState: Function,
+  setPublishErrorState: Function,
   setPublishingState: Function,
   setRemoteSession: Function,
   setSyncingState: Function,
@@ -137,12 +139,13 @@ class PublishDatasetsModal extends Component<Props> {
   *  sets public state
   *  @return {}
   */
-  _failureCall = (errorMessage) => {
+  _failureCall = (errorMessage, jobQueryData) => {
     const {
       header,
       owner,
       name,
       resetPublishState,
+      setPublishErrorState,
       setPublishingState,
       setSyncingState,
       toggleModal,
@@ -150,6 +153,7 @@ class PublishDatasetsModal extends Component<Props> {
     } = this.props;
     const isPublishing = (header === 'Publish');
 
+    setPublishErrorState(errorMessage, jobQueryData);
     setTimeout(() => toggleModal(false, true), 2000);
 
     if (isPublishing) {
@@ -456,6 +460,7 @@ class PublishDatasetsModal extends Component<Props> {
     const {
       buttonText,
       header,
+      isVisible,
       localDatasets,
       name,
       owner,
@@ -476,83 +481,82 @@ class PublishDatasetsModal extends Component<Props> {
       'PublishDatasetsModal__container--processing': isProcessing,
     });
 
+
+    if (!isVisible) {
+      return null;
+    }
+
     return (
       <Modal
         header={header}
         handleClose={this._handleClose}
         size="large"
         icon="dataset"
-        renderContent={() => (
-          <div className="PublishDatasetsModal">
-            { showPrompt
-              ? (
-                <WarningInfoPrompt
-                  localDatasets={localDatasets}
-                  toggleModal={toggleModal}
-                  hidePrompt={this._hidePrompt}
-                />
-              )
-              : (
-                <div>
-                  <div className={containerCSS}>
-                    { (header === 'Publish') || isProcessing
-                      ? (
-                        <ProjectPublish
-                          isProcessing={isProcessing}
-                          owner={owner}
-                          name={name}
-                          setPublic={this._setPublic}
-                          header={header}
-                          progress={progress}
-                        />
-                      )
-                      : <p>Select the visibility for the datasets to be published.</p>
-                    }
-                    <h5 className="PublishDatasetsModal__Label">
-                      Datasets
-                    </h5>
-                    <ul>
-                      { localDatasets.map(localDataset => (
-                        <DatasetPublish
-                          localDataset={localDataset}
-                          setPublic={this._setPublic}
-                          progress={progress}
-                          isProcessing={isProcessing}
-                        />
-                      ))
-                      }
-                    </ul>
+      >
+        <div className="PublishDatasetsModal">
+          { showPrompt
+            ? (
+              <WarningInfoPrompt
+                localDatasets={localDatasets}
+                toggleModal={toggleModal}
+                hidePrompt={this._hidePrompt}
+              />
+            )
+            : (
+              <div>
+                <div className={containerCSS}>
+                  { (header === 'Publish') || isProcessing
+                    ? (
+                      <ProjectPublish
+                        isProcessing={isProcessing}
+                        owner={owner}
+                        name={name}
+                        setPublic={this._setPublic}
+                        header={header}
+                        progress={progress}
+                      />
+                    )
+                    : <p>Select the visibility for the datasets to be published.</p>}
+                  <h5 className="PublishDatasetsModal__Label">
+                    Datasets
+                  </h5>
+                  <ul>
+                    { localDatasets.map(localDataset => (
+                      <DatasetPublish
+                        localDataset={localDataset}
+                        setPublic={this._setPublic}
+                        progress={progress}
+                        isProcessing={isProcessing}
+                      />
+                    ))}
+                  </ul>
 
-                  </div>
-                  { (!isProcessing)
-                      && (
-                      <div className="PublishDatasetsModal__buttons">
-                        <button
-                          type="button"
-                          className="Btn--flat"
-                          onClick={() => { toggleModal(false, true); }}
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          type="button"
-                          className="Btn Btn--last"
-                          disabled={isDisabled}
-                          onClick={() => { this._publishLabbook(); }}
-                        >
-                          {buttonText}
-                          {header === 'Sync' && ' And Sync'}
-                        </button>
-                      </div>
-                      )
-                    }
                 </div>
-              )
-              }
-          </div>
-        )
-        }
-      />
+                { (!isProcessing)
+                    && (
+                    <div className="PublishDatasetsModal__buttons">
+                      <button
+                        type="button"
+                        className="Btn--flat"
+                        onClick={() => { toggleModal(false, true); }}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        className="Btn Btn--last"
+                        disabled={isDisabled}
+                        onClick={() => { this._publishLabbook(); }}
+                      >
+                        {buttonText}
+                        {header === 'Sync' && ' And Sync'}
+                      </button>
+                    </div>
+                    )}
+              </div>
+            )}
+        </div>
+      </Modal>
     );
   }
 }

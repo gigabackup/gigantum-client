@@ -81,8 +81,9 @@ class TestContainerOps:
         result = proj_container.exec_command("echo My sample message", get_results=True)
         assert result.strip() == 'My sample message'
 
-        result = proj_container.exec_command("pip search gigantum", get_results=True)
-        assert any(['Gigantum Platform' in l for l in result.strip().split('\n')])
+        result = proj_container.exec_command("pip freeze", get_results=True)
+        assert "conda" in result
+        assert "notebook" in result
 
         result = proj_container.exec_command("/bin/true", get_results=True)
         assert result.strip() == ""
@@ -173,24 +174,27 @@ class TestPutFile:
             assert tf - t0 < 1.0, \
                 f"Time to insert small file must be less than 1 sec - took {tf-t0:.2f}s"
 
-    @pytest.mark.skipif(getpass.getuser() == 'circleci', reason="Cannot run this test in CircleCI, needs shared vol")
     def test_start_bundled_app(self, build_lb_image_for_jupyterlab):
-        test_file_path = os.path.join('/mnt', 'share', 'test.txt')
-        try:
-            lb = build_lb_image_for_jupyterlab[0]
+        test_file_path = "/tmp/test.txt"
 
-            assert os.path.exists(test_file_path) is False
+        lb = build_lb_image_for_jupyterlab[0]
 
-            bam = BundledAppManager(lb)
-            bam.add_bundled_app(9002, 'my app', 'tester', f"echo 'teststr' >> {test_file_path}")
-            apps = bam.get_bundled_apps()
+        client = docker.from_env()
+        container = client.containers.get(build_lb_image_for_jupyterlab[4])
+        result = container.exec_run(f"cat {test_file_path}")
+        assert result.exit_code == 1
+        assert "No such file" in result.output.decode()
 
-            start_bundled_app(lb, 'unittester', apps['my app']['command'])
+        bam = BundledAppManager(lb)
+        bam.add_bundled_app(9002, 'my app', 'tester', f"echo 'teststr' >> {test_file_path}")
+        apps = bam.get_bundled_apps()
 
-            time.sleep(3)
-            assert os.path.exists(test_file_path) is True
-        except:
-            raise
-        finally:
-            if os.path.exists(test_file_path):
-                os.remove(test_file_path)
+        start_bundled_app(lb, 'unittester', apps['my app']['command'], "")
+
+        time.sleep(3)
+
+        result = container.exec_run(f"cat {test_file_path}")
+        assert result.exit_code == 0
+        assert "teststr" in result.output.decode()
+
+

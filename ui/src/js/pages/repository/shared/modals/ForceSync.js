@@ -1,5 +1,5 @@
 // vendor
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import uuidv4 from 'uuid/v4';
 // mutations
 import SyncLabbookMutation from 'Mutations/branches/SyncLabbookMutation';
@@ -12,11 +12,14 @@ import { setMultiInfoMessage } from 'JS/redux/actions/footer';
 import './ForceSync.scss';
 
 type Props = {
-  owner: string,
+  isVisible: boolean,
   name: string,
+  owner: string,
   pullOnly: bool,
+  sectionType: string,
+  setPublishErrorState: Function,
   toggleSyncModal: Function,
-}
+};
 
 export default class ForceSync extends Component<Props> {
   /**
@@ -25,16 +28,17 @@ export default class ForceSync extends Component<Props> {
   *  @return {}
   */
   _forceSync(method) {
-    const { props } = this;
     const id = uuidv4;
     const {
       owner,
       name,
       pullOnly,
+      sectionType,
+      setPublishErrorState,
       toggleSyncModal,
     } = this.props;
 
-    if (props.sectionType === 'labbook') {
+    if (sectionType === 'labbook') {
       const footerMessageData = {
         id,
         message: 'Syncing Project with Gigantum cloud ...',
@@ -60,6 +64,13 @@ export default class ForceSync extends Component<Props> {
               messageBody: error,
             };
             setMultiInfoMessage(owner, name, messageData);
+
+            setPublishErrorState(
+              `Could not 'force' sync ${name}`,
+              {
+                feedback: error[0].message,
+              },
+            );
           }
         },
       );
@@ -89,6 +100,13 @@ export default class ForceSync extends Component<Props> {
               messageBody: error,
             };
             setMultiInfoMessage(owner, name, messageData);
+
+            setPublishErrorState(
+              `Could not 'force' sync ${name}`,
+              {
+                feedback: error[0].message,
+              },
+            );
           }
         },
       );
@@ -99,45 +117,49 @@ export default class ForceSync extends Component<Props> {
 
   render() {
     const {
+      isVisible,
       toggleSyncModal,
     } = this.props;
+
+    if (!isVisible) {
+      return null;
+    }
+
     return (
       <Modal
         header="Sync Conflict"
         handleClose={() => toggleSyncModal()}
         size="medium"
         icon="sync"
-        renderContent={() => (
-          <Fragment>
-            <div>
-              <p>Your Project conflicts with changes already synced to the server. You can choose which changes to use</p>
-              <p><b>**Note: This will overwrite the unselected conflicting files.</b></p>
-              <p>Which changes would you like to use?</p>
-            </div>
-            <div className="ForceSync__buttonContainer">
-              <button
-                onClick={() => { this._forceSync('ours'); }}
-                type="button"
-              >
-                Use Mine
-              </button>
-              <button
-                onClick={() => { this._forceSync('theirs'); }}
-                type="button"
-              >
-                Use Theirs
-              </button>
-              <button
-                onClick={() => { toggleSyncModal(); }}
-                type="button"
-              >
-                Abort
-              </button>
-            </div>
-          </Fragment>
-        )
-        }
-      />
+      >
+        <>
+          <div>
+            <p>Your Project conflicts with changes already synced to the server. You can choose which changes to use</p>
+            <p><b>**Note: This will overwrite the unselected conflicting files.</b></p>
+            <p>Which changes would you like to use?</p>
+          </div>
+          <div className="ForceSync__buttonContainer">
+            <button
+              onClick={() => { this._forceSync('ours'); }}
+              type="button"
+            >
+              Use Mine
+            </button>
+            <button
+              onClick={() => { this._forceSync('theirs'); }}
+              type="button"
+            >
+              Use Theirs
+            </button>
+            <button
+              onClick={() => { toggleSyncModal(); }}
+              type="button"
+            >
+              Abort
+            </button>
+          </div>
+        </>
+      </Modal>
     );
   }
 }
