@@ -1,6 +1,8 @@
 // vendor
 import React, { Component } from 'react';
 import classNames from 'classnames';
+// context
+import ServerContext from 'Pages/ServerContext';
 // components
 import LoginPrompt from 'Pages/repository/shared/modals/LoginPrompt';
 import Collaborators from './collaborators/Collaborators';
@@ -45,22 +47,26 @@ class ActionsSection extends Component<Props> {
     });
 
     return (
+      <ServerContext.Consumer>
+        { value => (
+          <div className={actionsSectionCSS}>
+            <Collaborators
+              {...this.props}
+              showLoginPrompt={this._showLoginPrompt}
+            />
+            <ActionsMenu
+              {...this.props}
+              currentServer={value.currentServer}
+              showLoginPrompt={this._showLoginPrompt}
+            />
 
-      <div className={actionsSectionCSS}>
-        <Collaborators
-          {...this.props}
-          showLoginPrompt={this._showLoginPrompt}
-        />
-        <ActionsMenu
-          {...this.props}
-          showLoginPrompt={this._showLoginPrompt}
-        />
-
-        <LoginPrompt
-          showLoginPrompt={showLoginPrompt}
-          closeModal={this._closeLoginPromptModal}
-        />
-      </div>
+            <LoginPrompt
+              showLoginPrompt={showLoginPrompt}
+              closeModal={this._closeLoginPromptModal}
+            />
+          </div>
+        )}
+      </ServerContext.Consumer>
     );
   }
 }

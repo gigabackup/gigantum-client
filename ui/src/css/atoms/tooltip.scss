@@ -121,6 +121,18 @@
         cursor: pointer;
     }
 
+
+    &--info--white {
+        width: 15px;
+        height: 15px;
+        background: url('~Images/icons/info-icon-white.svg') no-repeat center center;
+        background-size: 15px;
+        position: absolute;
+        right: 10px;
+        top: calc(50% - 7px);
+        cursor: pointer;
+    }
+
     &--visible::after,
     &--visible:hover::after {
       width: 140px !important;

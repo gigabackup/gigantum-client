@@ -2,11 +2,16 @@
 // vendor
 import React, { Component } from 'react';
 import ReactTooltip from 'react-tooltip';
+import classNames from 'classnames';
+// components
 import VisibilityModal from 'Pages/repository/shared/modals/visibility/VisibilityModal';
 // css
 import './ChangeVisibility.scss';
 
 type Props = {
+  currentServer: {
+    backupInProgress: boolean,
+  },
   defaultRemote: string,
   name: string,
   owner: string,
@@ -34,15 +39,22 @@ class ChangeVisibility extends Component<Props> {
 
   render() {
     const {
+      currentServer,
       defaultRemote,
       remoteUrl,
       visibility,
       isLocked,
     } = this.props;
+    const { backupInProgress } = currentServer;
     const { visibilityModalVisible } = this.state;
 
     const doesNotHaveRemote = (defaultRemote === null) && (remoteUrl === null);
 
+    // declare css here
+    const visibilityButtonCSS = classNames({
+      'ActionsMenu__btn--flat': true,
+      'Tooltip-data': backupInProgress,
+    });
 
     return (
       <li
@@ -53,9 +65,10 @@ class ChangeVisibility extends Component<Props> {
         <div className={`ActionsMenu__item ChangeVisibility--visibility-${visibility}`}>
 
           <button
-            disabled={doesNotHaveRemote || isLocked}
+            className={visibilityButtonCSS}
+            data-tooltip="Visibility cannot be modified when backup is in progress."
+            disabled={doesNotHaveRemote || isLocked || backupInProgress}
             onClick={() => this._toggleModal('visibilityModalVisible')}
-            className="ActionsMenu__btn--flat"
             type="button"
           >
             Change Visibility

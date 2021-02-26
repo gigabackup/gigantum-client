@@ -25,8 +25,6 @@ import { setContainerMenuWarningMessage, setContainerMenuVisibility } from 'JS/r
 // queries
 import UserIdentity from 'JS/Auth/UserIdentity';
 import LinkedLocalDatasetsQuery from 'Pages/repository/shared/header/actionsSection/queries/LinkedLocalDatasetsQuery';
-// context
-import ServerContext from 'Pages/ServerContext';
 // components
 import CreateBranch from 'Pages/repository/shared/modals/createBranch/CreateBranch';
 import Tooltip from 'Components/tooltip/Tooltip';
@@ -39,6 +37,9 @@ import ChangeVisibility from './visibility/ChangeVisibility';
 import './ActionsMenu.scss';
 
 type Props = {
+  currentServer: {
+    baseUrl: string,
+  },
   defaultRemote: string,
   description: string,
   history: Object,
@@ -564,7 +565,7 @@ class ActionsMenu extends Component<Props> {
   *  @return {}
   */
   _setRemoteSession = () => {
-    const { currentServer } = this.context;
+    const { currentServer } = this.props;
     const { baseUrl } = currentServer;
     const {
       name,
@@ -576,26 +577,25 @@ class ActionsMenu extends Component<Props> {
     });
   }
 
-  static contextType = ServerContext;
-
   render() {
     const {
+      currentServer,
+      defaultRemote,
+      description,
+      history,
+      isLocked,
       name,
       owner,
       sectionType,
-      defaultRemote,
-      history,
-      description,
-      isLocked,
     } = this.props;
     const {
-      menuOpen,
-      showLoginPrompt,
       deleteModalVisible,
-      remoteUrl,
-      justOpened,
       exporting,
       exportPath,
+      justOpened,
+      menuOpen,
+      remoteUrl,
+      showLoginPrompt,
     } = this.state;
     const deleteText = (sectionType === 'labbook') ? 'Delete Project' : 'Delete Dataset';
     const exportText = getExportText(exporting, name, sectionType);
@@ -704,6 +704,7 @@ class ActionsMenu extends Component<Props> {
             <ChangeVisibility
               {...this.props}
               checkSessionIsValid={this._checkSessionIsValid}
+              currentServer={currentServer}
               defaultRemote={defaultRemote}
               resetState={this._resetState}
             />

@@ -115,6 +115,10 @@
       background-color: $background-color;
     }
 
+    &:hover button:disabled  {
+      background-color: $white;
+    }
+
     &--export {
       background: url('~Images/icons/export-azure.svg') no-repeat 7px center;
       background-size: 24px;

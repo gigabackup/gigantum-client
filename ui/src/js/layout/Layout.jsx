@@ -1,6 +1,8 @@
 // @flow
 // vendor
 import React, { Node } from 'react';
+// context
+import ServerContext from 'Pages/ServerContext';
 // component
 import Footer from 'Components/footer/Footer';
 import Prompt from 'Components/prompt/Prompt';
@@ -19,21 +21,29 @@ type Props = {
 const Layout = (props: Props) => {
   const { auth, children } = props;
   return (
-    <div className="Layout">
-      <Header {...props} />
+    <ServerContext.Consumer>
+      { value => (
+        <div className="Layout">
+          <Header {...props} />
 
-      <Sidebar {...props} />
+          <Sidebar
+            {...props}
+            currentServer={value.currentServer}
 
-      <main className="Layout__main">
-        {children}
-      </main>
+          />
 
-      <Footer />
+          <main className="Layout__main">
+            {children}
+          </main>
 
-      <Helper auth={auth} />
+          <Footer />
 
-      <Prompt />
-    </div>
+          <Helper auth={auth} />
+
+          <Prompt />
+        </div>
+      )}
+    </ServerContext.Consumer>
   );
 };
 
