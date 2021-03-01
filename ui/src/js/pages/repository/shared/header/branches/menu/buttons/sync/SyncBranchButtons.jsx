@@ -79,10 +79,10 @@ const SyncBranchButtons = (props: Props) => {
 
   const syncButtonText = getSyncButtonText(defaultRemote, showPullOnly);
   const commitsTooltip = getCommitsTooltip(activeBranch);
-  const syncButtonDisabled = (showPullOnly && !allowSyncPull)
+  const syncButtonDisabled = ((showPullOnly && !allowSyncPull)
    || (!defaultRemote && !allowSync)
    || (defaultRemote && !allowSync && !showPullOnly)
-   || backupInProgress;
+   || backupInProgress) && !publishSyncError;
   const isCommitsOutOfSync = !upToDate && allowSync
     && (activeBranch.commitsAhead !== undefined)
     && (activeBranch.commitsAhead !== null)

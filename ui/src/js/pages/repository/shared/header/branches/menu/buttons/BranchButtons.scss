@@ -42,6 +42,7 @@ $dropBoxWidth: 250px;
   }
   &:disabled,
   &:hover:disabled {
+    color: $romanSilver;
     background-color: $background-color !important;
     border: 1px solid $romanSilver !important;
   }

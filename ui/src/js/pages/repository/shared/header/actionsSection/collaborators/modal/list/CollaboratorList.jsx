@@ -2,11 +2,17 @@
 // component
 import React, { PureComponent } from 'react';
 import classNames from 'classnames';
+// images
+import exclamationSVG from 'Images/icons/exclamation-orange.svg';
 // components
 import CollaboratorsRow from './CollaboratorsRow';
 import NoCollaborators from './NoCollaborators';
 
+// css
+import './CollaboratorList.scss';
+
 type Props = {
+  currentServer: Object,
   collaborators: Array<Object>,
   overflow: boolean,
   toggleCollaborators: Function,
@@ -15,6 +21,7 @@ type Props = {
 class CollaboratorList extends PureComponent<Props> {
   render() {
     const {
+      currentServer,
       collaborators,
       overflow,
       toggleCollaborators,
@@ -24,6 +31,19 @@ class CollaboratorList extends PureComponent<Props> {
       CollaboratorsModal__list: true,
       'CollaboratorsModal__list--overflow': overflow,
     });
+
+    if (currentServer.backupInProgress) {
+      return (
+        <div className="CollaboratorList__warning flex justify--center flex--column align-items--center">
+          <img
+            alt="warning"
+            className="CollaboratorList__warning-icon"
+            src={exclamationSVG}
+          />
+          <p>Backup is in progress, cannot add, modify or list collaborators at this time.</p>
+        </div>
+      );
+    }
 
     if (collaborators && (collaborators.length > 0)) {
       return (
@@ -44,6 +64,7 @@ class CollaboratorList extends PureComponent<Props> {
     return (
       <NoCollaborators
         collaborators={collaborators}
+        currentServer={currentServer}
         toggleCollaborators={toggleCollaborators}
       />
     );

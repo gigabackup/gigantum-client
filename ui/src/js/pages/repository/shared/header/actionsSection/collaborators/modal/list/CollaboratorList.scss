@@ -1,0 +1,13 @@
+@import '~Styles/_imports.scss';
+
+.CollaboratorList {
+  &__warning {
+    color: $orange;
+    text-align: center;
+  }
+
+  &__warning-icon {
+    height: 3em;
+    width: 3em;
+  }
+}

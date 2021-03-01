@@ -42,7 +42,8 @@ const getSyncTooltip = (data, currentServer) => {
     collaborators,
     defaultRemote,
     hasWriteAccess,
-    isLocked,
+    isLockedSync,
+    publishSyncError,
     section,
     sectionType,
   } = data;
@@ -51,7 +52,7 @@ const getSyncTooltip = (data, currentServer) => {
   const sectionCollabs = (collaborators && collaborators[section.name]) || null;
   const isPullOnly = defaultRemote && !hasWriteAccess && sectionCollabs;
 
-  const syncOrPublish = getSyncOrPublish(defaultRemote, syncOrPublish);
+  const syncOrPublish = getSyncOrPublish(defaultRemote, isPullOnly);
   const { backupInProgress, name } = currentServer;
   const repositoryType = isDataset ? 'Dataset' : 'Project';
 
@@ -59,7 +60,7 @@ const getSyncTooltip = (data, currentServer) => {
   syncTooltip = !defaultRemote
     ? `Click Publish to push branch to ${name}`
     : syncTooltip;
-  syncTooltip = isLocked
+  syncTooltip = isLockedSync
     ? `Cannot ${syncOrPublish} while ${repositoryType} is in use`
     : syncTooltip;
   syncTooltip = (activeBranch.branchName !== 'master' && !defaultRemote)
@@ -70,6 +71,9 @@ const getSyncTooltip = (data, currentServer) => {
     : syncTooltip;
   syncTooltip = backupInProgress
     ? `Cannot  ${syncOrPublish} while ${repositoryType} back up is in progress`
+    : syncTooltip;
+  syncTooltip = publishSyncError
+    ? `An error occured during ${syncOrPublish}ing, click to see more detail.`
     : syncTooltip;
 
   return syncTooltip;

@@ -218,10 +218,13 @@ class Branches extends Component<Props> {
     const {
       collaborators,
       defaultRemote,
-      isLocked,
+      isLockedSync,
       section,
       sectionType,
     } = this.props;
+    const {
+      publishSyncError,
+    } = this.state;
     const { currentServer } = this.context;
 
     const data = {
@@ -229,7 +232,8 @@ class Branches extends Component<Props> {
       collaborators,
       defaultRemote,
       hasWriteAccess,
-      isLocked,
+      isLockedSync,
+      publishSyncError,
       section,
       sectionType,
     };

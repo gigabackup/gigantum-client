@@ -25,7 +25,7 @@
   &--error:hover,
   &--error:disabled {
     color: transparent !important;
-    background: $crimson url(~Images/icons/close-white.svg) no-repeat 50% 50% !important;
+    background: $orange url(~Images/icons/exclamation.svg) no-repeat 50% 50% !important;
     background-size: 14px !important;
   }
 

@@ -5,6 +5,8 @@ import classNames from 'classnames';
 // config
 import config from 'JS/config';
 import fetchQuery from 'JS/fetch';
+// utils
+import { checkBackupMode } from 'JS/utils/checkBackupMode';
 // context
 import ServerContext from 'Pages/ServerContext';
 // components
@@ -19,6 +21,17 @@ type Props = {
   },
   sectionType: string,
 }
+
+/**
+  Method checks error message, if the backup string matches then it checks backup mode.
+  @param {Array} error
+  @param {string} error[i].message
+*/
+const checkErrorForBackup = (error) => {
+  if (error[0].message.indexOf('backup in progress') > -1) {
+    checkBackupMode();
+  }
+};
 
 class CollaboratorSearch extends Component<Props> {
   state = {
@@ -221,6 +234,7 @@ class CollaboratorSearch extends Component<Props> {
         this.collaboratorSearch.value = '';
 
         if (error) {
+          checkErrorForBackup(error);
           this.setState({ buttonLoaderAddCollaborator: 'error' });
         } else {
           this.setState({ buttonLoaderAddCollaborator: 'finished' });
