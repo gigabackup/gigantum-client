@@ -188,6 +188,7 @@ class Routes extends Component<Props> {
     }).catch(() => false);
   }
 
+
   /**
     @param {Error, Object} error, info
     shows error message when runtime error occurs
@@ -206,6 +207,7 @@ class Routes extends Component<Props> {
     if (!hasError) {
       return (
         <ServerContext.Provider value={currentServer}>
+
           <Router
             basename={this.basename}
           >
@@ -214,7 +216,6 @@ class Routes extends Component<Props> {
               auth={auth}
               diskLow={showDiskLow}
             >
-
               <Switch>
 
                 <Route

@@ -2,10 +2,14 @@
 import React, { Component } from 'react';
 import classNames from 'classnames';
 import uuidv4 from 'uuid/v4';
+// context
+import ServerContext from 'Pages/ServerContext';
 // queries
 import UserIdentity from 'JS/Auth/UserIdentity';
 // store
 import store from 'JS/redux/store';
+// main utils
+import { checkBackupMode } from 'JS/utils/checkBackupMode';
 // mutations
 import ImportRemoteDatasetMutation from 'Mutations/repository/import/ImportRemoteDatasetMutation';
 import ImportRemoteLabbookMutation from 'Mutations/repository/import/ImportRemoteLabbookMutation';
@@ -20,6 +24,16 @@ import prepareUpload from './PrepareUpload';
 import './ImportModule.scss';
 
 const dropZoneId = uuidv4();
+
+/**
+* Method checks if error failed from being in backup mode.
+* @param {Object} error
+*/
+const checkForBackUpErrors = (error) => {
+  if (error[0].message.indexOf('backup in progress') > -1) {
+    checkBackupMode();
+  }
+};
 
 
 /**
@@ -194,12 +208,12 @@ class ImportModule extends Component<Props> {
       return;
     }
     // use evt, event is a reserved word in chrome
-    const dataTransfer = evt.dataTransfer;
+    const { dataTransfer } = evt;
     evt.preventDefault();
     evt.dataTransfer.effectAllowed = 'none';
     evt.dataTransfer.dropEffect = 'none';
     this._getBlob(dataTransfer);
-    this.setState({ isOver: false })
+    this.setState({ isOver: false });
     return false;
   }
 
@@ -208,8 +222,8 @@ class ImportModule extends Component<Props> {
   *  handle end of dragover with file
   */
   _dragendHandler = (evt) => { // use evt, event is a reserved word in chrome
-    const dataTransfer = evt.dataTransfer;
-    this.setState({ isOver: false })
+    const { dataTransfer } = evt;
+    this.setState({ isOver: false });
     evt.preventDefault();
     evt.dataTransfer.effectAllowed = 'none';
     evt.dataTransfer.dropEffect = 'none';
@@ -250,11 +264,9 @@ class ImportModule extends Component<Props> {
   *  @param {}
   *  @return {string} returns text to be rendered
   */
-  _getImportDescriptionText = () => {
-    return this.state.error
-      ? 'File must be .zip'
-      : 'Drag & Drop .zip file, or click to select.';
-  }
+  _getImportDescriptionText = () => (this.state.error
+    ? 'File must be .zip'
+    : 'Drag & Drop .zip file, or click to select.')
 
   /**
   *  @param {}
@@ -402,7 +414,6 @@ class ImportModule extends Component<Props> {
   */
   _dragover = (evt) => {
     if (document.getElementById('dropZone')) {
-
       document.getElementById('dropZone').classList.add('ImportModule__drop-area-highlight');
     }
 
@@ -423,7 +434,6 @@ class ImportModule extends Component<Props> {
     if (evt.target.classList && evt.target.classList.contains(dropZoneId) < 0) {
       if (document.getElementById('dropZone')) {
         if (this.counter === 0) {
-
           document.getElementById('dropZone').classList.remove('ImportModule__drop-area-highlight');
         }
       }
@@ -438,7 +448,6 @@ class ImportModule extends Component<Props> {
     this.counter += 1;
 
     if (document.getElementById('dropZone')) {
-
       document.getElementById('dropZone').classList.add('ImportModule__drop-area-highlight');
     }
 
@@ -516,6 +525,7 @@ class ImportModule extends Component<Props> {
       failureCall,
       (response, error) => {
         if (error) {
+          checkForBackUpErrors(error);
           failureCall(error);
         }
       },
@@ -541,7 +551,7 @@ class ImportModule extends Component<Props> {
       document.getElementById('modal__cover').classList.add('hidden');
       document.getElementById('loader').classList.add('hidden');
       if (error) {
-        console.error(error);
+        checkForBackUpErrors(error);
         store.dispatch({
           type: 'MULTIPART_INFO_MESSAGE',
           payload: {
@@ -585,45 +595,52 @@ class ImportModule extends Component<Props> {
     });
 
     return (
-      <div
-        className="ImportModule Card Card--line-50 Card--text-center Card--add Card--import column-4-span-3"
-        key="AddLabbookCollaboratorPayload"
-      >
-        <LoginPrompt
-          showLoginPrompt={showLoginPrompt}
-          closeModal={this._closeLoginPromptModal}
-        />
-        <ImportModal self={this} />
+      <ServerContext.Consumer>
+        { value => (
+          <div
+            className="ImportModule Card Card--line-50 Card--text-center Card--add Card--import column-4-span-3"
+            key="AddLabbookCollaboratorPayload"
+          >
+            <LoginPrompt
+              showLoginPrompt={showLoginPrompt}
+              closeModal={this._closeLoginPromptModal}
+            />
+            <ImportModal
+              currentServer={value.currentServer}
+              self={this}
+            />
 
-        <div className="Import__header">
-          <div className={`Import__icon Import__icon--${section}`}>
-            <div className="Import__add-icon" />
+            <div className="Import__header">
+              <div className={`Import__icon Import__icon--${section}`}>
+                <div className="Import__add-icon" />
+              </div>
+              <div className="Import__title">
+                <h2 className="Import__h2 Import__h2--azure">{title}</h2>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="btn--import"
+              onClick={(evt) => { this._showModal(evt); }}
+            >
+              Create New
+            </button>
+
+            <button
+              type="button"
+              className="btn--import"
+              onClick={() => { this.setState({ showImportModal: true }); }}
+            >
+              Import Existing
+            </button>
+
+            <Tooltip section="createLabbook" />
+            <Tooltip section="importLabbook" />
+            <div className={loadingMaskCSS} />
           </div>
-          <div className="Import__title">
-            <h2 className="Import__h2 Import__h2--azure">{title}</h2>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          className="btn--import"
-          onClick={(evt) => { this._showModal(evt); }}
-        >
-          Create New
-        </button>
-
-        <button
-          type="button"
-          className="btn--import"
-          onClick={() => { this.setState({ showImportModal: true }); }}
-        >
-          Import Existing
-        </button>
-
-        <Tooltip section="createLabbook" />
-        <Tooltip section="importLabbook" />
-        <div className={loadingMaskCSS} />
-      </div>
+        )}
+      </ServerContext.Consumer>
     );
   }
 }

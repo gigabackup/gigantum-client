@@ -1,0 +1,14 @@
+@import '~Styles/_imports.scss';
+
+
+.BackupInProgressModal {
+  padding-top: 3em;
+
+  &__pre {
+    display: inline;
+  }
+
+  &__p {
+    padding: 1em 0;
+  }
+}
