@@ -12,6 +12,7 @@ import RepositoryTitle from 'Pages/dashboard/shared/title/RepositoryTitle';
 import ImportButton from 'Pages/dashboard/shared/buttons/import/ImportButton';
 // muations
 import ImportRemoteProjectMutation from 'Mutations/repository/import/ImportRemoteLabbookMutation';
+import ImportRemoteDatasetMutation from 'Mutations/repository/import/ImportRemoteDatasetMutation';
 import BuildImageMutation from 'Mutations/container/BuildImageMutation';
 // store
 import { setWarningMessage, setMultiInfoMessage } from 'JS/redux/actions/footer';
@@ -40,6 +41,7 @@ type Props = {
   existsLocally: boolean,
   toggleDeleteModal: Function,
   filterText: string,
+  sectionType: string,
 }
 
 class RemotePanel extends Component<Props> {
@@ -53,8 +55,11 @@ class RemotePanel extends Component<Props> {
     *  changes state of isImporting to false
   */
   _clearState = () => {
-    if (document.getElementById('dashboard__cover')) {
-      document.getElementById('dashboard__cover').classList.add('hidden');
+    if (document.getElementById('modal__cover')) {
+      document.getElementById('modal__cover').classList.add('hidden');
+    }
+    if (document.getElementById('loader')) {
+      document.getElementById('loader').classList.add('hidden');
     }
     this.setState({
       isImporting: false,
@@ -78,9 +83,10 @@ class RemotePanel extends Component<Props> {
     *  imports project from remote url, builds the image, and redirects to imported project
     *  @return {}
   */
-  _importProject = (owner, name) => {
+  _importRepository = (owner, name) => {
     // TODO break up this function
-    const { edge } = this.props;
+    const { edge, sectionType } = this.props;
+    const capitalRepository = sectionType === 'project' ? 'Project' : 'Dataset';
     const self = this;
     const id = uuidv4();
     const remote = edge.node.importUrl;
@@ -92,75 +98,117 @@ class RemotePanel extends Component<Props> {
             this._importingState();
             const messageData = {
               id,
-              message: 'Importing Project please wait',
+              message: `Importing ${capitalRepository} please wait`,
               isLast: false,
               error: false,
             };
             setMultiInfoMessage(owner, name, messageData);
-            const successCall = () => {
-              this._clearState();
-              const mulitMessageData = {
-                id,
-                message: `Successfully imported remote Project ${name}`,
-                isLast: true,
-                error: false,
-              };
-              setMultiInfoMessage(owner, name, mulitMessageData);
+            if (sectionType === 'project') {
+              const successCall = () => {
+                this._clearState();
+                const mulitMessageData = {
+                  id,
+                  message: `Successfully imported remote ${capitalRepository} ${name}`,
+                  isLast: true,
+                  error: false,
+                };
+                setMultiInfoMessage(owner, name, mulitMessageData);
 
-              BuildImageMutation(
+                BuildImageMutation(
+                  owner,
+                  name,
+                  false,
+                  (res, error) => {
+                    if (error) {
+                      const buildMessageData = {
+                        id,
+                        owner,
+                        name,
+                        message: `ERROR: Failed to build ${name}`,
+                        isLast: null,
+                        error: true,
+                        messageBody: error,
+                      };
+                      setMultiInfoMessage(owner, name, buildMessageData);
+                    }
+                  },
+                );
+
+                self.props.history.replace(`/projects/${owner}/${name}`);
+              };
+              const failureCall = (error) => {
+                this._clearState();
+                const failureMessageData = {
+                  id,
+                  owner,
+                  name,
+                  message: 'ERROR: Could not import remote Project',
+                  isLast: null,
+                  error: true,
+                  messageBody: error,
+                };
+                if (error.indexOf('backup in progress') > -1) {
+                  checkBackupMode();
+                } else {
+                  setMultiInfoMessage(owner, name, failureMessageData);
+                }
+              };
+              self.setState({ isImporting: true });
+
+              ImportRemoteProjectMutation(
                 owner,
                 name,
-                false,
-                (buildResponse, error) => {
+                remote,
+                successCall,
+                failureCall,
+                (res, error) => {
                   if (error) {
-                    const buildMessageData = {
+                    failureCall(error);
+                  }
+                  self.setState({ isImporting: false });
+                },
+              );
+            } else {
+              ImportRemoteDatasetMutation(
+                owner,
+                name,
+                remote,
+                (mutationResponse, error) => {
+                  this._clearState();
+
+
+                  if (error) {
+                    console.error(error);
+                    const failureMessageData = {
                       id,
                       owner,
                       name,
-                      message: `ERROR: Failed to build ${name}`,
+                      message: 'ERROR: Could not import remote Dataset',
                       isLast: null,
                       error: true,
                       messageBody: error,
                     };
-                    setMultiInfoMessage(owner, name, buildMessageData);
+                    if (error.indexOf('backup in progress') > -1) {
+                      checkBackupMode();
+                    } else {
+                      setMultiInfoMessage(owner, name, failureMessageData);
+                    }
+                  } else if (mutationResponse) {
+                    const successMessageData = {
+                      id,
+                      owner,
+                      name,
+                      message: `Successfully imported remote Dataset ${name}`,
+                      isLast: true,
+                      error: false,
+                    };
+                    setMultiInfoMessage(owner, name, successMessageData);
+
+                    self.props.history.replace(`/datasets/${owner}/${name}`);
                   }
                 },
               );
-
-              self.props.history.replace(`/projects/${owner}/${name}`);
-            };
-            const failureCall = (error) => {
-              this._clearState();
-              const failureMessageData = {
-                id,
-                owner,
-                name,
-                message: 'ERROR: Could not import remote Project',
-                isLast: null,
-                error: true,
-                messageBody: Array.isArray(error) ? error : [{ message: error }],
-              };
-              if (error.indexOf('backup in progress') > -1) {
-                checkBackupMode();
-              } else {
-                setMultiInfoMessage(owner, name, failureMessageData);
-              }
-            };
-            self.setState({ isImporting: true });
-
-            ImportRemoteProjectMutation(
-              owner,
-              name,
-              remote,
-              successCall,
-              failureCall,
-              (res, error) => {
-                if (error) {
-                  failureCall(error);
-                }
-                self.setState({ isImporting: false });
-              },
-            );
+            }
           } else {
             this.setState({ showLoginPrompt: true });
           }
@@ -202,7 +250,7 @@ class RemotePanel extends Component<Props> {
                 remoteId: edge.node.id,
                 remoteUrl: edge.node.remoteUrl,
                 remoteOwner: edge.node.owner,
-                remoteLabbookName: edge.node.name,
+                remoteName: edge.node.name,
                 existsLocally,
               });
             } else {
@@ -256,7 +304,7 @@ class RemotePanel extends Component<Props> {
                 currentServer={value.currentServer}
                 edge={edge}
                 existsLocally={existsLocally}
-                importRepository={this._importProject}
+                importRepository={this._importRepository}
                 isImporting={isImporting}
               />
 

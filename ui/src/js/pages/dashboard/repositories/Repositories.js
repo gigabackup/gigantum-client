@@ -419,8 +419,8 @@ class Repositories extends Component<Props> {
     const { currentServer } = this.context;
     const repositoryTitle = sectionType === 'project' ? 'Project' : 'Dataset';
     const currentServerName = currentServer && currentServer.name ? currentServer.name : 'gigantum';
-    const projectListId = projectList && projectList.id;
-    const datasetListId = datasetList && datasetList.id;
+    const projectListId = projectList && projectList.labbookList.id;
+    const datasetListId = datasetList && datasetList.datasetList.id;
     const projectListingData = projectList && projectList.labbookList;
     const datasetListingData = datasetList && datasetList.datasetList;
 

@@ -1,5 +1,4 @@
-prLink: "https://github.com/gigantum/gigantum-client/pull/1679"
+prLink: "https://github.com/gigantum/gigantum-client/pull/1683"
 changelog:
   - type: FIX
-    description: Fixed a bug that caused the 'Download All' button not to appear for datasets with read-only permissions.
-    issueLink: https://github.com/gigantum/gigantum-client/issues/1658
+    description: Fixes issues with remote Dataset listing and remote import/delete following a recent code refactor
