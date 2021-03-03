@@ -151,7 +151,8 @@ module.exports = {
         },
         include: paths.appSrc,
         exclude: [
-          /\__tests__/
+          /\__tests__/,
+          /\.test.(js|jsx)$/,
         ]
       },
       // ** ADDING/UPDATING LOADERS **
@@ -164,7 +165,8 @@ module.exports = {
       // When you `import` an asset, you get its filename.
       {
         exclude: [
-           /\__tests__/,
+          /\__tests__/,
+          /\.test.(js|jsx)$/,
           /\.html$/,
           /\.(js|jsx)$/,
           /\.css$/,
@@ -184,7 +186,7 @@ module.exports = {
       // "url" loader works just like "file" loader but it also embeds
       // assets smaller than specified size as data URLs to avoid requests.
       {
-        test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.svg$/ ],
+        test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.svg$/, /\.test.(js|jsx)$/],
         loader: require.resolve('url-loader'),
         options: {
           limit: 10000,
@@ -194,7 +196,8 @@ module.exports = {
       // Process JS with Babel.
       {
         exclude: [
-          /\__tests__/
+          /\__tests__/,
+          /\.test.(js|jsx)$/,
         ],
         test: /\.(js|jsx)$/,
         include: paths.appSrc,

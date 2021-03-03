@@ -17,6 +17,7 @@ const getDevTool = (project) => {
   const bundledApps = project.environment && project.environment.bundledApps
     ? Object.keys(project.environment.bundledApps).map(index => project.environment.bundledApps[index].appName)
     : [];
+
   devTools = devTools.concat(bundledApps);
   devTools = devTools.filter(tool => !(tool === 'rstudio' && process.env.BUILD_TYPE === 'cloud'));
   return {

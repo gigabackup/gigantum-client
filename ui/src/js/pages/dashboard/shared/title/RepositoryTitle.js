@@ -24,7 +24,7 @@ class RepositoryTitle extends PureComponent<Props> {
     return (
       <h5
         role="presentation"
-        className={`${section}__panel-title`}
+        className="LocalPanel__panel-title"
         onClick={action}
         data-tip={name}
         data-for={`${section}--${name}`}
