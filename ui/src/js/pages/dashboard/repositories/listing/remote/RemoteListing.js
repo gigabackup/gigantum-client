@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 // components
 import RemotePanel from 'Pages/dashboard/repositories/listing/remote/panel/RemotePanel';
 import DeleteLabbook from 'Pages/repository/shared/modals/DeleteLabbook';
+import DeleteDataset from 'Pages/repository/shared/modals/DeleteDataset';
 import CardLoader from 'Pages/dashboard/shared/loaders/CardLoader';
 import NoResults from 'Pages/dashboard/shared/NoResults';
 import LoginPrompt from 'Pages/repository/shared/modals/LoginPrompt';
@@ -16,10 +17,12 @@ import './RemoteListing.scss';
 
 
 type Props = {
-  isVisible: Boolean,
+  datasetListId: string,
   filterRepositories: Function,
   filterState: string,
   forceLocalView: Function,
+  isVisible: Boolean,
+  projectListId: string,
   relay: {
     isLoading: Function,
     loadMore: Function,
@@ -40,8 +43,6 @@ type Props = {
       }
     }
   },
-  remoteDatasetsId: string,
-  remoteProjectsId: string,
   sectionType: string,
   setFilterValue: Function,
 };
@@ -51,7 +52,7 @@ class RemoteListing extends Component<Props> {
     deleteData: {
       remoteId: null,
       remoteOwner: null,
-      remoteLabbookName: null,
+      remoteName: null,
       remoteUrl: null,
       existsLocally: null,
     },
@@ -165,7 +166,7 @@ class RemoteListing extends Component<Props> {
           remoteId: null,
           remoteOwner: null,
           remoteUrl: null,
-          remoteLabbookName: null,
+          remoteName: null,
           existsLocally: null,
         },
         deleteModalVisible: false,
@@ -179,8 +180,9 @@ class RemoteListing extends Component<Props> {
       filterRepositories,
       filterState,
       remoteDatasets,
+      datasetListId,
       remoteProjects,
-      remoteProjectsId,
+      projectListId,
       relay,
       sectionType,
       setFilterValue,
@@ -193,15 +195,14 @@ class RemoteListing extends Component<Props> {
     if (!isVisible) {
       return null;
     }
-    const list = sectionType === 'project' ? remoteProjects.remoteLabbooks : remoteDatasets.remoteDatasets;
+    const list = (sectionType === 'project') ? remoteProjects.remoteLabbooks : remoteDatasets.remoteDatasets;
     const { hasNextPage } = list.pageInfo;
 
     if (
-      remoteProjects
-      && (remoteProjects.remoteLabbooks !== null)
+      list
     ) {
-      const projects = filterRepositories(
-        remoteProjects.remoteLabbooks.edges,
+      const repositories = filterRepositories(
+        list.edges,
         filterState,
       );
 
@@ -209,12 +210,11 @@ class RemoteListing extends Component<Props> {
         <div className="Labbooks__listing">
           <div className="grid">
             {
-            projects.length
-              ? projects.map(edge => (
+            repositories.length
+              ? repositories.map(edge => (
                 <RemotePanel
                   {...this.props}
                   toggleDeleteModal={this._toggleDeleteModal}
-                  projectistId={remoteProjectsId}
                   key={edge.node.owner + edge.node.name}
                   edge={edge}
                   existsLocally={edge.node.isLocal}
@@ -230,17 +230,33 @@ class RemoteListing extends Component<Props> {
             />
 
           </div>
-
-          { deleteModalVisible
+          {/* TODO: Reuse delete modal */}
+          { (deleteModalVisible && (sectionType === 'project'))
             && (
               <DeleteLabbook
                 {...deleteData}
                 {...this.props}
+                labbookListId={projectListId}
                 owner={deleteData.remoteOwner}
-                name={deleteData.remoteLabbookName}
+                name={deleteData.remoteName}
                 handleClose={() => { this._toggleDeleteModal(); }}
                 remoteConnection="RemoteLabbooks_remoteLabbooks"
                 toggleModal={this._toggleDeleteModal}
+                remoteDelete
+              />
+            )}
+          { (deleteModalVisible && (sectionType === 'dataset'))
+            && (
+              <DeleteDataset
+                {...deleteData}
+                {...this.props}
+                datasetListId={datasetListId}
+                sectionType="dataset"
+                handleClose={() => { this._toggleDeleteModal(); }}
+                remoteConnection="RemoteDatasets_remoteDatasets"
+                toggleModal={this._toggleDeleteModal}
+                owner={deleteData.remoteOwner}
+                name={deleteData.remoteName}
                 remoteDelete
               />
             )}
