@@ -23,9 +23,7 @@ module.exports = {
   },
   "transformIgnorePatterns": [
     // "[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$"
-    // "/node_modules/(?!(@my-company)/).*/"
-    "<rootDir>/(node_modules)/",
-    "<rootDir>/node_modules/(?!shared|another)"
+    "/node_modules/(?!file-icons-js).+\\.js$",
   ],
   "unmockedModulePathPatterns": [
     "react",
