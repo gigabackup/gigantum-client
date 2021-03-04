@@ -1,0 +1,5 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1678"
+changelog:
+  - type: NEW
+    description: Blocks the downloading of dataset files when the remote gitlab server is in backup mode.
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1590

@@ -1,16 +1,32 @@
 // vendor
 import React, { Component } from 'react';
 import classNames from 'classnames';
+import ReactTooltip from 'react-tooltip';
+// context
+import ServerContext from 'Pages/ServerContext';
 // queries
 import UserIdentity from 'JS/Auth/UserIdentity';
 // mutations
 import ModifyDatasetLinkMutation from 'Mutations/repository/datasets/ModifyDatasetLinkMutation';
 // store
 import { setErrorMessage } from 'JS/redux/actions/footer';
+// utils
+import { checkBackupMode } from 'JS/utils/checkBackupMode';
 // assets
 import './DatasetActionsMenu.scss';
 
+/**
+*  Method checks if a backup is running and starts polling for status using utils functions.
+*  @param {Object} error
+*/
+const checkErrorForBackup = (error) => {
+  if (error[0].message.indexOf('backup in progress') > -1) {
+    checkBackupMode();
+  }
+};
+
 type Props = {
+  backupInProgress: boolean,
   edge: {
     node: {
       datasetName: string,
@@ -178,7 +194,8 @@ class DatasetActionsMenu extends Component<Props> {
             setFolderIsDownloading(false);
           }
         };
-        data.failureCall = () => {
+        data.failureCall = (error) => {
+          checkErrorForBackup(error);
           this.setState({ fileDownloading: false });
           if (setFolderIsDownloading) {
             setFolderIsDownloading(true);
@@ -215,12 +232,14 @@ class DatasetActionsMenu extends Component<Props> {
   render() {
     const { fileDownloading } = this.state;
     const {
+      backupInProgress,
       edge,
       isLocal,
       isDownloading,
       parentDownloading,
       section,
     } = this.props;
+
     const downloadText = isLocal ? 'Downloaded' : 'Download';
     const isLoading = fileDownloading
       || ((parentDownloading || isDownloading) && !isLocal);
@@ -231,10 +250,10 @@ class DatasetActionsMenu extends Component<Props> {
       'Btn__FileBrowserAction--downloaded': isLocal,
       'Btn__FileBrowserAction--loading': isLoading,
       'Btn--first': section === 'input',
+      'Tooltip-data': backupInProgress,
     });
 
     return (
-
       <div
         className="DatasetActionsMenu"
         key={`${edge.node.id}-action-menu}`}
@@ -243,7 +262,8 @@ class DatasetActionsMenu extends Component<Props> {
         <button
           onClick={() => this._downloadFile(isLocal)}
           className={downloadCSS}
-          disabled={isLocal || isLoading}
+          disabled={isLocal || isLoading || backupInProgress}
+          data-tooltip="Cannot download Dataset files while server backup is in progress"
           type="button"
         >
           {downloadText}
@@ -253,4 +273,16 @@ class DatasetActionsMenu extends Component<Props> {
   }
 }
 
-export default DatasetActionsMenu;
+const BackupConsumeServer = (props) => (
+  <ServerContext.Consumer>
+    { value => (
+      <DatasetActionsMenu
+        {...props}
+        backupInProgress={value.currentServer.backupInProgress}
+      />
+    )}
+  </ServerContext.Consumer>
+);
+
+
+export default BackupConsumeServer;

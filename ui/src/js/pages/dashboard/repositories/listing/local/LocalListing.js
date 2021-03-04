@@ -154,7 +154,7 @@ class LocalListing extends Component<Props> {
 
     if (listing) {
       if ((distanceY > expandOn) && !isPaginating
-        && localProjects.localLabbooks.pageInfo.hasNextPage) {
+        && listing.pageInfo.hasNextPage) {
         this._loadMore();
       }
     }

@@ -12,6 +12,8 @@ import {
 import {
   setUploadMessageRemove,
 } from 'JS/redux/actions/footer';
+// utils
+import { checkBackupMode } from 'JS/utils/checkBackupMode';
 // assets
 import './FileBrowser.scss';
 // components
@@ -29,6 +31,15 @@ import FileBrowserMutations from './utilities/FileBrowserMutations';
 import Connectors from './utilities/Connectors';
 import FileFormatter, { fileHandler } from './utilities/FileFormatter';
 
+/**
+*  Method checks if a backup is running and starts polling for status using utils functions.
+*  @param {Object} error
+*/
+const checkErrorForBackup = (error) => {
+  if (error[0].message.indexOf('backup in progress') > -1) {
+    checkBackupMode();
+  }
+};
 
 /**
   *  @param {Object} childrenState
@@ -378,7 +389,8 @@ class FileBrowser extends Component {
       data.successCall = () => {
         this.setState({ downloadingAll: false });
       };
-      data.failureCall = () => {
+      data.failureCall = (error) => {
+        checkErrorForBackup(error);
         this.setState({ downloadingAll: false });
       };
 
