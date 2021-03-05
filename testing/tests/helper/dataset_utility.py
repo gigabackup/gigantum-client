@@ -206,11 +206,6 @@ class DatasetUtility:
         if not is_clicked:
             return "Could not click publish button on project publish window"
 
-        # Check for the presence of Upload complete pop up message
-        is_checked = dataset_list.project_menu_component.check_upload_complete_pop_up_presence()
-        if not is_checked:
-            return "Could not get Upload complete pop up window"
-
         # Check private lock icon presence
         is_checked = dataset_list.project_menu_component.check_private_lock_icon_presence()
         if not is_checked:

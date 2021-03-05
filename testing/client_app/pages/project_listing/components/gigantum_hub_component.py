@@ -27,11 +27,11 @@ class GigantumHubComponent(BaseComponent):
             return True
         return False
 
-    def verify_title_in_gigantum_hub(self, title_text) -> bool:
-        """ Verify whether the title is present in the Gigantum Hub page or not
+    def verify_project_title_in_gigantum_hub(self, title_text) -> bool:
+        """ Verify whether the project title is present in the Gigantum Hub page or not
 
         Args:
-            title_text: Title of the current project or dataset
+            title_text: Title of the current project
 
         Returns: returns the result of title verification
 
@@ -47,7 +47,7 @@ class GigantumHubComponent(BaseComponent):
                         return True
         return False
 
-    def click_import_button(self, project_title) -> bool:
+    def click_project_import_button(self, project_title) -> bool:
         """ Performs click action on import button
 
         Args:
@@ -70,8 +70,8 @@ class GigantumHubComponent(BaseComponent):
                             return True
         return False
 
-    def click_delete_button(self, project_title) -> bool:
-        """ Performs click action on delete button
+    def click_project_delete_button(self, project_title) -> bool:
+        """ Performs click action on project delete button
 
         Args:
             project_title: Title of the current project
@@ -145,3 +145,69 @@ class GigantumHubComponent(BaseComponent):
         """
         element = "//div[@class='Icon Icon--delete']"
         return self.check_element_absence(LocatorType.XPath, element, wait_time)
+
+    def verify_dataset_title_in_gigantum_hub(self, dataset_title) -> bool:
+        """ Verify whether the dataset title is present in the Gigantum Hub page or not
+
+        Args:
+            dataset_title: Title of the dataset
+
+        Returns: returns the result of dataset verification
+
+        """
+        element = "//div[@data-selenium-id='RemoteDatasetsPanel']"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            title_list = self.driver.find_elements_by_xpath(element)
+            if title_list is not None:
+                for title in title_list:
+                    title_name = title.find_element_by_xpath\
+                        (".//div[@class='RemoteDatasets__row RemoteDatasets__row--title']/h5/div[1]")
+                    if dataset_title == title_name.get_text().strip():
+                        return True
+        return False
+
+    def click_dataset_import_button(self, dataset_title) -> bool:
+        """ Performs click action on dataset import button
+
+        Args:
+            dataset_title: Title of the current dataset
+
+        Returns: returns the result of click action
+
+        """
+        element = "//div[@data-selenium-id='RemoteDatasetsPanel']"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            datasets_list = self.driver.find_elements_by_xpath(element)
+            if datasets_list is not None:
+                for dataset in datasets_list:
+                    dataset_name = dataset.find_element_by_xpath \
+                        (".//div[@class='RemoteDatasets__row RemoteDatasets__row--title']/h5/div[1]")
+                    if dataset_title == dataset_name.get_text().strip():
+                        import_button = dataset.find_element_by_xpath(".//button[contains(text(),'Import')]")
+                        if import_button is not None:
+                            import_button.execute_script("arguments[0].click();")
+                            return True
+        return False
+
+    def click_dataset_delete_button(self, dataset_title) -> bool:
+        """ Performs click action on dataset delete button
+
+        Args:
+            dataset_title: Title of the current dataset
+
+        Returns: returns the result of click action
+
+        """
+        element = "//div[@data-selenium-id='RemoteDatasetsPanel']"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            datasets_list = self.driver.find_elements_by_xpath(element)
+            if datasets_list is not None:
+                for dataset in datasets_list:
+                    dataset_name = dataset.find_element_by_xpath\
+                        (".//div[@class='RemoteDatasets__row RemoteDatasets__row--title']/h5/div[1]")
+                    if dataset_title == dataset_name.get_text().strip():
+                        delete_button = dataset.find_element_by_xpath(".//button[contains(text(),'Delete')]")
+                        if delete_button is not None:
+                            delete_button.execute_script("arguments[0].click();")
+                            return True
+        return False

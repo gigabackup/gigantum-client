@@ -189,11 +189,11 @@ class TestAddProjectPublishSyncDeleteImport:
         assert is_clicked, "Could not click Gigantum Hub tab"
 
         # Verify project in Gigantum Hub page
-        is_verified = project_list.gigantum_hub_component.verify_title_in_gigantum_hub(project_title)
+        is_verified = project_list.gigantum_hub_component.verify_project_title_in_gigantum_hub(project_title)
         assert is_verified, "Could not verify project in Gigantum Hub"
 
         # Click import button in Gigantum Hub page
-        is_clicked = project_list.gigantum_hub_component.click_import_button(project_title)
+        is_clicked = project_list.gigantum_hub_component.click_project_import_button(project_title)
         assert is_clicked, "Could not click import button in Gigantum Hub page"
 
         # Monitor container status to go through Stopped -> Building
@@ -233,11 +233,11 @@ class TestAddProjectPublishSyncDeleteImport:
         assert is_clicked, "Could not click Gigantum Hub tab"
 
         # Verify project in Gigantum Hub page
-        is_verified = project_list.gigantum_hub_component.verify_title_in_gigantum_hub(project_title)
+        is_verified = project_list.gigantum_hub_component.verify_project_title_in_gigantum_hub(project_title)
         assert is_verified, "Could not verify project in Gigantum Hub"
 
         # Click delete button in Gigantum Hub page
-        is_clicked = project_list.gigantum_hub_component.click_delete_button(project_title)
+        is_clicked = project_list.gigantum_hub_component.click_project_delete_button(project_title)
         assert is_clicked, "Could not click delete button in Gigantum Hub page"
 
         # Get project title from delete project window in Gigantum Hub page
@@ -257,7 +257,7 @@ class TestAddProjectPublishSyncDeleteImport:
         assert is_verified, "Could not close delete modal"
 
         # Verify project is not exist in Gigantum Hub page
-        is_verified = project_list.gigantum_hub_component.verify_title_in_gigantum_hub(project_title)
+        is_verified = project_list.gigantum_hub_component.verify_project_title_in_gigantum_hub(project_title)
         assert not is_verified, "Project is still exist in the Gigantum Hub"
 
         # wait ~5 seconds to guarantee server side deletion completes
@@ -268,5 +268,5 @@ class TestAddProjectPublishSyncDeleteImport:
         assert is_clicked, "Could not click Gigantum Hub tab"
 
         # Verify project is not exist in Gigantum Hub page
-        is_verified = project_list.gigantum_hub_component.verify_title_in_gigantum_hub(project_title)
+        is_verified = project_list.gigantum_hub_component.verify_project_title_in_gigantum_hub(project_title)
         assert not is_verified, "Project is still exist in the Gigantum Hub"

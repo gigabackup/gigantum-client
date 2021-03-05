@@ -16,7 +16,7 @@ class LandingComponent(BaseComponent):
 
     def __init__(self, driver: webdriver, component_data: ComponentModel) -> None:
         super(LandingComponent, self).__init__(driver, component_data)
-        self.btn_server = self.get_locator(LocatorType.XPath, "//button[@class='Btn Server__button']")
+        self.btn_server = self.get_locator(LocatorType.XPath, "//button[contains(text(),'Gigantum Hub')]")
 
     def load_log_in_page(self) -> LogInPage:
         """Performs navigation to login page.

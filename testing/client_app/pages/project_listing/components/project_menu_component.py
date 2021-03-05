@@ -74,7 +74,7 @@ class ProjectMenuComponent(BaseComponent):
         """
         element = "//div[contains(text(), 'Publish')]"
         btn_publish = self.get_locator(LocatorType.XPath, element)
-        if btn_publish is not None:
+        if btn_publish is not None and btn_publish.element_to_be_clickable():
             btn_publish.click()
             return True
         return False
@@ -113,7 +113,7 @@ class ProjectMenuComponent(BaseComponent):
 
         """
         element = "//div[@class='TitleSection__private Tooltip-data Tooltip-data--small']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, 60):
             return True
         return False
 
@@ -225,5 +225,16 @@ class ProjectMenuComponent(BaseComponent):
         projects_menu = self.get_locator(LocatorType.XPath, element)
         if projects_menu is not None:
             projects_menu.click()
+            return True
+        return False
+
+    def check_sync_button_is_enabled(self) -> bool:
+        """ Check sync button is enabled or not
+
+        Returns:returns the result of sync button enabled state
+
+        """
+        element = "//button[@data-tooltip='Cannot Sync while Dataset is in use']"
+        if self.check_element_absence(LocatorType.XPath, element, 40):
             return True
         return False
