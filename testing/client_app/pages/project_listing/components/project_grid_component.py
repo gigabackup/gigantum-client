@@ -16,5 +16,4 @@ class ProjectGridComponent(BaseComponent):
     def get_project_title_by_index(self, position: int) -> str:
         sel_project = self.ui_element.find_element_by_xpath(f"a[{str(position)}]")
         proj_name = sel_project.find_element_by_xpath("div[2]//div[1]//h5[1]//div[1]")
-        print(proj_name.get_text())
         return proj_name.get_text()

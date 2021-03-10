@@ -175,9 +175,9 @@ class ProjectMenuComponent(BaseComponent):
         Returns: returns True if the element is present
 
         """
-        element = "//p[@class='FooterMessage__title FooterMessage__title--collapsed' and " \
-                  "text()='Upload complete!']"
-        if self.check_element_presence(LocatorType.XPath, element, 40):
+        element = "//p[@class='FooterMessage__title FooterMessage__title--collapsed' and contains(text(), " \
+                  "'Upload complete!')]"
+        if self.check_element_presence(LocatorType.XPath, element, 60):
             return True
         return False
 
