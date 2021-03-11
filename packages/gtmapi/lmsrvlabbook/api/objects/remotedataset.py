@@ -1,6 +1,7 @@
 import graphene
 
 from gtmcore.inventory.inventory import InventoryManager, InventoryException
+from gtmcore.workflows.gitlab import GitLabException
 
 from lmsrvcore.api.interfaces import GitRepository
 from lmsrvcore.auth.user import get_logged_in_username

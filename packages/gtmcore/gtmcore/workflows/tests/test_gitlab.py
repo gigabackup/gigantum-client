@@ -78,6 +78,14 @@ class TestGitLabManager(object):
         assert gitlab_mngr_fixture.repository_exists("testuser", "test-labbook") is True
 
     @responses.activate
+    def test_exists_wrong_content_type(self, property_mocks_fixture, gitlab_mngr_fixture):
+        """test the exists method for a repo that should exist"""
+        responses.add(responses.GET, 'https://test.repo.gigantum.com/api/v4/projects/testuser%2Fbackup-in-progress',
+                      content_type="text/plain",
+                      status=200)
+        assert gitlab_mngr_fixture.repository_exists("testuser", "backup-in-progress") is False
+
+    @responses.activate
     def test_exists_false(self, gitlab_mngr_fixture):
         """test the exists method for a repo that should not exist"""
         responses.add(responses.POST, 'https://test.gigantum.com/api/v1/',
@@ -137,6 +145,35 @@ class TestGitLabManager(object):
             gitlab_mngr_fixture.create_labbook("testuser", "test-labbook", visibility="private")
 
     @responses.activate
+    def test_set_visibility(self, gitlab_mngr_fixture, property_mocks_fixture):
+        responses.add(responses.GET, 'https://test.repo.gigantum.com/api/v4/projects/testuser%2Fnew-labbook',
+                      json={
+                          "id": 27,
+                          "description": "",
+                      },
+                      status=200)
+        responses.add(responses.PUT, 'https://test.repo.gigantum.com/api/v4/projects/testuser%2Fnew-labbook',
+                      status=200)
+        responses.add(responses.GET, 'https://test.repo.gigantum.com/api/v4/projects/testuser%2Fnew-labbook',
+                      json={
+                          "id": 27,
+                          "description": "",
+                          "visibility": "public"
+                      },
+                      status=200)
+
+        gitlab_mngr_fixture.set_visibility("testuser", "new-labbook", "public")
+
+    @responses.activate
+    def test_set_visibility_does_not_exist(self, gitlab_mngr_fixture, property_mocks_fixture):
+        responses.add(responses.GET, 'https://test.repo.gigantum.com/api/v4/projects/testuser%2Fnew-labbook',
+                      content_type="text/plain",
+                      status=200)
+
+        with pytest.raises(GitLabException):
+            gitlab_mngr_fixture.set_visibility("testuser", "new-labbook", "public")
+
+    @responses.activate
     def test_get_collaborators(self, gitlab_mngr_fixture, property_mocks_fixture):
         """Test the get_collaborators method"""
         responses.add(responses.GET, 'https://test.repo.gigantum.com/api/v4/projects/testuser%2Ftest-labbook/members?'
@@ -169,7 +206,7 @@ class TestGitLabManager(object):
         assert collaborators[1] == (30, 'jd', ProjectPermissions.READ_ONLY)
 
         # Verify it fails on error to gitlab (should get second mock on second call)
-        with pytest.raises(ValueError):
+        with pytest.raises(GitLabException):
             gitlab_mngr_fixture.get_collaborators("testuser", "test-labbook")
 
     @responses.activate

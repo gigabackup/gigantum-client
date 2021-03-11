@@ -86,9 +86,9 @@ class BackupInProgressModal extends Component<Props> {
           <p className="BackupInProgressModal__p">
             The server
             {' '}
-            <pre className="BackupInProgressModal__pre">
-              <code>{name}</code>
-            </pre>
+            <span className="BackupInProgressModal__span--highlight">
+              {name}
+            </span>
             {' '}
             is currently backing up your data. During this time, access to the server is blocked to ensure backup integrity. Once the backup complete, these restrictions will automatically be removed and you will be able to interact with the server again.
           </p>

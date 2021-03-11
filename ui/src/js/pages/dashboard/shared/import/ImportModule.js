@@ -61,6 +61,9 @@ const buildImage = (name, owner, id) => {
 
 
 type Props = {
+  currentServer: {
+    backupInProgress: boolean,
+  },
   section: string,
   showModal: Function,
   title: string,
@@ -587,62 +590,98 @@ class ImportModule extends Component<Props> {
   }
 
   render() {
-    const { isImporting, showLoginPrompt } = this.state;
-    const { section, title } = this.props;
+    const {
+      currentServer,
+      section,
+      title,
+    } = this.props;
+    const {
+      isImporting,
+      isOver,
+      files,
+      ready,
+      remoteUrl,
+      showImportModal,
+      showLoginPrompt,
+    } = this.state;
+    const sectionType = section === 'labbook' ? 'Projects' : 'Datasets';
+    // declare css here
     const loadingMaskCSS = classNames({
       'ImportModule__loading-mask': isImporting,
       hidden: !isImporting,
     });
+    const createButtonCSS = classNames({
+      'Import__button btn--import': true,
+      'Tooltip-data': currentServer.backupInProgress,
+    });
 
     return (
-      <ServerContext.Consumer>
-        { value => (
-          <div
-            className="ImportModule Card Card--line-50 Card--text-center Card--add Card--import column-4-span-3"
-            key="AddLabbookCollaboratorPayload"
-          >
-            <LoginPrompt
-              showLoginPrompt={showLoginPrompt}
-              closeModal={this._closeLoginPromptModal}
-            />
-            <ImportModal
-              currentServer={value.currentServer}
-              self={this}
-            />
+      <div
+        className="ImportModule Card Card--line-50 Card--text-center Card--add Card--import column-4-span-3"
+        key="AddLabbookCollaboratorPayload"
+      >
+        <LoginPrompt
+          showLoginPrompt={showLoginPrompt}
+          closeModal={this._closeLoginPromptModal}
+        />
+        <ImportModal
+          closeImportModal={this._closeImportModal}
+          currentServer={currentServer}
+          dragendHandler={this.dragendHandler}
+          dragEnterHandler={this._dragEnterHandler}
+          dragLeaveHandler={this._dragLeaveHandler}
+          dragoverHandler={this._dragoverHandler}
+          dropHandler={this._dropHandler}
+          dropZone={this.dropZone}
+          files={files}
+          importRepository={this._import}
+          isOver={isOver}
+          isVisible={showImportModal}
+          ready={ready}
+          remoteUrl={remoteUrl}
+          sectionType={section}
+          updateRemoteUrl={this._updateRemoteUrl}
+        />
 
-            <div className="Import__header">
-              <div className={`Import__icon Import__icon--${section}`}>
-                <div className="Import__add-icon" />
-              </div>
-              <div className="Import__title">
-                <h2 className="Import__h2 Import__h2--azure">{title}</h2>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              className="btn--import"
-              onClick={(evt) => { this._showModal(evt); }}
-            >
-              Create New
-            </button>
-
-            <button
-              type="button"
-              className="btn--import"
-              onClick={() => { this.setState({ showImportModal: true }); }}
-            >
-              Import Existing
-            </button>
-
-            <Tooltip section="createLabbook" />
-            <Tooltip section="importLabbook" />
-            <div className={loadingMaskCSS} />
+        <div className="Import__header">
+          <div className={`Import__icon Import__icon--${section}`}>
+            <div className="Import__add-icon" />
           </div>
-        )}
-      </ServerContext.Consumer>
+          <div className="Import__title">
+            <h2 className="Import__h2 Import__h2--azure">{title}</h2>
+          </div>
+        </div>
+
+        <button
+          className={createButtonCSS}
+          data-tooltip={`Cannot create ${sectionType} while backup is in progress`}
+          disabled={currentServer.backupInProgress}
+          onClick={(evt) => { this._showModal(evt); }}
+          type="button"
+        >
+          Create New
+        </button>
+
+        <button
+          type="button"
+          className="btn--import"
+          onClick={() => { this.setState({ showImportModal: true }); }}
+        >
+          Import Existing
+        </button>
+
+        <Tooltip section="createLabbook" />
+        <Tooltip section="importLabbook" />
+        <div className={loadingMaskCSS} />
+      </div>
     );
   }
 }
 
-export default ImportModule;
+const WithContext = (Component) => (props) => (
+  <ServerContext.Consumer>
+    {value => <Component {...props} currentServer={value.currentServer} />}
+  </ServerContext.Consumer>
+);
+
+export default WithContext(ImportModule);

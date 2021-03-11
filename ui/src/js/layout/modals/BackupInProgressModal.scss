@@ -4,8 +4,8 @@
 .BackupInProgressModal {
   padding-top: 3em;
 
-  &__pre {
-    display: inline;
+  &__span--highlight {
+  text-decoration: underline;
   }
 
   &__p {

@@ -242,6 +242,10 @@ class GitLabManager(object):
                                 timeout=REQUEST_TIMEOUT)
 
         if response.status_code == 200:
+            # if a backup is in progress, the api is redirected to the gigantum api url and returns a 200, so we
+            # need to also check that the content-type is json to make sure the response is from the gitlab api
+            if response.headers.get('content-type') != 'application/json':
+                return False
             return True
         elif response.status_code == 404:
             return False
@@ -263,6 +267,9 @@ class GitLabManager(object):
             None (Exception on failure)
 
         """
+        if not self.repository_exists(namespace, repository_name):
+            raise GitLabException("Cannot set visibility for remote repository that does not exist")
+
         repo_id = self.get_repository_id(namespace, repository_name)
         update_data = {'visibility': visibility}
         response = requests.put(f"{self.remote_host}api/v4/projects/{repo_id}",
@@ -398,7 +405,7 @@ class GitLabManager(object):
 
             if response.status_code != 200:
                 logger.error(f"Failed to get remote repository collaborators for {repo_id}, page {page}")
-                logger.error(response.json())
+                logger.error(response.content)
                 raise GitLabException("Failed to get remote repository collaborators")
             else:
                 # Will load one of ProjectPermissions enum fields, else throwing value err
