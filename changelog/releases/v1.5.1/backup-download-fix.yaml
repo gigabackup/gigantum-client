@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1693"
+changelog:
+  - type: FIX
+    description: Fixed a bug with how the error from downloading dataset files is being handled in backup mode.

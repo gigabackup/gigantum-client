@@ -17,10 +17,10 @@ import './DatasetActionsMenu.scss';
 
 /**
 *  Method checks if a backup is running and starts polling for status using utils functions.
-*  @param {Object} error
+*  @param {String} errorMessage
 */
-const checkErrorForBackup = (error) => {
-  if (error[0].message.indexOf('backup in progress') > -1) {
+const checkErrorForBackup = (errorMessage) => {
+  if (errorMessage.indexOf('backup in progress') > -1) {
     checkBackupMode();
   }
 };
