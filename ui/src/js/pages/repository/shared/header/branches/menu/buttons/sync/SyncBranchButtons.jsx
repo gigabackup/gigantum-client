@@ -179,7 +179,7 @@ const SyncBranchButtons = (props: Props) => {
 
       <button
         className={syncMenuDropdownButtonCSS}
-        disabled={disableDropdown || backupInProgress}
+        disabled={disableDropdown}
         onClick={() => { updateMenuVisible(!menuVisible); }}
         type="submit"
       />

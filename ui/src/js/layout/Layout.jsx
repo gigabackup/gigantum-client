@@ -33,9 +33,9 @@ const Layout = (props: Props) => {
 
           />
 
-          <BackupInProgressModal currentServer={value.currentServer} />
+      <BackupInProgressModal />
 
-          <Footer />
+      <Footer />
           <main className="Layout__main">
             {children}
           </main>
