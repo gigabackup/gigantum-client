@@ -1,4 +1,6 @@
 """Test call for exercise linked published dataset"""
+import time
+
 import pytest
 from configuration.configuration import ConfigurationManager
 from client_app.pages.landing.landing_page import LandingPage
@@ -59,6 +61,7 @@ class TestCreatePublishDataset:
         # Click "Data" tab
         is_clicked = dataset_list.dataset_menu_component.click_data_tab()
         assert is_clicked, "Could not click Data tab"
+        time.sleep(3)
 
         # Drag and drop text file with contents "created"
         is_dropped = dataset_list.dataset_data_component.drag_and_drop_text_file_in_data_drop_zone('file1', 'created')
@@ -194,11 +197,11 @@ class TestCreatePublishDataset:
         assert is_clicked, "Could not click Gigantum Hub tab"
 
         # Verify project in Gigantum Hub page
-        is_verified = dataset_list.gigantum_hub_component.verify_title_in_gigantum_hub(project_title)
+        is_verified = dataset_list.gigantum_hub_component.verify_project_title_in_gigantum_hub(project_title)
         assert is_verified, "Could not verify project in Gigantum Hub"
 
         # Click import button in Gigantum Hub page
-        is_clicked = dataset_list.gigantum_hub_component.click_import_button(project_title)
+        is_clicked = dataset_list.gigantum_hub_component.click_project_import_button(project_title)
         assert is_clicked, "Could not click import button in Gigantum Hub page"
 
         # Monitor container status to go through Stopped -> Building

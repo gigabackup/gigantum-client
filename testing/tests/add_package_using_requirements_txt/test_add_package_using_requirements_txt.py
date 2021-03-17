@@ -92,7 +92,7 @@ class TestAddPackage:
         # Open Jupyter_lab and verify packages
         commands = namedtuple('command', ('command_text', 'output', 'error_message'))
         command_text = ['pip freeze | grep gtmunit']
-        output = ['gtmunit1==0.12.4', 'gtmunit2==2.1', 'gtmunit3==5.0']
+        output = ['gtmunit1==0.12.4', 'gtmunit2==2.0', 'gtmunit3==5.0']
         error_message = 'Verification of package failed'
         gtmunit_grep_command = commands(command_text, output, error_message)
         verification_message = ProjectUtility().verify_command_execution(self.driver, [gtmunit_grep_command])

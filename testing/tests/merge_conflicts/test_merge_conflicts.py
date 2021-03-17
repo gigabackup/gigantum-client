@@ -196,11 +196,11 @@ class TestMergeConflicts:
         assert is_clicked, "Could not click Gigantum Hub tab"
 
         # Verify project in Gigantum Hub page
-        is_verified = project_list.gigantum_hub_component.verify_title_in_gigantum_hub(project_title)
+        is_verified = project_list.gigantum_hub_component.verify_project_title_in_gigantum_hub(project_title)
         assert is_verified, "Could not verify project in Gigantum Hub"
 
         # Click import button in Gigantum Hub page
-        is_clicked = project_list.gigantum_hub_component.click_import_button(project_title)
+        is_clicked = project_list.gigantum_hub_component.click_project_import_button(project_title)
         assert is_clicked, "Could not click import button in Gigantum Hub page"
 
         # Monitor container status to go through Stopped -> Building

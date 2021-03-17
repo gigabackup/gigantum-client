@@ -379,4 +379,5 @@ WebElement.get_list_selected_item = PageFactory.get_list_selected_item
 WebElement.execute_script = PageFactory.execute_script
 setattr(WebElement, 'wait_until', PageFactory.wait_until)
 setattr(WebElement, 'drag_drop_file_in_drop_zone', PageFactory.drag_drop_text_file_in_drop_zone)
+setattr(WebElement, 'invisibility_of_element_located', PageFactory.invisibility_of_element_located)
 
