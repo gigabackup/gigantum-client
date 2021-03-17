@@ -30,10 +30,12 @@ class ChangeVisibility extends Component<Props> {
   *  copies remote
   *  @return {}
   */
-  _toggleModal = () => {
+  _toggleModal = (value) => {
     this.setState((state) => {
       const visibilityModalVisible = !state.visibilityModalVisible;
-      return { visibilityModalVisible };
+
+      const newVisibilityModalVisible = value === undefined ? visibilityModalVisible : value;
+      return { visibilityModalVisible: newVisibilityModalVisible };
     });
   }
 

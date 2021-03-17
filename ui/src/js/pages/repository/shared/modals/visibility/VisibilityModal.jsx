@@ -5,12 +5,16 @@ import React, { Component } from 'react';
 import ServerContext from 'Pages/ServerContext';
 // job status
 import JobStatus from 'JS/utils/JobStatus';
+// utils
+import { setErrorMessage } from 'JS/redux/actions/footer';
 // component
 import Modal from 'Components/modal/Modal';
+
 import Complete from './status/Complete';
 import Error from './status/Error';
 import Publishing from './status/Publishing';
 import VisibilityModalConent from './content/Content';
+// store
 // utilities
 import { publish, changeVisibility } from './utils/PublishMutations';
 // Machine
@@ -195,15 +199,10 @@ class VisibilityModal extends Component<Props> {
       );
 
       setTimeout(() => {
-        toggleModal();
+        toggleModal(false);
       }, 1000);
     } else {
-      this._transition(
-        ERROR,
-        {
-          failureMessage: error[0].message,
-        },
-      );
+      setErrorMessage(owner, name, error[0].message, error);
     }
   };
 
@@ -234,7 +233,7 @@ class VisibilityModal extends Component<Props> {
       changeVisibility(this.props, isPublic, this._modifyVisibilityCallback);
     }
 
-    toggleModal();
+    toggleModal(false);
   }
 
   static contextType = ServerContext;
@@ -317,7 +316,7 @@ class VisibilityModal extends Component<Props> {
       return (
         <Modal
           header={header}
-          handleClose={() => toggleModal(modalStateValue)}
+          handleClose={() => toggleModal(false)}
           size="large"
           icon={icon}
         >
