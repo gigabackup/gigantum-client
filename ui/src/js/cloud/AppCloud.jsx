@@ -30,17 +30,25 @@ const AppCloudQuery = graphql`
   }
 `;
 
+type State = {
+  availableServers: array,
+  isLoggedIn: boolean | null,
+  machine?: string,
+
+}
+
 class App extends Component {
   state = {
     availableServers: [],
     isLoggedIn: null,
-    machine: stateMachine.initialState,
+    machine: null,
   }
 
   auth = new Auth();
 
   componentDidMount() {
     const serverUrl = apiURL('server');
+    this.setState({ machine: stateMachine.initialState });
     fetchQuery(
       serverUrl,
     ).then(serverResponse => {
@@ -63,7 +71,7 @@ class App extends Component {
       } else {
         this.transition(ERROR);
       }
-    })
+    });
   }
 
 
@@ -82,7 +90,7 @@ class App extends Component {
     @param {object} nextState
     sets transition of the state machine
   */
-  transition = (eventType, nextState) => {
+  transition = (eventType) => {
     const { state } = this;
     const { machine } = this.state;
 

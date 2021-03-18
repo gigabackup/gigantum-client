@@ -216,7 +216,6 @@ class File extends Component<Props> {
               } else if (props.fileData.edge.node.key.indexOf('.Rmd') === -1) {
                 path = `${path}/lab/tree/${props.section}/${props.fileData.edge.node.key}`;
               }
-
               window[tabName] = window.open(path, tabName);
               window[tabName].close();
               window[tabName] = window.open(path, tabName);
