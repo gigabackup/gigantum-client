@@ -33,6 +33,7 @@ import Tooltip from 'Components/tooltip/Tooltip';
 import LoginPrompt from 'Pages/repository/shared/modals/LoginPrompt';
 import DeleteLabbook from 'Pages/repository/shared/modals/DeleteLabbook';
 import DeleteDataset from 'Pages/repository/shared/modals/DeleteDataset';
+import ShareLink from './share/ShareLink';
 import CopyUrl from './copy/CopyUrl';
 import ChangeVisibility from './visibility/ChangeVisibility';
 // assets
@@ -629,8 +630,7 @@ class ActionsMenu extends Component<Props> {
               remoteAdded={defaultRemote}
               remoteDelete={false}
             />
-          )
-        }
+          )}
 
         { (deleteModalVisible && (sectionType === 'dataset'))
           && (
@@ -641,8 +641,7 @@ class ActionsMenu extends Component<Props> {
               owner={owner}
               remoteAdded={defaultRemote}
             />
-          )
-        }
+          )}
 
         <CreateBranch
           description={description}
@@ -709,6 +708,8 @@ class ActionsMenu extends Component<Props> {
               defaultRemote={defaultRemote}
               resetState={this._resetState}
             />
+
+            <ShareLink />
 
             <CopyUrl
               defaultRemote={defaultRemote}

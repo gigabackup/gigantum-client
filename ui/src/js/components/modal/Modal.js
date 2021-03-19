@@ -69,7 +69,7 @@ class Modal extends Component<Props> {
               <button
                 type="button"
                 className="Btn Btn--flat Modal__close padding--small "
-                onClick={() => handleClose()}
+                onClick={(evt) => handleClose(evt)}
               />
             )}
             <div className="Modal__container">
