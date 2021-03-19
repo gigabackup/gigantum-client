@@ -24,7 +24,7 @@ import gigantumLogo from 'Images/logos/gigantum-client.svg';
 // components
 import Login from 'Pages/login/Login';
 import Routes from 'Pages/Routes';
-import Importing from 'JS/Auth/components/ImportingWrapper';
+import Importing from 'Pages/importing/ImportingWrapper';
 import Interstitial from 'Components/interstitial/Interstitial';
 // css
 import './App.scss';
