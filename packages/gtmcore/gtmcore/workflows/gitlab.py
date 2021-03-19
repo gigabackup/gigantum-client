@@ -56,7 +56,7 @@ def check_backup_in_progress(git_url=None):
         git_url = server_config.git_url
 
     try:
-        gitlab_response = requests.get(f"{git_url}backup")
+        gitlab_response = requests.get(f"{git_url}backup", timeout=5)
         if gitlab_response.status_code == 503 and "backup in progress" in str(gitlab_response.content).lower():
             return True
         else:
