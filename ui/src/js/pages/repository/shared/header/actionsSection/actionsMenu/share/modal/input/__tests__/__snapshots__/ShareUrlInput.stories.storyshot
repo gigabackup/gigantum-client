@@ -1,0 +1,133 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots Components/ShareLink/ShareUrlInput Snapshots: ShareUrlInput Default 1`] = `
+<ShareUrlInputWrapped>
+  <ShareInputUrlWrapper
+    codeFile="code/batch.ipynb"
+    currentServer={
+      Object {
+        "baseUrl": "gigantum.com",
+        "id": "id_here",
+        "name": "gigantum",
+      }
+    }
+    devTool="jupyterLab"
+    labbook={
+      Object {
+        "code": Object {
+          "allFiles": Array [
+            Object {
+              "node": Object {
+                "key": "code/Batch.ipynb",
+              },
+            },
+            Object {
+              "node": Object {
+                "key": "code/Match.ipynb",
+              },
+            },
+            Object {
+              "node": Object {
+                "key": "code/Clean.ipynb",
+              },
+            },
+          ],
+        },
+      }
+    }
+    repository={
+      Object {
+        "environment": Object {
+          "base": Object {
+            "developmentTools": Array [
+              "jupyterLab",
+              "notebook",
+            ],
+          },
+          "bundledApps": Array [
+            Object {
+              "name": "tensor-brd",
+            },
+          ],
+        },
+        "name": "projectname",
+        "owner": "ownername",
+      }
+    }
+    urlOrigin="gigantum.com"
+  >
+    <ShareUrlInput
+      codeFile="code/batch.ipynb"
+      currentServer={
+        Object {
+          "baseUrl": "gigantum.com",
+          "id": "id_here",
+          "name": "gigantum",
+        }
+      }
+      devTool="jupyterLab"
+      labbook={
+        Object {
+          "code": Object {
+            "allFiles": Array [
+              Object {
+                "node": Object {
+                  "key": "code/Batch.ipynb",
+                },
+              },
+              Object {
+                "node": Object {
+                  "key": "code/Match.ipynb",
+                },
+              },
+              Object {
+                "node": Object {
+                  "key": "code/Clean.ipynb",
+                },
+              },
+            ],
+          },
+        }
+      }
+      repository={
+        Object {
+          "environment": Object {
+            "base": Object {
+              "developmentTools": Array [
+                "jupyterLab",
+                "notebook",
+              ],
+            },
+            "bundledApps": Array [
+              Object {
+                "name": "tensor-brd",
+              },
+            ],
+          },
+          "name": "projectname",
+          "owner": "ownername",
+        }
+      }
+      urlOrigin="gigantum.com"
+    >
+      <div
+        className="ShareUrlInput relative"
+        data-selenium-id="ShareUrlInputx"
+      >
+        <textarea
+          className="ShareUrlInput__textarea"
+          id="ShareUrlInput__textarea"
+          type="text"
+          value="gigantum.com/projects/ownername/projectname/#autoImport=true&baseUrl=gigantum.com&devtool=undefined&filePath=code/batch.ipynb"
+        />
+        <button
+          className="ShareUrlInput__button ShareUrlInput__button--copy fa fa-clone"
+          data-tooltip="Copied to clipboard!"
+          onClick={[Function]}
+          type="button"
+        />
+      </div>
+    </ShareUrlInput>
+  </ShareInputUrlWrapper>
+</ShareUrlInputWrapped>
+`;

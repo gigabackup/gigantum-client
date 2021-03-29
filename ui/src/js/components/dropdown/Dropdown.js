@@ -42,7 +42,7 @@ class Dropdown extends Component<Props> {
     return (
       <div
         className={dropdownCSS}
-        onClick={(evt) => listAction(evt)}
+        onClick={listAction}
         role="presentation"
       >
         {label}

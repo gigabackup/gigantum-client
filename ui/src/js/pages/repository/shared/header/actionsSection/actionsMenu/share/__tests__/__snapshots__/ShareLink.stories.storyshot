@@ -1,0 +1,121 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots Components/ShareLink Snapshots: ShareLink Default 1`] = `
+<ShareLinkWrapped>
+  <ShareLinkWrapper
+    currentServer={
+      Object {
+        "baseUrl": "gigantum.com",
+        "id": "id_here",
+        "name": "gigantum",
+      }
+    }
+    environment={"RelayModernEnvironment(RelayModernMockEnvironment)"}
+    labbook={
+      Object {
+        "code": Object {
+          "allFiles": Array [
+            Object {
+              "node": Object {
+                "key": "code/Batch.ipynb",
+              },
+            },
+            Object {
+              "node": Object {
+                "key": "code/Match.ipynb",
+              },
+            },
+            Object {
+              "node": Object {
+                "key": "code/Clean.ipynb",
+              },
+            },
+          ],
+        },
+      }
+    }
+    repository={
+      Object {
+        "environment": Object {
+          "base": Object {
+            "developmentTools": Array [
+              "jupyterLab",
+              "notebook",
+            ],
+          },
+          "bundledApps": Array [
+            Object {
+              "name": "tensor-brd",
+            },
+          ],
+        },
+        "name": "projectname",
+        "owner": "ownername",
+      }
+    }
+  >
+    <ShareLink
+      repository={
+        Object {
+          "environment": Object {
+            "base": Object {
+              "developmentTools": Array [
+                "jupyterLab",
+                "notebook",
+              ],
+            },
+            "bundledApps": Array [
+              Object {
+                "name": "tensor-brd",
+              },
+            ],
+          },
+          "name": "projectname",
+          "owner": "ownername",
+        }
+      }
+    >
+      <li
+        className="ActionsMenu__item ShareLink"
+        data-selenium-id="ShareLinkx"
+        onClick={[Function]}
+        role="presentation"
+      >
+        <button
+          className="ActionsMenu__btn--flat"
+        >
+          Share Link
+        </button>
+        <span
+          className="Tooltip-data Tooltip-data--info"
+          data-tooltip="Share link is ..."
+        />
+        <ShareModal
+          environment={"RelayModernEnvironment()"}
+          handleClose={[Function]}
+          isVisible={false}
+          repository={
+            Object {
+              "environment": Object {
+                "base": Object {
+                  "developmentTools": Array [
+                    "jupyterLab",
+                    "notebook",
+                  ],
+                },
+                "bundledApps": Array [
+                  Object {
+                    "name": "tensor-brd",
+                  },
+                ],
+              },
+              "name": "projectname",
+              "owner": "ownername",
+            }
+          }
+        />
+      </li>
+    </ShareLink>
+  </ShareLinkWrapper>
+</ShareLinkWrapped>
+`;

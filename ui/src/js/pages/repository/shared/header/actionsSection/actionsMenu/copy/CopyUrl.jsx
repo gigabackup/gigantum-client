@@ -50,7 +50,7 @@ class CopyUrl extends Component<Props> {
     const { currentServer } = this.context;
     const { baseUrl } = currentServer;
     const doesNotHaveRemote = (defaultRemote === null) && (remoteUrl === null);
-    const text = showExport ? 'Export Path' : 'Get Share URL';
+    const text = showExport ? 'Export Path' : 'Get Import URL';
     const copyValue = showExport ? remoteUrl : `${baseUrl}${owner}/${name}`;
     // declare css here
     const copyUrlCSS = classNames({
@@ -68,7 +68,13 @@ class CopyUrl extends Component<Props> {
         <div
           className={copyUrlCSS}
         >
-          <div className="ActionsMenu__item--label">{text}</div>
+          <div className="CopyUrl__container ActionsMenu__item--label">
+            <h6 className="CopyUrl__h6">{text}</h6>
+            <span
+              className="Tooltip-data Tooltip-data--info"
+              data-tooltip="Share link is ..."
+            />
+          </div>
           <div className="ActionsMenu__copyRemote">
 
             <input

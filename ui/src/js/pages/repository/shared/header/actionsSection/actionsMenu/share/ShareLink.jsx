@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 // conetxt
 import RepositoryContext from 'Pages/repository/RepositoryContext';
+// environment
+import environment from 'JS/createRelayEnvironment';
 // components
 import ShareModal from './modal/ShareModal';
 // css
@@ -38,7 +40,12 @@ const ShareLink = ({
         Share Link
       </button>
 
+      <span
+        className="Tooltip-data Tooltip-data--info"
+        data-tooltip="Share link is ..."
+      />
       <ShareModal
+        environment={environment}
         handleClose={handleClose}
         isVisible={isVisible}
         name={name}

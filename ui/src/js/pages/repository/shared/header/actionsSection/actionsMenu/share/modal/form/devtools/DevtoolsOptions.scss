@@ -1,5 +1,7 @@
 @import '~Styles/_imports.scss';
 
 .DevtoolsOptions {
-
+  &__container {
+    width: 0;
+  }
 }
