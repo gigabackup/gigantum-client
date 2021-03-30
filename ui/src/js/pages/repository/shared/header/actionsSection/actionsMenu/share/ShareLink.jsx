@@ -41,8 +41,8 @@ const ShareLink = ({
       </button>
 
       <span
-        className="Tooltip-data Tooltip-data--info"
-        data-tooltip="Share link is ..."
+        className="Tooltip-data Tooltip-data--info Toolip-data--action"
+        data-tooltip="Get a link to open or run this project."
       />
       <ShareModal
         environment={environment}

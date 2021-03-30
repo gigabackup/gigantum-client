@@ -1,7 +1,8 @@
 @import '~Styles/_imports.scss';
 
 .DevtoolsOptions {
-  &__container {
-    width: 0;
+  &__h6 {
+    display: inline-block !important;
+    width: 4em !important;
   }
 }

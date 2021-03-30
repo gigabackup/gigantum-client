@@ -131,7 +131,7 @@ const ShareFileInput = ({
           File Path
           <span
             className="Tooltip-data Tooltip-data--info"
-            data-tooltip="Add a file path to drop a collaborator into a jupyterLab file. Currently only available with jupyterLab."
+            data-tooltip="The specified file will automically be opened. (Only available in JupyterLab)"
           />
         </h6>
         <div className="relative">

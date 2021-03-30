@@ -11,7 +11,7 @@ import './ShareUrlInput.scss';
 type Props = {
   codeFile: string,
   currentServer: {
-    baseUrl: string,
+    serverId: string,
   },
   devtool: string,
   repository: {
@@ -30,13 +30,13 @@ const ShareUrlInput = ({
 }: Props) => {
   // props
   const { name, owner } = repository;
-  const { baseUrl } = currentServer;
+  const { serverId } = currentServer;
   // state
   const [isTooltipVisible, setTooltipVisible] = useState(false);
   // other variables
   const filePathUrl = (codeFile !== null) && (codeFile !== 'code/') ? `&filePath=${codeFile}` : '';
   const devtoolUrl = (devtool !== null) && (devtool !== 'none') ? `&devtool=${devtool}` : '';
-  const value = `${urlOrigin}/projects/${owner}/${name}/#autoImport=true&baseUrl=${baseUrl}${devtoolUrl}${filePathUrl}`;
+  const value = `${urlOrigin}/projects/${owner}/${name}/#autoImport=true&serverId=${serverId}${devtoolUrl}${filePathUrl}`;
 
   // css
   const copyButtonCSS = classNames({

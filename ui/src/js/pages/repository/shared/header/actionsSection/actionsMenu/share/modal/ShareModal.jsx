@@ -52,7 +52,8 @@ const ShareModal = ({
         overflow="visible"
         size="large"
       >
-        <p>Some filler text about share links</p>
+        <p>Create a share link to automatically import and open this Project. You can also automatically start a tool and even open a notebook in Jupyterlab.  </p>
+        <p><b><i>Note, this link is specific to this Client instance and will create a unique copy in a user's workspace.</i></b></p>
         <ShareUrlInput
           urlOrigin={urlOrigin}
           codeFile={codeFile}

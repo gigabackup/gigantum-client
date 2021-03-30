@@ -71,8 +71,8 @@ class CopyUrl extends Component<Props> {
           <div className="CopyUrl__container ActionsMenu__item--label">
             <h6 className="CopyUrl__h6">{text}</h6>
             <span
-              className="Tooltip-data Tooltip-data--info"
-              data-tooltip="Share link is ..."
+              className="Tooltip-data Tooltip-data--info Toolip-data--action"
+              data-tooltip="This link can be used to import a project in another client."
             />
           </div>
           <div className="ActionsMenu__copyRemote">

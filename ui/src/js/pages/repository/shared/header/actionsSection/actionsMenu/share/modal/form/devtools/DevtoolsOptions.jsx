@@ -7,6 +7,8 @@ import {
 } from 'Hooks/hooks';
 // components
 import Dropdown from 'Components/dropdown/Dropdown';
+// css
+import './DevtoolsOptions.scss';
 
 type Props = {
   repository: {
@@ -83,7 +85,13 @@ const DevtoolsOptions = ({
 
   return (
     <div className="DevtoolsOptions">
-      <h6>Tool</h6>
+      <h6 className="DevtoolsOptions__h6 relative">
+        Tool
+        <span
+          className="Tooltip-data Tooltip-data--info"
+          data-tooltip="If selected the tool will automatically launch."
+        />
+      </h6>
       <div
         className="DevtoolsOptions__container"
         ref={dropdownRef}
