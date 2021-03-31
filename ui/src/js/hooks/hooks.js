@@ -2,10 +2,15 @@
 import {
   useEffect,
   useRef,
+  useDebugValue,
 } from 'react';
 
 // Hook
-const useEventListener = (eventName, handler, element = window) => {
+const useEventListener = (
+  eventName,
+  handler,
+  element = window,
+) => {
   // Create a ref that stores handler
   const savedHandler = useRef();
 
@@ -37,6 +42,9 @@ const useEventListener = (eventName, handler, element = window) => {
     },
     [eventName, element], // Re-run if eventName or element changes
   );
+
+  useDebugValue(eventName);
+  useDebugValue(element);
 };
 
 export {
