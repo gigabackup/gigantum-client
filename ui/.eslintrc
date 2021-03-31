@@ -125,6 +125,7 @@
       "alias": [
         ["JS", "./src/js/"],
         ["Components", "./src/js/components/"],
+        ["Hooks", "./src/js/hooks/"],
         ["Pages", "./src/js/pages/"],
         ["Mutations", "./src/js/mutations"],
         ["Submodules", "./submodules"],

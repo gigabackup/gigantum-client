@@ -1,0 +1,5 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1713"
+changelog:
+  - type: NEW
+    description: Adds share link modal. Share link modal gives the user an interface to build a url for sharing with collaborators. Link will import the project, build project and launch devtool. If using jupyterLab drop there is an additional option to add a code file where the collaborator will be dropped into when jupyterLab opens.
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1646

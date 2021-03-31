@@ -31,6 +31,7 @@ class Dropdown extends Component<Props> {
       listItems,
       visibility,
     } = this.props;
+    // declare css here
     const dropdownCSS = classNames({
       'Dropdown relative': true,
       'Dropdown--open': visibility,
@@ -41,7 +42,7 @@ class Dropdown extends Component<Props> {
     return (
       <div
         className={dropdownCSS}
-        onClick={() => listAction()}
+        onClick={listAction}
         role="presentation"
       >
         {label}

@@ -179,6 +179,7 @@
     "update-globals": "npm install -g @babel/cli@7.2.3 @babel/core@7.2.2 jest@23.6.0 relay-compiler@2.0.0",
     "__comment-test__": "********************** TESTS SCRIPTS GO HERE **********************",
     "test": "BABEL_ENV=test TZ='Europe/London' jest src __tests__",
+    "test:file": "BABEL_ENV=test TZ='Europe/London' jest",
     "test:verbose": "BABEL_ENV=test TZ='Europe/London' jest --verbose src",
     "test:update": "TZ='Europe/London' jest src -u",
     "test:proxy": "USE_PROXY=true jest",
