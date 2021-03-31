@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1708"
+changelog:
+  - type: IMPROVEMENT
+    description: Update check for available disk space due to changes to Docker. This also better supports more complex host/VM configurations.

@@ -8,6 +8,8 @@ import sys
 from docker.errors import ImageNotFound, NotFound, APIError
 import yaml
 import requests
+from natsort import natsorted
+import shutil
 
 from gtm.common.console import ask_question
 from gtm.utils import get_docker_client, get_current_commit_hash
@@ -33,6 +35,13 @@ class ClientBuilder(object):
         """
         for filename in glob.glob('{}/**/*.pyc'.format(directory), recursive=True):
             os.remove(filename)
+
+    @staticmethod
+    def _remove_mypy_cache(client_root_dir: str) -> None:
+        """Method to remove mypy cache dirs
+        """
+        shutil.rmtree(os.path.join(client_root_dir, "packages", "gtmapi", ".mypy_cache"), ignore_errors=True)
+        shutil.rmtree(os.path.join(client_root_dir, "packages", "gtmcore", ".mypy_cache"), ignore_errors=True)
 
     @staticmethod
     def get_image_tag() -> str:
@@ -203,22 +212,24 @@ class ClientBuilder(object):
         # Add Build Info
         build_date = datetime.datetime.utcnow().strftime('%Y-%m-%d')
         short_hash = get_current_commit_hash()[:8]
-        base_data['build_info'] = f"Gigantum Client :: {build_date} :: {short_hash}"
+        releases = list()
+        for release in glob.glob(os.path.join(client_root_dir, "changelog", "releases", "*")):
+            releases.append(release)
+        releases = natsorted(releases)
+        _, release_version = releases[-1].split("/releases/v")
+        base_data['build_info'] = f"Gigantum Client :: {build_date} :: {short_hash} :: {release_version}"
 
         # Write out updated config file
         with open(os.path.join(client_root_dir, final_config_file), "wt") as cf:
             cf.write(yaml.dump(base_data, default_flow_style=False))
 
-        # Write final supervisor file to set CHP parameters
+        # Write final supervisor file to set Honeytail config if present (in hub)
         base_supervisor = os.path.join(client_root_dir, build_args['supervisor_file'])
         final_supervisor = os.path.join(client_root_dir, docker_args['SUPERVISOR_CONFIG'])
 
         with open(base_supervisor, 'rt') as source:
             with open(final_supervisor, 'wt') as dest:
                 supervisor_data = source.read()
-
-                ext_proxy_port = base_data['proxy']["external_proxy_port"]
-                api_port = base_data['proxy']['api_port']
                 context = base_data['container']['context']
                 if context == "hub":
                     honeycomb_block = f"""\n
@@ -228,23 +239,20 @@ autostart=true
 autorestart=true
 priority=10"""
                 else:
-                    honeycomb_block = "\n"
-
-                dest.write(f"""{supervisor_data}\n\n
-[program:chp]
-command=configurable-http-proxy --ip=0.0.0.0 --port={ext_proxy_port} --api-port={api_port} --default-target='http://localhost:10002'
-autostart=true
-autorestart=true
-priority=0
-{honeycomb_block}""")
+                    honeycomb_block = ""
+                dest.write(f"""{supervisor_data}\n\n{honeycomb_block}""")
 
         # Image Labels
         labels = {'com.gigantum.app': 'client',
                   'com.gigantum.revision': get_current_commit_hash(),
+                  'com.gigantum.version': release_version,
                   'com.gigantum.maintainer.email': 'support@gigantum.com'}
 
         # Delete .pyc files in case dev tools used on something not ubuntu before building
         self._remove_pyc(os.path.join(client_root_dir, "packages"))
+
+        # Delete mypy cache before building
+        self._remove_mypy_cache(client_root_dir)
 
         # Build image
         dockerfile_path = os.path.join(client_root_dir, 'resources', 'docker', 'Dockerfile')
