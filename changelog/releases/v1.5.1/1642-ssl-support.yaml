@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1697"
+changelog:
+  - type: NEW
+    description: Add ability to run Gigantum Client with a user provided SSL certificate

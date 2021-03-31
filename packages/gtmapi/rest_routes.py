@@ -43,11 +43,12 @@ def check_projects():
 def ping():
     """Unauthorized endpoint for validating the API is up"""
     config = current_app.config['LABMGR_CONFIG']
-    app_name, built_on, revision = config.config['build_info'].split(' :: ')
+    app_name, built_on, revision, version_str = config.config['build_info'].split(' :: ')
     return jsonify({
         "application": app_name,
         "built_on": built_on,
-        "revision": revision
+        "revision": revision,
+        "version": version_str
     })
 
 
@@ -62,11 +63,12 @@ def version():
     TODO! By August 2019, remove the .route(f'/version/') route.
     """
     config = current_app.config['LABMGR_CONFIG']
-    app_name, built_on, revision = config.config['build_info'].split(' :: ')
+    app_name, built_on, revision, version_str = config.config['build_info'].split(' :: ')
     return jsonify({
         "application": app_name,
         "built_on": built_on,
-        "revision": revision
+        "revision": revision,
+        "version": version_str
     })
 
 
