@@ -1,5 +1,8 @@
 """Test call for Create and publish a dataset"""
 import pytest
+
+from client_app.helper.local_project_helper_utility import ProjectHelperUtility
+from client_app.pages.login.login_factory import LoginFactory
 from configuration.configuration import ConfigurationManager
 from client_app.pages.landing.landing_page import LandingPage
 from client_app.pages.dataset_listing.dataset_listing_page import DatasetListingPage
@@ -8,6 +11,7 @@ from tests.helper.dataset_utility import DatasetUtility
 from tests.constants_enums.constants_enums import ProjectConstants
 import time
 from tests.test_fixtures import clean_up_dataset
+from tests.test_fixtures import server_data_fixture
 
 
 @pytest.mark.createPublishDatasetTest
@@ -15,15 +19,16 @@ class TestCreatePublishDataset:
     """Includes test methods for basic dataset creation, publish and its dependent tests"""
 
     @pytest.mark.run(order=1)
-    def test_log_in_success(self):
+    def test_log_in_success(self, server_data_fixture):
         """ Test method to check the successful log-in."""
         landing_page = LandingPage(self.driver)
-        assert landing_page.landing_component.get_server_button_text() == "Gigantum Hub"
-        log_in_page = landing_page.landing_component.load_log_in_page()
-        assert log_in_page.sign_up_component.get_sign_up_title() == "Sign Up"
-        user_credentials = ConfigurationManager.getInstance().get_user_credentials(LoginUser.User1)
-        log_in_page.sign_up_component.move_to_log_in_tab()
-        project_list = log_in_page.login(user_credentials.user_name, user_credentials.password)
+        ProjectHelperUtility().set_server_details(server_data_fixture)
+        landing_page.landing_component.click_server(server_data_fixture.server_name)
+        login_page = LoginFactory().load_login_page(server_data_fixture.login_type, self.driver)
+        assert login_page.check_login_page_title()
+        user_credentials = ConfigurationManager.getInstance().get_user_credentials(server_data_fixture.server_id,
+                                                                                   LoginUser.User1)
+        project_list = login_page.login(user_credentials.user_name, user_credentials.password)
         assert project_list.project_listing_component.get_project_title() == "Projects"
 
     @pytest.mark.depends(on=['test_log_in_success'])
@@ -242,17 +247,17 @@ class TestCreatePublishDataset:
             dataset_list: The page with UI elements
 
         """
-        # Click Gigantum Hub tab
-        is_clicked = dataset_list.gigantum_hub_component.click_gigantum_hub_tab()
-        assert is_clicked, "Could not click Gigantum Hub tab"
+        # Click server tab
+        is_clicked = dataset_list.server_component.click_server_tab()
+        assert is_clicked, "Could not click server tab"
 
-        # Verify dataset in Gigantum Hub page
-        is_verified = dataset_list.gigantum_hub_component.verify_dataset_title_in_gigantum_hub(dataset_title)
-        assert is_verified, "Could not verify dataset in Gigantum Hub"
+        # Verify dataset in server page
+        is_verified = dataset_list.server_component.verify_dataset_title_in_server(dataset_title)
+        assert is_verified, "Could not verify dataset in server"
 
-        # Click import button in Gigantum Hub page
-        is_clicked = dataset_list.gigantum_hub_component.click_dataset_import_button(dataset_title)
-        assert is_clicked, "Could not click import button in Gigantum Hub page"
+        # Click import button in server page
+        is_clicked = dataset_list.server_component.click_dataset_import_button(dataset_title)
+        assert is_clicked, "Could not click import button in server page"
 
         # Check private lock icon presence
         is_checked = dataset_list.project_menu_component.check_private_lock_icon_presence()
@@ -363,45 +368,45 @@ class TestCreatePublishDataset:
             dataset_title: Title of the current dataset
 
         """
-        # Click Gigantum Hub tab
-        is_clicked = dataset_list.gigantum_hub_component.click_gigantum_hub_tab()
-        assert is_clicked, "Could not click Gigantum Hub tab"
+        # Click server tab
+        is_clicked = dataset_list.server_component.click_server_tab()
+        assert is_clicked, "Could not click server tab"
 
-        # Verify dataset in Gigantum Hub page
-        is_verified = dataset_list.gigantum_hub_component.verify_dataset_title_in_gigantum_hub(dataset_title)
-        assert is_verified, "Could not verify dataset in Gigantum Hub"
+        # Verify dataset in server page
+        is_verified = dataset_list.server_component.verify_dataset_title_in_server(dataset_title)
+        assert is_verified, "Could not verify dataset in server"
 
-        # Click delete button in Gigantum Hub page
-        is_clicked = dataset_list.gigantum_hub_component.click_dataset_delete_button(dataset_title)
-        assert is_clicked, "Could not click delete button in Gigantum Hub page"
+        # Click delete button in server page
+        is_clicked = dataset_list.server_component.click_dataset_delete_button(dataset_title)
+        assert is_clicked, "Could not click delete button in server page"
 
-        # Get dataset title from delete dataset window in Gigantum Hub page
-        dataset_name = dataset_list.gigantum_hub_component.get_title()
-        assert dataset_name is not None, "Could not get dataset title in Gigantum Hub page"
+        # Get dataset title from delete dataset window in server page
+        dataset_name = dataset_list.server_component.get_title()
+        assert dataset_name is not None, "Could not get dataset title in server page"
 
-        # Input dataset title in delete window on Gigantum Hub page
-        is_typed = dataset_list.gigantum_hub_component.input_title(dataset_name)
-        assert is_typed, "Could not type dataset title in delete window on Gigantum Hub page"
+        # Input dataset title in delete window on server page
+        is_typed = dataset_list.server_component.input_title(dataset_name)
+        assert is_typed, "Could not type dataset title in delete window on server page"
 
-        # Click delete dataset button in delete window on Gigantum Hub page
-        is_clicked = dataset_list.gigantum_hub_component.click_delete_button_on_window()
-        assert is_clicked, "Could not click delete dataset button in delete window on Gigantum Hub page"
+        # Click delete dataset button in delete window on server page
+        is_clicked = dataset_list.server_component.click_delete_button_on_window()
+        assert is_clicked, "Could not click delete dataset button in delete window on server page"
 
         # Verify delete modal close
-        is_verified = dataset_list.gigantum_hub_component.verify_delete_modal_closed(30)
+        is_verified = dataset_list.server_component.verify_delete_modal_closed(30)
         assert is_verified, "Could not close delete modal"
 
-        # Verify dataset is not exist in Gigantum Hub page
-        is_verified = dataset_list.gigantum_hub_component.verify_dataset_title_in_gigantum_hub(dataset_title)
-        assert not is_verified, "Dataset is still exist in the Gigantum Hub"
+        # Verify dataset is not exist in server page
+        is_verified = dataset_list.server_component.verify_dataset_title_in_server(dataset_title)
+        assert not is_verified, "Dataset is still exist in the server"
 
         # wait ~5 seconds to guarantee server side deletion completes
         time.sleep(5)
 
-        # Refresh the "Gigantum Hub" tab
-        is_clicked = dataset_list.gigantum_hub_component.click_gigantum_hub_tab()
-        assert is_clicked, "Could not click Gigantum Hub tab"
+        # Refresh the server page
+        is_clicked = dataset_list.server_component.click_server_tab()
+        assert is_clicked, "Could not click server tab"
 
-        # Verify dataset is not exist in Gigantum Hub page
-        is_verified = dataset_list.gigantum_hub_component.verify_dataset_title_in_gigantum_hub(dataset_title)
-        assert not is_verified, "Dataset is still exist in the Gigantum Hub"
+        # Verify dataset is not exist in server page
+        is_verified = dataset_list.server_component.verify_dataset_title_in_server(dataset_title)
+        assert not is_verified, "Dataset is still exist in the server page"

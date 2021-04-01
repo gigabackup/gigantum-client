@@ -1,16 +1,15 @@
 from framework.base.page_base import BasePage
 from framework.factory.models_enums.page_config import PageConfig
 from framework.factory.models_enums.page_config import ComponentModel
-from client_app.pages.login.components.log_in_component import LogInComponent
-from client_app.pages.login.components.sign_up_component import SignUpComponent
-from client_app.pages.project_listing.project_listing_page import ProjectListingPage
+from client_app.pages.login.components.internal_login_component import InternalLogInComponent
 from client_app.pages.login.login_interface import Login
+from client_app.pages.project_listing.project_listing_page import ProjectListingPage
 
 
-class AuthLogInPage(BasePage, Login):
-    """Represents the login page of gigantum server.
+class InternalLogInPage(BasePage, Login):
+    """Represents the login page of internal server.
 
-    Holds the locators on the login page of gigantum server. The locators can be
+    Holds the locators on the login page of internal server. The locators can be
     presented in its corresponding component or directly on the page. Test functions can
     use these objects for all activities and validations and can avoid those in the
     test functions.
@@ -18,24 +17,15 @@ class AuthLogInPage(BasePage, Login):
 
     def __init__(self, driver) -> None:
         page_config = PageConfig()
-        super(AuthLogInPage, self).__init__(driver, page_config)
+        super(InternalLogInPage, self).__init__(driver, page_config)
         self._log_in_component_model = ComponentModel()
-        self._sign_up_component_model = ComponentModel()
-        self._sign_up_component = None
         self._log_in_component = None
 
     @property
-    def sign_up_component(self) -> SignUpComponent:
-        """Sign-up component."""
-        if self._sign_up_component is None:
-            self._sign_up_component = SignUpComponent(self.driver, self._sign_up_component_model)
-        return self._sign_up_component
-
-    @property
-    def log_in_component(self) -> LogInComponent:
+    def internal_log_in_component(self) -> InternalLogInComponent:
         """Log-in component."""
         if self._log_in_component is None:
-            self._log_in_component = LogInComponent(self.driver, self._log_in_component_model)
+            self._log_in_component = InternalLogInComponent(self.driver, self._log_in_component_model)
         return self._log_in_component
 
     def login(self, user_name: str, password: str) -> ProjectListingPage:
@@ -50,7 +40,7 @@ class AuthLogInPage(BasePage, Login):
         Returns:
             Instance of project list page.
         """
-        self.log_in_component.login(user_name, password)
+        self.internal_log_in_component.login(user_name, password)
         return ProjectListingPage(self.driver)
 
     def check_login_page_title(self):
@@ -59,4 +49,5 @@ class AuthLogInPage(BasePage, Login):
         Returns: returns the result of title checking
 
         """
-        return self.log_in_component.check_login_page_title()
+        return self.internal_log_in_component.check_login_page_title()
+

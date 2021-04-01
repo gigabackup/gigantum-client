@@ -41,9 +41,9 @@ def helper_get_current_server():
     server_config = flask.current_app.config['LABMGR_CONFIG'].get_server_configuration()
     auth_config = flask.current_app.config['LABMGR_CONFIG'].get_auth_configuration()
 
-    if auth_config.login_type == "auth0":
-        type_specific_fields = []
-    elif auth_config.login_type == "internal":
+    # All self-hosted auth types essentially appear as internal, but for now we list other options
+    # because the login screens are different.
+    if auth_config.login_type in ["auth0", "internal", "ldap"]:
         type_specific_fields = []
     else:
         raise ValueError(f"Unsupported authentication system type: {auth_config.login_type}")

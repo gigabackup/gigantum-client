@@ -5,6 +5,8 @@ Module consist setup, teardown amd generate failure test screenshot
 """
 import os
 import datetime
+import shutil
+import tempfile
 import pytest
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
@@ -32,6 +34,7 @@ def setup(request):
     if request.session.testsfailed != failed_before:
         test_name = request.node.name
         __take_screenshot(web_driver, test_name)
+    __clean_up_server_details_file()
     web_driver.close()
     web_driver.quit()
 
@@ -73,6 +76,8 @@ def __setup_chrome() -> webdriver:
         chrome_options.add_argument("--kiosk")
     else:
         chrome_options.add_argument("--start-maximized")
+    chrome_options.add_argument('--allow-running-insecure-content')
+    chrome_options.add_argument('--ignore-certificate-errors')
     chrome_options.experimental_options["prefs"] = chrome_prefs
     chrome_prefs["profile.default_content_settings"] = {"popups": 1}
     driver_version = ConfigurationManager.getInstance().get_app_setting("chrome_driver_version")
@@ -96,6 +101,7 @@ def __setup_firefox() -> webdriver:
     firefox_profile.set_preference("browser.privatebrowsing.autostart",
                                    ConfigurationManager.getInstance().get_app_setting("incognito"))
     firefox_profile.set_preference("dom.disable_open_during_load", False)
+    firefox_profile.accept_untrusted_certs = True
     firefox_options = webdriver.FirefoxOptions()
     if ConfigurationManager.getInstance().get_app_setting("headless"):
         firefox_options.add_argument('-headless')
@@ -156,3 +162,11 @@ def __take_screenshot(web_driver: webdriver, test_name: str):
     file_name = f"{str(datetime.datetime.now().timestamp())}_{test_name}.jpg"
     screenshot_file_path = os.path.join(root_dir, file_name)
     web_driver.save_screenshot(screenshot_file_path)
+
+
+def __clean_up_server_details_file():
+    """Removes server details file from temp directory"""
+    temp_dir = tempfile.gettempdir()
+    server_details_file = os.path.join(temp_dir, 'server_details')
+    if os.path.exists(server_details_file):
+        os.remove(server_details_file)

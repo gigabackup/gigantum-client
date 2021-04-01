@@ -1,34 +1,37 @@
+from client_app.helper.local_project_helper_utility import ProjectHelperUtility
 from framework.base.component_base import BaseComponent
 from framework.factory.models_enums.constants_enums import LocatorType
 from selenium import webdriver
 from framework.factory.models_enums.page_config import ComponentModel
 
 
-class GigantumHubComponent(BaseComponent):
+class ServerComponent(BaseComponent):
     """ Represents one of the components of project listing page.
 
-       Holds a set of all locators within the Gigantum Hub window on the project listing page of
+       Holds a set of all locators within the server window on the project listing page of
        gigantum client as an entity. Handles events and test functions of locators
        in this entity.
        """
 
     def __init__(self, driver: webdriver, component_data: ComponentModel) -> None:
-        super(GigantumHubComponent, self).__init__(driver, component_data)
+        super(ServerComponent, self).__init__(driver, component_data)
 
-    def click_gigantum_hub_tab(self) -> bool:
-        """ Performs click action on gigantum hub tab
+    def click_server_tab(self) -> bool:
+        """ Performs click action on server tab
 
         Returns: returns the result of click action
 
         """
-        gigantum_hub_tab = self.get_locator(LocatorType.XPath, "//button[contains(text(),'Gigantum Hub')]")
-        if gigantum_hub_tab is not None:
-            gigantum_hub_tab.click()
+        server_details = ProjectHelperUtility().get_server_details()
+        server_tab = self.get_locator(LocatorType.XPath, f"//button[contains(text(),'"
+                                                               f"{server_details['server_name']}')]")
+        if server_tab is not None:
+            server_tab.click()
             return True
         return False
 
-    def verify_project_title_in_gigantum_hub(self, title_text) -> bool:
-        """ Verify whether the project title is present in the Gigantum Hub page or not
+    def verify_title_in_server(self, title_text) -> bool:
+        """ Verify whether the title is present in the server page or not
 
         Args:
             title_text: Title of the current project
@@ -146,8 +149,8 @@ class GigantumHubComponent(BaseComponent):
         element = "//div[@class='Icon Icon--delete']"
         return self.check_element_absence(LocatorType.XPath, element, wait_time)
 
-    def verify_dataset_title_in_gigantum_hub(self, dataset_title) -> bool:
-        """ Verify whether the dataset title is present in the Gigantum Hub page or not
+    def verify_dataset_title_in_server(self, dataset_title) -> bool:
+        """ Verify whether the dataset title is present in the server page or not
 
         Args:
             dataset_title: Title of the dataset
