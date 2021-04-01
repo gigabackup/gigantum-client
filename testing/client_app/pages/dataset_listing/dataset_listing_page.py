@@ -6,7 +6,7 @@ from client_app.pages.dataset_listing.components.dataset_listing_component impor
 from client_app.pages.dataset_listing.components.dataset_data_component import DatasetDataComponent
 from client_app.pages.project_listing.components.project_menu_component import ProjectMenuComponent
 from client_app.pages.dataset_listing.components.dataset_delete_component import DatasetDeleteComponent
-from client_app.pages.project_listing.components.gigantum_hub_component import GigantumHubComponent
+from client_app.pages.project_listing.components.server_component import ServerComponent
 from client_app.pages.project_listing.components.project_code_input_output_data_component import \
     ProjectCodeInputOutputDataComponent
 from client_app.pages.project_listing.components.project_container_status_component import \
@@ -32,7 +32,7 @@ class DatasetListingPage(BasePage):
         self._dataset_data_component = None
         self._project_menu_component = None
         self._dataset_delete_component = None
-        self._gigantum_hub_component = None
+        self._server_component = None
         self._code_input_output_data_component = None
         self._container_status_component = None
         self._project_listing_component = None
@@ -73,11 +73,11 @@ class DatasetListingPage(BasePage):
         return self._dataset_delete_component
 
     @property
-    def gigantum_hub_component(self) -> GigantumHubComponent:
-        """ Returns an instance of gigantum hub component."""
-        if self._gigantum_hub_component is None:
-            self._gigantum_hub_component = GigantumHubComponent(self.driver, self.component_model)
-        return self._gigantum_hub_component
+    def server_component(self) -> ServerComponent:
+        """ Returns an instance of server component."""
+        if self._server_component is None:
+            self._server_component = ServerComponent(self.driver, self.component_model)
+        return self._server_component
 
     @property
     def code_input_output_data_component(self) -> ProjectCodeInputOutputDataComponent:

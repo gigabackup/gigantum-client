@@ -29,6 +29,14 @@ class LogInComponent(BaseComponent):
             password:
                 Password assigned for the current user.
         """
+        btn_not_existing_user_element = "//a[@class='auth0-lock-alternative-link']"
+        if self.check_element_presence(LocatorType.XPath, btn_not_existing_user_element, 5):
+            btn_not_existing_user = self.get_locator(LocatorType.XPath, "//a[@class='auth0-lock-alternative-link']")
+            btn_not_existing_user.click()
+        else:
+            btn_login = self.get_locator(LocatorType.XPath, "//a[contains(text(),'Log In')]")
+            if btn_login is not None:
+                btn_login.click()
         txt_user_name = self.get_locator(LocatorType.XPath, "//input[@placeholder='username/email']")
         txt_password = self.get_locator(LocatorType.XPath, "//input[@placeholder='password']")
         btn_login = self.get_locator(LocatorType.XPath, "//button[@name='submit']//span//*[local-name()='svg']")
@@ -44,3 +52,11 @@ class LogInComponent(BaseComponent):
         """
         btn_not_existing_user = self.get_locator(LocatorType.XPath, "//a[@class='auth0-lock-alternative-link']")
         btn_not_existing_user.click()
+
+    def check_login_page_title(self) -> bool:
+        """Check the login page title"""
+        if self.title_sign_in is not None:
+            if self.title_sign_in.get_text() == 'Sign Up':
+                return True
+        return False
+

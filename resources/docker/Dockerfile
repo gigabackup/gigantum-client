@@ -144,6 +144,9 @@ RUN mkdir -p /opt/log/supervisor && mkdir -p /opt/log/nginx && mkdir -p /opt/run
     mkdir -p /opt/nginx && nginx && nginx -s reload && nginx -s quit
 COPY resources/client/supervisord_base.conf /etc/supervisor/supervisord.conf
 COPY $SUPERVISOR_CONFIG /etc/supervisor/conf.d/supervisord.conf
+COPY resources/client/supervisord-chp.conf /etc/supervisor/conf.d/supervisord-chp.conf
+# This file is copied into place in the entrypoint file (over supervisord-chp.conf above) if SSL certs are provided
+COPY resources/client/supervisord-chp-ssl.conf /opt/supervisord-chp-ssl.conf
 
 COPY $ENTRYPOINT_FILE /usr/local/bin/entrypoint.sh
 RUN chmod u+x /usr/local/bin/entrypoint.sh

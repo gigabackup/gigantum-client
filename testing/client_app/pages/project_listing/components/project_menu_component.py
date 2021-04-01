@@ -113,7 +113,7 @@ class ProjectMenuComponent(BaseComponent):
 
         """
         element = "//div[@class='TitleSection__private Tooltip-data Tooltip-data--small']"
-        if self.check_element_presence(LocatorType.XPath, element, 60):
+        if self.check_element_presence(LocatorType.XPath, element, 120):
             return True
         return False
 
