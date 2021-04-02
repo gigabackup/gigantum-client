@@ -4,10 +4,13 @@ import React, { Component } from 'react';
 import { createFragmentContainer, graphql } from 'react-relay';
 // components
 import OutputMessage from 'Components/output/OutputMessage';
+import PopupBlocked from 'Components/modal/popup/PopupBlocked';
 // mutations
 import jobStatus from 'JS/utils/JobStatus';
 import importingUtils from './utils/ImportingUtils';
 import { launch, buildAndLaunch, importJob } from './utils/ContainerMutations';
+// components
+import ImportingError from './importingError/ImportingError';
 // css
 import './Importing.scss';
 
@@ -29,6 +32,10 @@ class Importing extends Component<Props, State> {
   state = {
     feedback: 'Importing...',
     failureMessage: null,
+    showDevtoolFailed: false,
+    showPopupBlocked: false,
+    devTool: sessionStorage.getItem('devTool'),
+    filePath: sessionStorage.getItem('filePath'),
   }
 
   componentDidMount() {
@@ -54,6 +61,20 @@ class Importing extends Component<Props, State> {
         this._triggerImport();
       }
     });
+  }
+
+  /**
+   * sets state for popup modal
+   */
+  _togglePopupModal = () => {
+    this.setState({ showPopupBlocked: false });
+  }
+
+  /**
+   * sets state for popup modal
+   */
+  _toggleDevtoolFailed = () => {
+    this.setState({ showDevtoolFailed: false });
   }
 
   /**
@@ -96,6 +117,7 @@ class Importing extends Component<Props, State> {
     const name = pathArray[3];
     const devtool = sessionStorage.getItem('devTool');
     const feedbackUpdated = `${feedback} <br /> Starting ${devtool} in '${owner}/${name}'`;
+    let showPopupBlocked = false;
 
     this.setState({ feedback: feedbackUpdated });
 
@@ -116,19 +138,41 @@ class Importing extends Component<Props, State> {
         }
 
         window[tabName] = window.open(path, tabName);
-        window[tabName].close();
-        window[tabName] = window.open(path, tabName);
+        if (
+          !window[tabName]
+          || window[tabName].closed
+          || typeof window[tabName].closed === 'undefined'
+        ) {
+          this.setState({ showPopupBlocked: true });
+          showPopupBlocked = true;
+        }
 
-
-        window.location.hash = '';
-        sessionStorage.removeItem('autoImport');
-        sessionStorage.removeItem('devTool');
-        sessionStorage.removeItem('filePath');
-        window.location.reload();
+        if (!showPopupBlocked) {
+          window.location.hash = '';
+          sessionStorage.removeItem('autoImport');
+          sessionStorage.removeItem('devTool');
+          sessionStorage.removeItem('filePath');
+          window.location.reload();
+        }
+      } else {
+        this.setState({ showDevtoolFailed: true });
       }
     };
 
     launch(owner, name, devtool, callback);
+  }
+
+  /**
+  * Opens the project
+  * @param {}
+  * @return {}
+  */
+  _openProject = () => {
+    window.location.hash = '';
+    sessionStorage.removeItem('autoImport');
+    sessionStorage.removeItem('devTool');
+    sessionStorage.removeItem('filePath');
+    window.location.reload();
   }
 
   /**
@@ -222,8 +266,12 @@ class Importing extends Component<Props, State> {
 
   render() {
     const {
-      feedback,
+      devTool,
       failureMessage,
+      feedback,
+      filePath,
+      showDevtoolFailed,
+      showPopupBlocked,
     } = this.state;
     const pathArray = window.location.pathname.split('/');
     const owner = pathArray[2];
@@ -233,6 +281,19 @@ class Importing extends Component<Props, State> {
 
     return (
       <div className="Importing">
+        <PopupBlocked
+          attemptRelaunch={this.launch}
+          devTool={devTool}
+          hideCancel
+          togglePopupModal={this._togglePopupModal}
+          isVisible={showPopupBlocked}
+        />
+        <ImportingError
+          devTool={devTool}
+          openProject={this._openProject}
+          toggleDevtoolFailedModal={this._toggleDevtoolFailed}
+          isVisible={showDevtoolFailed}
+        />
         <h2 className="Importing__h2">{header}</h2>
         <div className="Importing__status">
           { failureMessage

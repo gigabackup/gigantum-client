@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Storyshots Components/ShareLink/ShareUrlInput Snapshots: ShareUrlInput Default 1`] = `
+exports[`Storyshots Header/ShareLink/ShareUrlInput ShareUrlInput Default 1`] = `
 <ShareUrlInputWrapped>
   <ShareInputUrlWrapper
     codeFile="code/batch.ipynb"
@@ -117,8 +117,9 @@ exports[`Storyshots Components/ShareLink/ShareUrlInput Snapshots: ShareUrlInput 
         <textarea
           className="ShareUrlInput__textarea"
           id="ShareUrlInput__textarea"
+          onChange={[Function]}
           type="text"
-          value="gigantum.com/projects/ownername/projectname/#autoImport=true&baseUrl=gigantum.com&devtool=undefined&filePath=code/batch.ipynb"
+          value="gigantum.com/projects/ownername/projectname/#autoImport=true&serverId=undefined&devtool=undefined&filePath=code/batch.ipynb"
         />
         <button
           className="ShareUrlInput__button ShareUrlInput__button--copy fa fa-clone"

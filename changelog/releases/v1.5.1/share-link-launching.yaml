@@ -1,0 +1,6 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1717"
+changelog:
+  - type: NEW
+    description: Handles launching devtools and custom applications from a share URL. Handles pop-up blocker when devtool is launched.
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1644
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1645

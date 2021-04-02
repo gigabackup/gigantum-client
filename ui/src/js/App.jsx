@@ -63,7 +63,7 @@ class App extends Component<State> {
 
     if (hash.autoImport) {
       sessionStorage.setItem('autoImport', true);
-      sessionStorage.setItem('devTool', hash.devTool);
+      sessionStorage.setItem('devTool', hash.devtool);
       sessionStorage.setItem('route', window.location.pathname);
 
       if (hash.filePath) {

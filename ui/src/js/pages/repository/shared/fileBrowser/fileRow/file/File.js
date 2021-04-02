@@ -440,16 +440,12 @@ class File extends Component<Props> {
         onMouseEnter={() => { this._mouseEnter(); }}
         className="File"
       >
-        {
-          showPopupBlocked
-          && (
-            <PopupBlocked
-              togglePopupModal={this._togglePopupModal}
-              devTool={devTool}
-              attemptRelaunch={() => this._validateFile(isLaunchable, devTool)}
-            />
-          )
-        }
+        <PopupBlocked
+          togglePopupModal={this._togglePopupModal}
+          devTool={devTool}
+          attemptRelaunch={() => this._validateFile(isLaunchable, devTool)}
+          isVisible={showPopupBlocked}
+        />
         <div
           className={fileRowCSS}
           style={rowStyle}

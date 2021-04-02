@@ -1,6 +1,6 @@
 @import '~Styles/_imports.scss';
 
-.PopupBlocked {
+.ImportingError {
   height: 100%;
 
   &__body {
@@ -20,7 +20,7 @@
   &__header-text{
     display:inline-block;
     padding-left: 50px;
-    background: url('~Images/icons/offsite-azure.svg') no-repeat left center;
+    background: url('~Images/icons/prompt-warning.svg') no-repeat left center;
     background-size: 40px;
     color: $primary;
     font-weight: 400;
@@ -32,6 +32,10 @@
 
   &__message {
     padding: 20px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
     p {
       font-size: 19px;
       color: $mineShaft;
