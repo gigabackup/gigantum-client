@@ -9,6 +9,8 @@ from tests.constants_enums.constants_enums import ProjectConstants
 from tests.test_fixtures import clean_up_project
 from client_app.helper.local_project_helper_utility import ProjectHelperUtility
 import time
+from client_app.pages.login.login_factory import LoginFactory
+from tests.test_fixtures import server_data_fixture
 
 
 @pytest.mark.addProjectPublishSyncDeleteImport
@@ -16,15 +18,16 @@ class TestAddProjectPublishSyncDeleteImport:
     """Includes test methods for basic project, publish, sync, delete and import"""
 
     @pytest.mark.run(order=1)
-    def test_log_in_success(self):
+    def test_log_in_success(self, server_data_fixture):
         """ Test method to check the successful log-in."""
         landing_page = LandingPage(self.driver)
-        assert landing_page.landing_component.get_server_button_text() == "Gigantum Hub"
-        log_in_page = landing_page.landing_component.load_log_in_page()
-        assert log_in_page.sign_up_component.get_sign_up_title() == "Sign Up"
-        user_credentials = ConfigurationManager.getInstance().get_user_credentials(LoginUser.User1)
-        log_in_page.sign_up_component.move_to_log_in_tab()
-        project_list = log_in_page.login(user_credentials.user_name, user_credentials.password)
+        ProjectHelperUtility().set_server_details(server_data_fixture)
+        landing_page.landing_component.click_server(server_data_fixture.server_name)
+        login_page = LoginFactory().load_login_page(server_data_fixture.login_type, self.driver)
+        assert login_page.check_login_page_title()
+        user_credentials = ConfigurationManager.getInstance().get_user_credentials(server_data_fixture.server_id,
+                                                                                   LoginUser.User1)
+        project_list = login_page.login(user_credentials.user_name, user_credentials.password)
         assert project_list.project_listing_component.get_project_title() == "Projects"
 
     @pytest.mark.depends(on=['test_log_in_success'])
@@ -184,17 +187,17 @@ class TestAddProjectPublishSyncDeleteImport:
             project_title: Title of the current project
 
         """
-        # Click Gigantum Hub tab
-        is_clicked = project_list.gigantum_hub_component.click_gigantum_hub_tab()
-        assert is_clicked, "Could not click Gigantum Hub tab"
+        # Click server tab
+        is_clicked = project_list.server_component.click_server_tab()
+        assert is_clicked, "Could not click server tab"
 
-        # Verify project in Gigantum Hub page
-        is_verified = project_list.gigantum_hub_component.verify_title_in_gigantum_hub(project_title)
-        assert is_verified, "Could not verify project in Gigantum Hub"
+        # Verify project in server page
+        is_verified = project_list.server_component.verify_title_in_server(project_title)
+        assert is_verified, "Could not verify project in server"
 
-        # Click import button in Gigantum Hub page
-        is_clicked = project_list.gigantum_hub_component.click_import_button(project_title)
-        assert is_clicked, "Could not click import button in Gigantum Hub page"
+        # Click import button in server page
+        is_clicked = project_list.server_component.click_project_import_button(project_title)
+        assert is_clicked, "Could not click import button in server page"
 
         # Monitor container status to go through Stopped -> Building
         is_status_changed = project_list.monitor_container_status("Building", 60)
@@ -228,45 +231,45 @@ class TestAddProjectPublishSyncDeleteImport:
             project_title: Title of the current project
 
         """
-        # Click Gigantum Hub tab
-        is_clicked = project_list.gigantum_hub_component.click_gigantum_hub_tab()
-        assert is_clicked, "Could not click Gigantum Hub tab"
+        # Click server tab
+        is_clicked = project_list.server_component.click_server_tab()
+        assert is_clicked, "Could not click server tab"
 
-        # Verify project in Gigantum Hub page
-        is_verified = project_list.gigantum_hub_component.verify_title_in_gigantum_hub(project_title)
-        assert is_verified, "Could not verify project in Gigantum Hub"
+        # Verify project in server page
+        is_verified = project_list.server_component.verify_title_in_server(project_title)
+        assert is_verified, "Could not verify project in server"
 
-        # Click delete button in Gigantum Hub page
-        is_clicked = project_list.gigantum_hub_component.click_delete_button(project_title)
-        assert is_clicked, "Could not click delete button in Gigantum Hub page"
+        # Click delete button in server page
+        is_clicked = project_list.server_component.click_project_delete_button(project_title)
+        assert is_clicked, "Could not click delete button in server page"
 
-        # Get project title from delete project window in Gigantum Hub page
-        project_name = project_list.gigantum_hub_component.get_title()
-        assert project_name is not None, "Could not get project title in Gigantum Hub page"
+        # Get project title from delete project window in server page
+        project_name = project_list.server_component.get_title()
+        assert project_name is not None, "Could not get project title in server page"
 
-        # Input project title in delete window on Gigantum Hub page
-        is_typed = project_list.gigantum_hub_component.input_title(project_name)
-        assert is_typed, "Could not type project title in delete window on Gigantum Hub page"
+        # Input project title in delete window on server page
+        is_typed = project_list.server_component.input_title(project_name)
+        assert is_typed, "Could not type project title in delete window on server page"
 
-        # Click delete project button in delete window on Gigantum Hub page
-        is_clicked = project_list.gigantum_hub_component.click_delete_button_on_window()
-        assert is_clicked, "Could not click delete project button in delete window on Gigantum Hub page"
+        # Click delete project button in delete window on server page
+        is_clicked = project_list.server_component.click_delete_button_on_window()
+        assert is_clicked, "Could not click delete project button in delete window on server page"
 
         # Verify delete modal close
-        is_verified = project_list.gigantum_hub_component.verify_delete_modal_closed(30)
+        is_verified = project_list.server_component.verify_delete_modal_closed(30)
         assert is_verified, "Could not close delete modal"
 
-        # Verify project is not exist in Gigantum Hub page
-        is_verified = project_list.gigantum_hub_component.verify_title_in_gigantum_hub(project_title)
-        assert not is_verified, "Project is still exist in the Gigantum Hub"
+        # Verify project is not exist in server page
+        is_verified = project_list.server_component.verify_title_in_server(project_title)
+        assert not is_verified, "Project is still exist in the server"
 
         # wait ~5 seconds to guarantee server side deletion completes
         time.sleep(5)
 
-        # Refresh the "Gigantum Hub" tab
-        is_clicked = project_list.gigantum_hub_component.click_gigantum_hub_tab()
-        assert is_clicked, "Could not click Gigantum Hub tab"
+        # Refresh the server page
+        is_clicked = project_list.server_component.click_server_tab()
+        assert is_clicked, "Could not click server tab"
 
-        # Verify project is not exist in Gigantum Hub page
-        is_verified = project_list.gigantum_hub_component.verify_title_in_gigantum_hub(project_title)
-        assert not is_verified, "Project is still exist in the Gigantum Hub"
+        # Verify project is not exist in server page
+        is_verified = project_list.server_component.verify_title_in_server(project_title)
+        assert not is_verified, "Project is still exist in the server"

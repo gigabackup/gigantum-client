@@ -93,13 +93,14 @@ class ConfigurationManager:
         else:
             return None
 
-    def get_user_credentials(self, user: LoginUser) -> UserCredentials:
+    def get_user_credentials(self, server_id: str, user: LoginUser) -> UserCredentials:
         """Provides user credential.
         Args:
             user: given user type
+            server_id: current server id
         Returns:
             User and password of given user type
         """
-        user_data = self.__user_credentials[user.value]
-        user_credentials = UserCredentials(user_data['user_name'], user_data['password'])
+        user_data = self.__user_credentials[server_id][user.value]
+        user_credentials = UserCredentials(user_data['user_name'], user_data['password'], user_data['display_name'])
         return user_credentials

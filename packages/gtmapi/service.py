@@ -182,10 +182,10 @@ def post_save_hook(os_path, model, contents_manager, **kwargs):
         logger.info(f'Created `local_data` dir for Local Filesystem Dataset Type: {local_data_dir}')
 
     # Create certificates file directory for custom CA certificate support.
-    certificate_dir = os.path.join(config.config['git']['working_directory'], 'certificates')
+    certificate_dir = os.path.join(config.config['git']['working_directory'], 'certificates', 'ssl')
     if os.path.isdir(certificate_dir) is False:
         os.makedirs(certificate_dir, exist_ok=True)
-        logger.info(f'Created `certificates` dir for custom CA certificates: {certificate_dir}')
+        logger.info(f'Created `certificates` dir for SSL and custom CA certificates: {certificate_dir}')
 
     # make sure temporary upload directory exists and is empty
     tempdir = config.upload_dir

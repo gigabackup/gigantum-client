@@ -1,11 +1,12 @@
 import random
+import time
+
 from client_app.pages.dataset_listing.dataset_listing_page import DatasetListingPage
 from client_app.pages.project_listing.project_listing_page import ProjectListingPage
 from selenium import webdriver
 from tests.constants_enums.constants_enums import ProjectConstants
 from client_app.pages.jupyter_lab.jupyter_lab_page import JupyterLabPage
 from tests.helper.project_utility import ProjectUtility
-import time
 
 
 class DatasetUtility:
@@ -205,11 +206,6 @@ class DatasetUtility:
         is_clicked = dataset_list.project_menu_component.click_publish_window_button()
         if not is_clicked:
             return "Could not click publish button on project publish window"
-
-        # Check for the presence of Upload complete pop up message
-        is_checked = dataset_list.project_menu_component.check_upload_complete_pop_up_presence()
-        if not is_checked:
-            return "Could not get Upload complete pop up window"
 
         # Check private lock icon presence
         is_checked = dataset_list.project_menu_component.check_private_lock_icon_presence()

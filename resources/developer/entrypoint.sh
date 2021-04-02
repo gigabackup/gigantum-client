@@ -47,15 +47,38 @@ fi
 gosu giguser git lfs install
 
 # Setup custom CA certs if provided by the user
-CERT_COUNT=`ls -1 /mnt/gigantum/certificates/*.crt 2>/dev/null | wc -l`
+CERT_COUNT=$(find /mnt/gigantum/certificates -name "*.crt" -maxdepth 1 2>/dev/null | wc -l)
 if [[ ${CERT_COUNT} != 0 ]];then
-  echo "Configuring user provided CA certificates"
+  echo "Configuring user provided CA certificates. Found ${CERT_COUNT} certificates"
   cp /mnt/gigantum/certificates/*.crt /usr/local/share/ca-certificates/
   update-ca-certificates
   export REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
   export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 else
   echo "No user provided CA certificates found. Skipping CA update."
+fi
+
+# Setup SSL certs if present
+SSL_CERT_COUNT=$(find /mnt/gigantum/certificates/ssl -name "*.crt" -maxdepth 1 2>/dev/null | wc -l)
+KEY_COUNT=$(find /mnt/gigantum/certificates/ssl -name "*.key" -maxdepth 1 2>/dev/null | wc -l)
+if [[ ${SSL_CERT_COUNT} == 1 ]];then
+  if [[ ${KEY_COUNT} == 1 ]];then
+    echo "Configuring SSL certificate"
+    mkdir -p /opt/ssl/private
+    chmod -R 0500 /opt/ssl
+    SSL_CERT=$(find /mnt/gigantum/certificates/ssl -maxdepth 1 -name "*.crt" 2>/dev/null)
+    SSL_KEY=$(find /mnt/gigantum/certificates/ssl -maxdepth 1 -name "*.key" 2>/dev/null)
+    cp "${SSL_CERT}" /etc/ssl/certs/gigantum-client.crt
+    cp "${SSL_KEY}" /opt/ssl/private/gigantum-client.key
+    chown giguser:root /etc/ssl/certs/gigantum-client.crt
+    chown -R giguser:giguser /opt/ssl
+    chmod 0400 /opt/ssl/private/gigantum-client.key
+    cp /opt/supervisord-chp-ssl.conf /etc/supervisor/conf.d/supervisord-chp.conf
+  else
+    echo "SSL certificate found, but key is missing. SSL not enabled."
+  fi
+else
+  echo "No SSL certificates found, or multiple certificates found. Provide 1 cert/key pair to enable SSL."
 fi
 
 # Start supervisord

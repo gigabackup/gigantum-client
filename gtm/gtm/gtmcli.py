@@ -60,7 +60,7 @@ def client_actions(args):
 
     if args.action == "build":
         build_args = {"build_dir": os.path.join("build", "client"),
-                      "supervisor_file": os.path.join("resources", "client", "supervisord-local.conf"),
+                      "supervisor_file": os.path.join("resources", "client", "supervisord.conf"),
                       "config_override_file": os.path.join("resources", "client",
                                                            "labmanager-config-override.yaml")}
 
@@ -173,7 +173,7 @@ def cloud_actions(args):
             raise ValueError(f"Unsupported stage when building cloud client: {args.stage}")
 
         build_args = {"build_dir": os.path.join("build", "cloud-client"),
-                      "supervisor_file": os.path.join("resources", "client", "supervisord-cloud.conf"),
+                      "supervisor_file": os.path.join("resources", "client", "supervisord.conf"),
                       "config_override_file": config_override_file,
                       "honeycomb_dataset": honeycomb_dataset}
 
