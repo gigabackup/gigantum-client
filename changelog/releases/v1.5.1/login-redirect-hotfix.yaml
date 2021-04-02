@@ -1,0 +1,7 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1719"
+changelog:
+  - type: FIX
+    description: Resolves issue with login redirecting on invalid sessions. __init__.py files will no longer be ignored by filebrowser upload. Messaging changed on Dataset overview type.
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1640
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1687
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1690
