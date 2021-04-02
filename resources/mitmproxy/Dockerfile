@@ -11,9 +11,13 @@ RUN apt-get update && \
     python3-pip \
     python3-setuptools \
     gosu && \
-    apt-get clean 
+    apt-get clean
 
 # add mitmproxy to track rstudio
+# The latest version of mitmproxy uses the latest cryptography package, but changes the output
+# format slightly. Work needed to update this container.
+# https://github.com/gigantum/gigantum-client/issues/1714
+
 RUN python3 -m pip install --upgrade pip \
     && pip3 install wheel \
     && pip3 install mitmproxy==5.1.1 \
