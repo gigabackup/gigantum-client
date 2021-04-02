@@ -1,18 +1,18 @@
 # FRONTEND BUILD CONTAINER
-FROM ubuntu:18.04 as ui-builder
+FROM ubuntu:20.04 as ui-builder
 
 # Install system level dependencies
 RUN apt-get -y update && apt-get -y install git curl gosu
 
 # Install Node
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
     apt-get -y install nodejs
 
 # Install Yarn
 RUN npm install yarn -g
 
 # Install babel-node
-RUN npm install -g @babel/cli@7.2.3 @babel/core@7.2.2 jest@24.0.0 relay-compiler@1.6.1
+RUN npm install -g @babel/cli@7.2.3 @babel/core@7.2.2 jest@24.0.0 relay-compiler@10.1.3
 
 # Make build location dir
 RUN mkdir /opt/ui
@@ -30,9 +30,8 @@ RUN /bin/bash /opt/ui_build_script.sh
 
 
 
-
 # PRODUCTION CONTAINER
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 LABEL maintainer="Gigantum <support@gigantum.com>"
 
 # Copy requirements files
@@ -42,8 +41,9 @@ COPY build/requirements-testing.txt /opt/requirements-testing.txt
 COPY packages/confhttpproxy /opt/confhttpproxy
 ENV SHELL=/bin/bash \
     LC_ALL=C.UTF-8 \
-    LANG=C.UTF-8
-
+    LANG=C.UTF-8 \
+    GIT_VERSION=2.31.1 \
+    DEBIAN_FRONTEND=noninteractive
 
 # Arguments, defaulted to production values
 ARG CLIENT_CONFIG_FILE=build/client/labmanager-config.yaml
@@ -59,20 +59,15 @@ COPY $HONEYTAIL_INSTALLER /tmp/honeytail.sh
 # Super instruction to install all dependencies that need apt and clean up to minimize layer size
 RUN apt-get -y update && \
     # Install all apt packages
-    apt-get -y --no-install-recommends install nginx supervisor wget openssl python3.7 python3-pip python3-distutils \
-    gcc g++ gosu redis-server libjpeg-dev python3-setuptools python3.7-dev libdpkg-perl zip unzip libsnappy-dev \
-    curl make autoconf dh-autoreconf libcurl4-openssl-dev libexpat1-dev libz-dev && \
-    # Make sure correct Python version is used
-    # DP NOTE: pip will use whatever version python3 points to
-    ln -sf python3.7 /usr/bin/python3 && \
-    ln -sf python3.7-config /usr/bin/python3-config && \
-    ln -sf python3.7m /usr/bin/python3m && \
-    ln -sf python3.7m-config /usr/bin/python3m-config && \
+    apt-get -y --no-install-recommends install nginx supervisor wget openssl python3 python3-pip python3-distutils \
+      gcc g++ gosu redis-server libjpeg-dev python3-setuptools python3-dev libdpkg-perl zip unzip libsnappy-dev \
+      curl make autoconf dh-autoreconf libcurl4-openssl-dev libexpat1-dev libz-dev \
+      libssl-dev libffi-dev python3-dev cargo && \
+    python3 -m pip install --upgrade pip && \
     # Install Git from source to use OpenSSL for better enterprise network support.
     mkdir /tmp/gitbuild && cd /tmp/gitbuild && \
     # Get the latest git tarball
-    git_tarball_url="https://www.github.com$(curl 'https://github.com/git/git/tags' | grep -o "/git/git/archive/v2\..*\.tar\.gz" | sort -r | head -1 | tr -d '\n')" && \
-    curl -L --retry 5 "${git_tarball_url}" --output "git-source.tar.gz" && \
+    curl -L --retry 5 "https://github.com/git/git/archive/refs/tags/v${GIT_VERSION}.tar.gz" --output "git-source.tar.gz" && \
     tar -xf "git-source.tar.gz" --strip 1 && \
     # Configure the custom git build to use openSSL
     make configure && \
@@ -93,7 +88,7 @@ RUN apt-get -y update && \
     cd /tmp && rm -rf ./lfs_install && \
     # Install node so you can run the CHP, and install the CHP
     apt-get -y install curl gnupg gnupg1 gnupg2 && \
-    curl -sL https://deb.nodesource.com/setup_12.x | bash && \
+    curl -sL https://deb.nodesource.com/setup_14.x | bash && \
     apt-get -y install nodejs && \
     npm install -g configurable-http-proxy && \
     # Install client package dependencies
@@ -106,7 +101,8 @@ RUN apt-get -y update && \
     # Configure Honeytail (If running in a cluster, will be a noop otherwise)
     chmod u+x /tmp/honeytail.sh && /tmp/honeytail.sh && \
     # Cleanup!
-    apt-get -qq -y remove gcc g++ wget curl gnupg gnupg1 gnupg2 make autoconf dh-autoreconf && \
+    apt-get -qq -y remove gcc g++ wget curl gnupg gnupg1 gnupg2 make autoconf dh-autoreconf \
+                          libssl-dev libffi-dev cargo && \
     apt-get -qq -y autoremove && \
     apt-get -qq -y autoclean && \
     apt-get clean && \
