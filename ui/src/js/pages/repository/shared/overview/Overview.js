@@ -5,6 +5,8 @@ import classNames from 'classnames';
 // mutations
 import WriteLabbookReadmeMutation from 'Mutations/repository/readme/WriteLabbookReadmeMutation';
 import WriteDatasetReadmeMutation from 'Mutations/repository/readme/WriteDatasetReadmeMutation';
+// context
+import ServerContext from 'Pages/ServerContext';
 // store
 import { setErrorMessage } from 'JS/redux/actions/footer';
 // components
@@ -232,6 +234,8 @@ class Overview extends Component<Props> {
      }
    }
 
+  static contextType = ServerContext;
+
    render() {
      // destructure here
      const {
@@ -251,6 +255,7 @@ class Overview extends Component<Props> {
        readmeExpanded,
      } = this.state;
      // declare variables here
+     const { currentServer } = this.context;
      const sectionProps = this.props[sectionType];
      const isLabbook = (sectionType === 'labbook');
      const typeText = isLabbook ? 'Environment' : 'Type';
@@ -419,6 +424,7 @@ class Overview extends Component<Props> {
                  <Type
                    type={datasetType}
                    isManaged={isManaged}
+                   currentServer={currentServer}
                  />
                </div>
              )}

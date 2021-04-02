@@ -11,16 +11,23 @@ type Props = {
     icon: string,
     name: string,
   },
+  currentServer: {
+    name: string,
+  },
 };
 
 const Type = ({
   type,
+  currentServer,
 }: Props) => {
   const {
     description,
     icon,
     name,
   } = type;
+  const isHub = currentServer.name === 'Gigantum Hub';
+  const displayedName = isHub ? name : 'Gigantum';
+  const displayedDescription = isHub ? description : 'Versioned Dataset storage supporting individual files up to 5GB in size';
   return (
     <div className="Type">
       <div className="Type__info grid">
@@ -37,10 +44,10 @@ const Type = ({
 
           <div className="Type__cardText">
             <div className="Type__title">
-              <h6 className="Type__name">{name}</h6>
+              <h6 className="Type__name">{displayedName}</h6>
             </div>
             <div>
-              <p className="Type__paragraph">{description}</p>
+              <p className="Type__paragraph">{displayedDescription}</p>
             </div>
           </div>
         </div>
