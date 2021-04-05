@@ -2,15 +2,18 @@
 // vendor
 import React, { Component } from 'react';
 import { createFragmentContainer, graphql } from 'react-relay';
+// general utils
+import jobStatus from 'JS/utils/JobStatus';
 // components
+import { ProgressLoader } from 'Components/loader/Loader';
 import OutputMessage from 'Components/output/OutputMessage';
 import PopupBlocked from 'Components/modal/popup/PopupBlocked';
+import ImportFeedback from './feedback/ImportFeedback';
+import ImportHeader from './header/ImportHeader';
+import ImportError from './error/ImportError';
 // mutations
-import jobStatus from 'JS/utils/JobStatus';
 import importingUtils from './utils/ImportingUtils';
 import { launch, buildAndLaunch, importJob } from './utils/ContainerMutations';
-// components
-import ImportingError from './importingError/ImportingError';
 // css
 import './Importing.scss';
 
@@ -32,6 +35,7 @@ class Importing extends Component<Props, State> {
   state = {
     feedback: 'Importing...',
     failureMessage: null,
+    headerStep: 'Importing',
     showDevtoolFailed: false,
     showPopupBlocked: false,
     devTool: sessionStorage.getItem('devTool'),
@@ -46,19 +50,23 @@ class Importing extends Component<Props, State> {
       owner,
       name,
     ).then((response) => {
-      if (response.data.labbook && response.data.labbook.sizeBytes) {
+      if (response.data && response.data.labbook && response.data.labbook.sizeBytes) {
         const { environment } = response.data.labbook;
         const { imageStatus } = environment;
         if ((imageStatus !== 'EXISTS') && (imageStatus !== 'BUILD_IN_PROGRESS')) {
           this._buildAndLaunch();
+          this.setState({ headerStep: 'Building' });
         } else if ((imageStatus === 'EXISTS')) {
           this._launch();
+          this.setState({ headerStep: 'Launching' });
         } else if (imageStatus === 'BUILD_IN_PROGRESS') {
           const buildKey = localStorage.getItem(`${owner}:${name}:buildkey`);
           this._jobStatus(buildKey);
+          this.setState({ headerStep: 'Building' });
         }
       } else {
         this._triggerImport();
+        this.setState({ headerStep: 'Importing' });
       }
     });
   }
@@ -92,6 +100,7 @@ class Importing extends Component<Props, State> {
     const callback = (response) => {
       if (response.buildImage === null) {
         this._launch();
+        this.setState({ headerStep: 'Launching' });
         return;
       }
       const { backgroundJobKey } = response.buildImage;
@@ -99,6 +108,7 @@ class Importing extends Component<Props, State> {
       this._jobStatus(
         backgroundJobKey,
       );
+      this.setState({ headerStep: 'Building' });
     };
 
     buildAndLaunch(owner, name, callback);
@@ -115,11 +125,14 @@ class Importing extends Component<Props, State> {
     const pathArray = window.location.pathname.split('/');
     const owner = pathArray[2];
     const name = pathArray[3];
-    const devtool = sessionStorage.getItem('devTool');
+    const devtool = sessionStorage.getItem('devtool');
     const feedbackUpdated = `${feedback} <br /> Starting ${devtool} in '${owner}/${name}'`;
     let showPopupBlocked = false;
 
-    this.setState({ feedback: feedbackUpdated });
+    this.setState({
+      feedback: feedbackUpdated,
+      headerStep: 'Launching',
+    });
 
     const callback = (response, error) => {
       if (error) {
@@ -150,7 +163,7 @@ class Importing extends Component<Props, State> {
         if (!showPopupBlocked) {
           window.location.hash = '';
           sessionStorage.removeItem('autoImport');
-          sessionStorage.removeItem('devTool');
+          sessionStorage.removeItem('devtool');
           sessionStorage.removeItem('filePath');
           window.location.reload();
         }
@@ -191,6 +204,8 @@ class Importing extends Component<Props, State> {
         this._jobStatus(jobKey);
       }
     };
+
+    this.setState({ headerStep: 'Importing' });
 
     importJob(
       currentServer,
@@ -234,10 +249,12 @@ class Importing extends Component<Props, State> {
 
       if ((status === 'finished') && (method === 'build_image')) {
         this._launch();
+        this.setState({ headerStep: 'Launching' });
       }
 
       if ((status === 'finished') && (method === 'import_labbook_from_remote')) {
         this._buildAndLaunch();
+        this.setState({ headerStep: 'Building' });
       }
     }).catch((error) => {
       if (error.jobStatus) {
@@ -265,22 +282,42 @@ class Importing extends Component<Props, State> {
   }
 
   render() {
+    const pathArray = window.location.pathname.split('/');
+    const owner = pathArray[2];
+    const name = pathArray[3];
     const {
       devTool,
+      headerStep,
       failureMessage,
       feedback,
       filePath,
       showDevtoolFailed,
       showPopupBlocked,
     } = this.state;
-    const pathArray = window.location.pathname.split('/');
-    const owner = pathArray[2];
-    const project = pathArray[3];
+    const {
+      error,
+      isComplete,
+      percentageComplete,
+    } = importingUtils.getProgressLoaderData(feedback, name, owner);
 
-    const header = `Importing ${owner}/${project}`;
+    const text = failureMessage || '';
+
+    const header = `${headerStep} ${owner}/${name}`;
+
 
     return (
       <div className="Importing">
+        <ImportHeader />
+        <h4 className="Importing__h4">{header}</h4>
+
+        <ProgressLoader
+          error={failureMessage}
+          isCanceling={false}
+          isComplete={isComplete}
+          percentageComplete={percentageComplete}
+          text={text}
+        />
+
         <PopupBlocked
           attemptRelaunch={this.launch}
           devTool={devTool}
@@ -288,19 +325,14 @@ class Importing extends Component<Props, State> {
           togglePopupModal={this._togglePopupModal}
           isVisible={showPopupBlocked}
         />
-        <ImportingError
+        <ImportError
           devTool={devTool}
           openProject={this._openProject}
           toggleDevtoolFailedModal={this._toggleDevtoolFailed}
           isVisible={showDevtoolFailed}
         />
-        <h2 className="Importing__h2">{header}</h2>
         <div className="Importing__status">
-          { failureMessage
-            && <p>{failureMessage}</p>}
-          <div className="Importing__feedback">
-            <OutputMessage message={feedback} />
-          </div>
+          <ImportFeedback feedback={feedback} />
         </div>
       </div>
     );

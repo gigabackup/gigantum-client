@@ -3,15 +3,16 @@
 .Importing {
   min-height: 100%;
   width: 100%;
-  background: $gradient;
+  background: $white;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0em 1em;
+  padding: 0em;
   overflow: hidden;
 
-  &__h2 {
-    color: $white;
+  &__h4 {
+    margin: 2em 0;
+    color: $primaryText;
   }
 
   &__status {
@@ -22,8 +23,8 @@
     padding: 2em;
     overflow: auto;
     width: 800px;
-    margin: 3em auto;
-    max-height: calc(100vh - 12em);
+    max-height: calc(100vh - 28em);
+    height: calc(100vh - 18em);
     background: $slateBlue;
     border-radius: 3px;
 

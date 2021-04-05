@@ -47,6 +47,26 @@ const importingUtils = {
       fetchData();
     });
   },
+  /**
+  * Method checks if a project exists before attempting to import it
+  * @param {String} owner owner of project
+    * @param {String} name name of the project
+  * @fires fetchQuery
+  * @return {}
+  */
+  getProgressLoaderData: (feedback, name, owner) => {
+    const regex = /(Step [0-9]+\/[0-9]+)/g;
+    const percentRegex = /[0-9]+\/[0-9]+/;
+    const matches = feedback.match(regex);
+    const lastMatchPct = matches ? matches[matches.length - 1].match(percentRegex)[0].split('/') : [];
+    const percentageComplete = matches ? `${Math.round((lastMatchPct[0] / lastMatchPct[1]) * 100)}%` : '';
+    document.title = `${owner}/${name} - ${percentageComplete}`;
+    return {
+      error: false,
+      isComplete: percentageComplete === 100,
+      percentageComplete,
+    };
+  },
 };
 
 export default importingUtils;

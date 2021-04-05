@@ -1,6 +1,6 @@
 @import '~Styles/_imports.scss';
 
-.ImportingError {
+.ImportError {
   height: 100%;
 
   &__body {
@@ -47,6 +47,6 @@
   &__buttonContainer {
     height: 100px;
     width: 100%;
-    padding-right: 70px;
+
   }
 }

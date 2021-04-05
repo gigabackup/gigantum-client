@@ -108,7 +108,7 @@ const ShareFileInput = ({
         updateAutoCompleteIndex(index);
       }
 
-      if (evt.key === 'Enter') {
+      if ((evt.key === 'Enter') && (list.length > 0)) {
         updateFilePathState(list[autoCompleteIndex].node.key);
         setTimeout(() => {
           updateAutoCompleteOpen(false);

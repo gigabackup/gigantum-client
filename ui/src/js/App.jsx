@@ -63,8 +63,9 @@ class App extends Component<State> {
 
     if (hash.autoImport) {
       sessionStorage.setItem('autoImport', true);
-      sessionStorage.setItem('devTool', hash.devtool);
+      sessionStorage.setItem('devtool', hash.devtool);
       sessionStorage.setItem('route', window.location.pathname);
+      sessionStorage.setItem('serverId', hash.serverId);
 
       if (hash.filePath) {
         sessionStorage.setItem('filePath', hash.filePath);
@@ -72,6 +73,7 @@ class App extends Component<State> {
     }
 
     promise.then((data) => {
+      console.log(data);
       if (data.isLoggedIn) {
         const autoImport = JSON.parse(sessionStorage.getItem('autoImport'));
         const { pathname } = window.location;

@@ -40,7 +40,7 @@ const ShareForm = ({
       environment={environment}
       variables={{
         cursor: null,
-        first: 100,
+        first: 1000, // induce pagination and refactor with relay hooks
         name,
         owner,
       }}
