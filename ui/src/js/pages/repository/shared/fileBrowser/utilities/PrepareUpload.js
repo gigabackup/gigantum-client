@@ -65,8 +65,7 @@ const removeExcludedFiles = (files, owner, name) => {
       ? fileItem.file.name.replace(/.*\./, '')
       : fileItem.entry.fullPath.replace(/.*\./, '');
     const fileAllowed = (config.fileBrowser.excludedFiles.indexOf(extension) < 0)
-      && fileItem.file.size;
-
+      && (fileItem.file.size || extension === 'py');
     if (!fileAllowed) {
       filesNotAllowedList.push(fileItem.file.name);
     }
