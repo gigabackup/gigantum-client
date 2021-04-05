@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1722"
+changelog:
+  - type: NON_USER_FACING
+    description: Bumps ansi_up and react-dev-utils due to security warnings. Updates webpack start script to work with new react-dev-utils version.cd
