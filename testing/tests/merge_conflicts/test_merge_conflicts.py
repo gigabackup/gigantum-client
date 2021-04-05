@@ -10,6 +10,8 @@ from tests.test_fixtures import clean_up_project
 from tests.test_fixtures import clean_up_remote_project
 from client_app.helper.local_project_helper_utility import ProjectHelperUtility
 import time
+from client_app.pages.login.login_factory import LoginFactory
+from tests.test_fixtures import server_data_fixture
 
 
 @pytest.mark.mergeConflicts
@@ -17,19 +19,21 @@ class TestMergeConflicts:
     """Includes test methods for basic project, publish and verify merge conflicts"""
 
     @pytest.mark.run(order=1)
-    def test_log_in_success(self):
+    def test_log_in_success(self, server_data_fixture):
         """ Test method to check the successful log-in."""
         landing_page = LandingPage(self.driver)
-        assert landing_page.landing_component.get_server_button_text() == "Gigantum Hub"
-        log_in_page = landing_page.landing_component.load_log_in_page()
-        assert log_in_page.sign_up_component.get_sign_up_title() == "Sign Up"
-        user_credentials = ConfigurationManager.getInstance().get_user_credentials(LoginUser.User1)
-        log_in_page.sign_up_component.move_to_log_in_tab()
-        project_list = log_in_page.login(user_credentials.user_name, user_credentials.password)
+        ProjectHelperUtility().set_server_details(server_data_fixture)
+        landing_page.landing_component.click_server(server_data_fixture.server_name)
+        login_page = LoginFactory().load_login_page(server_data_fixture.login_type, self.driver)
+        assert login_page.check_login_page_title()
+        user_credentials = ConfigurationManager.getInstance().get_user_credentials(server_data_fixture.server_id,
+                                                                                   LoginUser.User1)
+        project_list = login_page.login(user_credentials.user_name, user_credentials.password)
         assert project_list.project_listing_component.get_project_title() == "Projects"
 
     @pytest.mark.depends(on=['test_log_in_success'])
-    def test_add_project_publish_verify_merge_conflicts(self, clean_up_project, clean_up_remote_project):
+    def test_add_project_publish_verify_merge_conflicts(self, clean_up_project, clean_up_remote_project,
+                                                        server_data_fixture):
         """Test method to create a project, publish and verify merge conflicts"""
         # Create project
         is_success_msg = ProjectUtility().create_project(self.driver)
@@ -56,13 +60,14 @@ class TestMergeConflicts:
         assert is_dropped, "Could not drag and drop text file in to code data drop zone"
 
         # Fetch user credentials of user 2
-        user2_credentials = ConfigurationManager.getInstance().get_user_credentials(LoginUser.User2)
+        user2_credentials = ConfigurationManager.getInstance().get_user_credentials(server_data_fixture.server_id,
+                                                                                    LoginUser.User2)
 
         # Publish project
         self.publish_project(project_list, user2_credentials)
 
         # Switch user1 to user2
-        self.switch_user(project_list, user2_credentials)
+        self.switch_user(project_list, user2_credentials, server_data_fixture)
 
         # Import project
         self.import_project(project_list, project_title)
@@ -71,10 +76,11 @@ class TestMergeConflicts:
         self.update_files_and_sync(project_list, project_title)
 
         # Fetch user credentials of user 1
-        user1_credentials = ConfigurationManager.getInstance().get_user_credentials(LoginUser.User1)
+        user1_credentials = ConfigurationManager.getInstance().get_user_credentials(server_data_fixture.server_id,
+                                                                                    LoginUser.User1)
 
         # Switch user2 to user1
-        self.switch_user(project_list, user1_credentials)
+        self.switch_user(project_list, user1_credentials, server_data_fixture)
 
         # Update files and sync -> Conflict, Abort
         self.update_files_and_sync_conflict_abort(project_list, project_title)
@@ -86,23 +92,24 @@ class TestMergeConflicts:
         self.create_another_conflict(project_list, project_title)
 
         # Switch user1 to user2
-        self.switch_user(project_list, user2_credentials)
+        self.switch_user(project_list, user2_credentials, server_data_fixture)
 
         # Update files and sync -> Conflict, Mine
         self.update_files_and_sync_conflict_mine(project_list, project_title)
 
         # Switch user2 to user1
-        self.switch_user(project_list, user1_credentials)
+        self.switch_user(project_list, user1_credentials, server_data_fixture)
 
         # Sync and verify resolution
         self.sync_and_verify_resolution(project_list, project_title)
 
-    def switch_user(self, project_list,  user_credentials):
+    def switch_user(self, project_list,  user_credentials, server_details):
         """Logical separation of switch user in gigantum client
 
         Args:
             project_list: The page with UI elements
             user_credentials: Includes username and password
+            server_details: Details of the current server
 
         """
         # Click on profile menu
@@ -115,16 +122,15 @@ class TestMergeConflicts:
 
         # Load Landing Page
         landing_page = LandingPage(self.driver, False)
-        assert landing_page.landing_component.get_server_button_text() == "Gigantum Hub"
 
-        # Load Log in window
-        log_in_page = landing_page.landing_component.load_log_in_page()
-        assert log_in_page.sign_up_component.get_sign_up_title() == "Log In"
+        # Click server button
+        landing_page.landing_component.click_server(server_details.server_name)
 
-        # Click on Not your account link
-        log_in_page.log_in_component.click_not_existing_user()
+        # Load Login page
+        login_page = LoginFactory().load_login_page(server_details.login_type, self.driver)
 
-        project_list = log_in_page.login(user_credentials.user_name, user_credentials.password)
+        # Load Project Listing page
+        project_list = login_page.login(user_credentials.user_name, user_credentials.password)
         assert project_list.project_listing_component.get_project_title() == "Projects"
 
     def publish_project(self, project_list, user2_credentials):
@@ -164,7 +170,7 @@ class TestMergeConflicts:
         assert is_clicked, "Could not click Collaborators button"
 
         # Input collaborator name into input area
-        is_typed = project_list.collaborators_modal_component.add_collaborator(user2_credentials.user_name)
+        is_typed = project_list.collaborators_modal_component.add_collaborator(user2_credentials.display_name)
         assert is_typed, "Could not type collaborator into input area"
 
         # Select Admin permission for collaborator
@@ -177,7 +183,7 @@ class TestMergeConflicts:
 
         # Verify collaborator is listed
         is_verified = project_list.collaborators_modal_component.verify_collaborator_is_listed(
-            user2_credentials.user_name)
+            user2_credentials.display_name)
         assert is_verified, "Collaborator is not listed in the modal"
 
         # Click on collaborator modal close button
@@ -185,23 +191,23 @@ class TestMergeConflicts:
         assert is_clicked, "Could not close collaborator modal"
 
     def import_project(self, project_list, project_title):
-        """ Import project from Gigantum hub server
+        """ Import project from server
 
         Args:
             project_list: The page with UI elements
             project_title: Title of the current project
         """
-        # Click Gigantum Hub tab
-        is_clicked = project_list.gigantum_hub_component.click_gigantum_hub_tab()
-        assert is_clicked, "Could not click Gigantum Hub tab"
+        # Click server tab
+        is_clicked = project_list.server_component.click_server_tab()
+        assert is_clicked, "Could not click server tab"
 
-        # Verify project in Gigantum Hub page
-        is_verified = project_list.gigantum_hub_component.verify_project_title_in_gigantum_hub(project_title)
-        assert is_verified, "Could not verify project in Gigantum Hub"
+        # Verify project in server page
+        is_verified = project_list.server_component.verify_title_in_server(project_title)
+        assert is_verified, "Could not verify project in server"
 
-        # Click import button in Gigantum Hub page
-        is_clicked = project_list.gigantum_hub_component.click_project_import_button(project_title)
-        assert is_clicked, "Could not click import button in Gigantum Hub page"
+        # Click import button in server page
+        is_clicked = project_list.server_component.click_project_import_button(project_title)
+        assert is_clicked, "Could not click import button in server page"
 
         # Monitor container status to go through Stopped -> Building
         is_status_changed = project_list.monitor_container_status("Building", 60)

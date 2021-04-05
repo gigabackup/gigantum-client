@@ -1,9 +1,9 @@
-
-from client_app.pages.login.log_in_page import LogInPage
 from framework.base.component_base import BaseComponent
 from framework.factory.models_enums.constants_enums import LocatorType
 from selenium import webdriver
 from framework.factory.models_enums.page_config import ComponentModel
+from client_app.helper.local_project_helper_utility import ProjectHelperUtility
+from collections import namedtuple
 
 
 class LandingComponent(BaseComponent):
@@ -16,21 +16,17 @@ class LandingComponent(BaseComponent):
 
     def __init__(self, driver: webdriver, component_data: ComponentModel) -> None:
         super(LandingComponent, self).__init__(driver, component_data)
-        self.btn_server = self.get_locator(LocatorType.XPath, "//button[contains(text(),'Gigantum Hub')]")
 
-    def load_log_in_page(self) -> LogInPage:
+    def click_server(self, server_name) -> bool:
         """Performs navigation to login page.
 
         Click event on the sign-in button is performed,
         and login page is displayed.
 
-        Returns:
-            An instance of LoginPage.
         """
-        self.btn_server.click()
-        log_in_page = LogInPage(self.driver)
-        return log_in_page
-
-    def get_server_button_text(self) -> str:
-        """Returns the title of server button"""
-        return self.btn_server.get_text()
+        element = f"//button[contains(text(), '{server_name}')]"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            server_button = self.get_locator(LocatorType.XPath, element)
+            server_button.click()
+            return True
+        return False

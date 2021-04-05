@@ -8,8 +8,6 @@ from string import Template
 import requests
 import subprocess
 import os
-from pathlib import Path
-import uuid
 
 
 class DatasetHelperUtility(object):
@@ -31,7 +29,7 @@ class DatasetHelperUtility(object):
         """
         dataset_folder_names = ProjectHelperUtility().get_folder_names()
         user_directory = dataset_folder_names.home_dir / GigantumConstants.SERVERS_FOLDER.value / dataset_folder_names.\
-            default_server / dataset_folder_names.username / dataset_folder_names.username / directory_name
+            server_name / dataset_folder_names.username / dataset_folder_names.username / directory_name
         user_datasets = user_directory.glob('d-*')
         if user_datasets:
             for dataset in user_datasets:
@@ -43,7 +41,7 @@ class DatasetHelperUtility(object):
         """Removes the dataset's file cache"""
         dataset_folder_names = ProjectHelperUtility().get_folder_names()
         user_directory = dataset_folder_names.home_dir / GigantumConstants.CACHE_FOLDER.value / \
-                         GigantumConstants.DATASETS_FOLDER.value / dataset_folder_names.default_server / \
+                         GigantumConstants.DATASETS_FOLDER.value / dataset_folder_names.server_name / \
                          dataset_folder_names.username / dataset_folder_names.username
         datasets_cache = user_directory.glob('d-*')
         if datasets_cache:
@@ -60,12 +58,14 @@ class DatasetHelperUtility(object):
             driver: driver instance
 
         """
+        server_details = ProjectHelperUtility().get_server_details()
         if ConfigurationManager.getInstance().get_app_setting("api_url"):
             api_url = ConfigurationManager.getInstance().get_app_setting("api_url")
         else:
             raise Exception("Unable to identify api url from configuration")
-        user_credentials = ConfigurationManager.getInstance().get_user_credentials(LoginUser.User1)
-        namespace = user_credentials.user_name
+        user_credentials = ConfigurationManager.getInstance().get_user_credentials(server_details['server_id'],
+                                                                                   LoginUser.User1)
+        namespace = user_credentials.display_name
         access_token = driver.execute_script("return window.localStorage.getItem('access_token')")
         id_token = driver.execute_script("return window.localStorage.getItem('id_token')")
         headers = {
@@ -101,7 +101,7 @@ class DatasetHelperUtility(object):
         """
         dataset_folder_names = ProjectHelperUtility().get_folder_names()
         working_directory = dataset_folder_names.home_dir / GigantumConstants.SERVERS_FOLDER.value / \
-                            dataset_folder_names.default_server / dataset_folder_names.username / \
+                            dataset_folder_names.server_name / dataset_folder_names.username / \
                             dataset_folder_names.username / GigantumConstants.DATASETS_FOLDER.value / dataset_title
         out = subprocess.Popen(['git', 'rev-list', 'HEAD', '--max-count=1'],
                                stdout=subprocess.PIPE,
@@ -126,11 +126,11 @@ class DatasetHelperUtility(object):
         dataset_folder_names = ProjectHelperUtility().get_folder_names()
         if sub_folder_name:
             file_directory = dataset_folder_names.home_dir / GigantumConstants.CACHE_FOLDER.value / GigantumConstants. \
-                DATASETS_FOLDER.value / dataset_folder_names.default_server / dataset_folder_names.username / \
+                DATASETS_FOLDER.value / dataset_folder_names.server_name / dataset_folder_names.username / \
                              dataset_folder_names.username / dataset_name / hash_code_folder / folder_name / sub_folder_name
         else:
             file_directory = dataset_folder_names.home_dir / GigantumConstants.CACHE_FOLDER.value / GigantumConstants. \
-                DATASETS_FOLDER.value / dataset_folder_names.default_server / dataset_folder_names.username / \
+                DATASETS_FOLDER.value / dataset_folder_names.server_name / dataset_folder_names.username / \
                              dataset_folder_names.username / dataset_name / hash_code_folder / folder_name
         temp_dir = tempfile.gettempdir()
         with open(os.path.join(temp_dir, file_name), 'w') as temp_file:
@@ -157,7 +157,7 @@ class DatasetHelperUtility(object):
         """
         dataset_folder_names = ProjectHelperUtility().get_folder_names()
         file_directory = dataset_folder_names.home_dir / GigantumConstants.CACHE_FOLDER.value / GigantumConstants. \
-            DATASETS_FOLDER.value / dataset_folder_names.default_server / dataset_folder_names.username / \
+            DATASETS_FOLDER.value / dataset_folder_names.server_name / dataset_folder_names.username / \
                          dataset_folder_names.username / dataset_name / hash_code_folder
         temp_dir = tempfile.gettempdir()
         with open(os.path.join(temp_dir, file_name), 'wb') as temp_file:
@@ -187,7 +187,7 @@ class DatasetHelperUtility(object):
         """
         dataset_folder_names = ProjectHelperUtility().get_folder_names()
         file_directory = dataset_folder_names.home_dir / GigantumConstants.CACHE_FOLDER.value / GigantumConstants. \
-            DATASETS_FOLDER.value / dataset_folder_names.default_server / dataset_folder_names.username / \
+            DATASETS_FOLDER.value / dataset_folder_names.server_name / dataset_folder_names.username / \
                          dataset_folder_names.username / dataset_name / hash_code_folder
         with open(os.path.join(file_directory, file_name), 'w') as temp_file:
             temp_file.seek(0)

@@ -26,7 +26,7 @@ const getIsLoggedIn = (serverId, loginUrl, auth) => {
           auth.setSession(userIdentity);
 
           resolve({ isLoggedIn: true, response });
-        } else if (userIdentity && accessToken) {
+        } else if (userIdentity && accessToken && userIdentity.isSessionValid) {
           // if user has invalid session but has an identify and has a access token try auto login
           const freshLoginText = localStorage.getItem('fresh_login') ? '&freshLogin=true' : '';
           const route = sessionStorage.getItem('route') ? `${window.location.origin}${sessionStorage.getItem('route')}` : window.location.href;
