@@ -1,6 +1,8 @@
 // @flow
 // vendor
-import React from 'react';
+import React, { useContext } from 'react';
+// context
+import ServerContext from 'Pages/ServerContext';
 // assets
 import './Type.scss';
 
@@ -11,20 +13,17 @@ type Props = {
     icon: string,
     name: string,
   },
-  currentServer: {
-    name: string,
-  },
 };
 
 const Type = ({
   type,
-  currentServer,
 }: Props) => {
   const {
     description,
     icon,
     name,
   } = type;
+  const { currentServer } = useContext(ServerContext);
   const isHub = currentServer.name === 'Gigantum Hub';
   const displayedName = isHub ? name : 'Gigantum';
   const displayedDescription = isHub ? description : 'Versioned Dataset storage supporting individual files up to 5GB in size';
