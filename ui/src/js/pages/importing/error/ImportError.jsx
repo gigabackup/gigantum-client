@@ -59,22 +59,22 @@ const ImportError = ({
   */
   const viewEnvironment = () => {
     clearState();
-    window.location.pathname = `${window.location.pathname}environment`;
+    window.location.pathname = `${window.location.pathname}/environment`;
   };
 
   const errorState = {
     Importing: {
       headerText: 'Project Failed to Launch',
-      bodyText: 'Gigantum failed to launch the Project. This is most likely because the Project does not exist.',
+      bodyText: 'Gigantum failed to import the Project. This is most likely because you do not have access to the Project or it does not exist.',
       subText: 'Please select a valid Project to launch.',
-      buttonText: 'View Project Listing',
+      buttonText: 'View My Projects',
       buttonAction: viewProjects,
     },
     Building: {
       headerText: 'Gigantum Failed to Build',
       bodyText: 'Gigantum failed to build the Project. This is most likely due to an issue with the Project\'s environment.',
       subText: 'Please modify the environment and try again.',
-      buttonText: 'View Environment',
+      buttonText: 'View Project Environment',
       buttonAction: viewEnvironment,
 
     },
@@ -113,7 +113,7 @@ const ImportError = ({
         </div>
         <div className="ImportError__buttonContainer flex justify--right">
           <button
-            className="Btn Btn--inverted Btn--popup-blocked"
+            className="Btn Btn--inverted Btn--popup-blocked ImportError__button"
             onClick={buttonAction}
             type="button"
           >

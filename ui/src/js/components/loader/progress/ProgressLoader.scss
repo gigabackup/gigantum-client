@@ -15,10 +15,10 @@
     background: url('~Images/loaders/status-spinner.svg') no-repeat center center;
     background-size: 130px;
     &--failed {
-      border: 10px solid $crimson;
       border-radius: 50%;
       line-height: 115px;
-      background: transparent;
+      background: url('~Images/icons/exclamation-orange.svg') no-repeat center center;;
+      background-size: 130px;
     }
     &--completed {
       border: 10px solid $green;
@@ -36,9 +36,10 @@
       color: $green;
     }
     &--failed {
-      padding-left: 30px;
-      background: url(~Images/icons/notifications/info-exclamation-red.svg) no-repeat left center;
-      color: $crimson;
+      padding-left: 30px;;
+      background: url(~Images/icons/exclamation-orange.svg) no-repeat left center;
+      background-size: 20px;
+      color: $orange;
     }
   }
 }

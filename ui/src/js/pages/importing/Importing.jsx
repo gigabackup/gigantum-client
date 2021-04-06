@@ -58,7 +58,10 @@ class Importing extends Component<Props, State> {
           this.setState({ headerStep: 'Building' });
         } else if ((imageStatus === 'EXISTS')) {
           this._launch();
-          this.setState({ headerStep: 'Launching' });
+          this.setState({
+            feedback: `Importing... \n${owner}/${name} already exists`,
+            headerStep: 'Launching',
+          });
         } else if (imageStatus === 'BUILD_IN_PROGRESS') {
           const buildKey = localStorage.getItem(`${owner}:${name}:buildkey`);
           this._jobStatus(buildKey);
@@ -121,6 +124,17 @@ class Importing extends Component<Props, State> {
     const devtool = sessionStorage.getItem('devtool');
     const feedbackUpdated = `${feedback} <br /> Starting ${devtool} in '${owner}/${name}'`;
     let showPopupBlocked = false;
+
+
+    if (devtool === 'undefined') {
+      const path = `${window.location.origin}/projects/${owner}/${name}`;
+      window.location.hash = '';
+      sessionStorage.removeItem('autoImport');
+      sessionStorage.removeItem('devTool');
+      sessionStorage.removeItem('filePath');
+      window.open(path, '_self');
+      return;
+    }
 
     this.setState({
       feedback: feedbackUpdated,
@@ -280,8 +294,6 @@ class Importing extends Component<Props, State> {
       percentageComplete,
     } = importingUtils.getProgressLoaderData(feedback, name, owner);
 
-    const text = failureMessage || '';
-
     const header = `${headerStep} ${owner}/${name}`;
 
 
@@ -295,7 +307,6 @@ class Importing extends Component<Props, State> {
           isCanceling={false}
           isComplete={isComplete}
           percentageComplete={percentageComplete}
-          text={text}
         />
 
         <PopupBlocked
