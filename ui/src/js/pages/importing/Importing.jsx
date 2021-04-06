@@ -36,7 +36,7 @@ class Importing extends Component<Props, State> {
     feedback: 'Importing...',
     failureMessage: null,
     headerStep: 'Importing',
-    showDevtoolFailed: false,
+    importErrorVisible: false,
     showPopupBlocked: false,
     devTool: sessionStorage.getItem('devTool'),
     filePath: sessionStorage.getItem('filePath'),
@@ -76,13 +76,6 @@ class Importing extends Component<Props, State> {
    */
   _togglePopupModal = () => {
     this.setState({ showPopupBlocked: false });
-  }
-
-  /**
-   * sets state for popup modal
-   */
-  _toggleDevtoolFailed = () => {
-    this.setState({ showDevtoolFailed: false });
   }
 
   /**
@@ -168,24 +161,11 @@ class Importing extends Component<Props, State> {
           window.location.reload();
         }
       } else {
-        this.setState({ showDevtoolFailed: true });
+        this.setState({ importErrorVisible: true });
       }
     };
 
     launch(owner, name, devtool, callback);
-  }
-
-  /**
-  * Opens the project
-  * @param {}
-  * @return {}
-  */
-  _openProject = () => {
-    window.location.hash = '';
-    sessionStorage.removeItem('autoImport');
-    sessionStorage.removeItem('devTool');
-    sessionStorage.removeItem('filePath');
-    window.location.reload();
   }
 
   /**
@@ -198,10 +178,12 @@ class Importing extends Component<Props, State> {
     const { currentServer } = this.props.currentServer;
 
     const callback = (response, error) => {
-      if (response) {
+      if (response && response.importRemoteLabbook) {
         const { jobKey } = response.importRemoteLabbook;
 
         this._jobStatus(jobKey);
+      } else {
+        this.setState({ importErrorVisible: true });
       }
     };
 
@@ -262,9 +244,9 @@ class Importing extends Component<Props, State> {
         const { jobMetadata, failureMessage } = error.jobStatus;
         const { feedback } = JSON.parse(jobMetadata);
         const feedbackAppened = `${stateFeedback} <br /> ${feedback}`;
-        this.setState({ feedback: feedbackAppened, failureMessage });
+        this.setState({ feedback: feedbackAppened, failureMessage, importErrorVisible: true });
       } else {
-        this.setState({ failureMessage: error });
+        this.setState({ failureMessage: error, importErrorVisible: true });
       }
     });
   }
@@ -290,12 +272,10 @@ class Importing extends Component<Props, State> {
       headerStep,
       failureMessage,
       feedback,
-      filePath,
-      showDevtoolFailed,
+      importErrorVisible,
       showPopupBlocked,
     } = this.state;
     const {
-      error,
       isComplete,
       percentageComplete,
     } = importingUtils.getProgressLoaderData(feedback, name, owner);
@@ -327,9 +307,8 @@ class Importing extends Component<Props, State> {
         />
         <ImportError
           devTool={devTool}
-          openProject={this._openProject}
-          toggleDevtoolFailedModal={this._toggleDevtoolFailed}
-          isVisible={showDevtoolFailed}
+          headerStep={headerStep}
+          isVisible={importErrorVisible}
         />
         <div className="Importing__status">
           <ImportFeedback feedback={feedback} />
