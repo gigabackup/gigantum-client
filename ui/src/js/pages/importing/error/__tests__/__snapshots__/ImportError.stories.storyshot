@@ -3,12 +3,10 @@
 exports[`Storyshots Pages/importing/ImportError ImportError Default 1`] = `
 <ImportError
   devTool="jarpyter"
+  headerStep="Importing"
   isVisible={true}
-  openProject={[Function]}
-  toggleDevtoolFailedModal={[Function]}
 >
   <Modal
-    handleClose={[Function]}
     size="medium"
   >
     <Portal
@@ -28,10 +26,6 @@ exports[`Storyshots Pages/importing/ImportError ImportError Default 1`] = `
               class="Modal__content Modal__content--medium"
               style="overflow: hidden;"
             >
-              <button
-                class="Btn Btn--flat Modal__close padding--small "
-                type="button"
-              />
               <div
                 class="Modal__container"
               >
@@ -48,19 +42,17 @@ exports[`Storyshots Pages/importing/ImportError ImportError Default 1`] = `
                       <h2
                         class="ImportError__header-text"
                       >
-                        Devtool Failed to Launch
+                        Project Failed to Launch
                       </h2>
                     </div>
                     <div
                       class="ImportError__message"
                     >
                       <p>
-                        Gigantum failed to launch
-                         jarpyter 
-                        . This is most likely because the devtool or custom app does not exist.
+                        Gigantum failed to launch the Project. This is most likely because the Project does not exist.
                       </p>
                       <p>
-                        Please open the Project and select a valid devtool or custom application.
+                        Please select a valid Project to launch.
                       </p>
                     </div>
                     <div
@@ -70,7 +62,7 @@ exports[`Storyshots Pages/importing/ImportError ImportError Default 1`] = `
                         class="Btn Btn--inverted Btn--popup-blocked"
                         type="button"
                       >
-                        Open Project
+                        View Project Listing
                       </button>
                     </div>
                   </div>
@@ -90,10 +82,6 @@ exports[`Storyshots Pages/importing/ImportError ImportError Default 1`] = `
               class="Modal__content Modal__content--medium"
               style="overflow: hidden;"
             >
-              <button
-                class="Btn Btn--flat Modal__close padding--small "
-                type="button"
-              />
               <div
                 class="Modal__container"
               >
@@ -110,19 +98,17 @@ exports[`Storyshots Pages/importing/ImportError ImportError Default 1`] = `
                       <h2
                         class="ImportError__header-text"
                       >
-                        Devtool Failed to Launch
+                        Project Failed to Launch
                       </h2>
                     </div>
                     <div
                       class="ImportError__message"
                     >
                       <p>
-                        Gigantum failed to launch
-                         jarpyter 
-                        . This is most likely because the devtool or custom app does not exist.
+                        Gigantum failed to launch the Project. This is most likely because the Project does not exist.
                       </p>
                       <p>
-                        Please open the Project and select a valid devtool or custom application.
+                        Please select a valid Project to launch.
                       </p>
                     </div>
                     <div
@@ -132,7 +118,7 @@ exports[`Storyshots Pages/importing/ImportError ImportError Default 1`] = `
                         class="Btn Btn--inverted Btn--popup-blocked"
                         type="button"
                       >
-                        Open Project
+                        View Project Listing
                       </button>
                     </div>
                   </div>
@@ -149,7 +135,6 @@ exports[`Storyshots Pages/importing/ImportError ImportError Default 1`] = `
       >
         <div
           className="Modal__cover"
-          onClick={[Function]}
           role="presentation"
         />
         <div
@@ -160,11 +145,6 @@ exports[`Storyshots Pages/importing/ImportError ImportError Default 1`] = `
             }
           }
         >
-          <button
-            className="Btn Btn--flat Modal__close padding--small "
-            onClick={[Function]}
-            type="button"
-          />
           <div
             className="Modal__container"
           >
@@ -181,19 +161,17 @@ exports[`Storyshots Pages/importing/ImportError ImportError Default 1`] = `
                   <h2
                     className="ImportError__header-text"
                   >
-                    Devtool Failed to Launch
+                    Project Failed to Launch
                   </h2>
                 </div>
                 <div
                   className="ImportError__message"
                 >
                   <p>
-                    Gigantum failed to launch
-                     jarpyter 
-                    . This is most likely because the devtool or custom app does not exist.
+                    Gigantum failed to launch the Project. This is most likely because the Project does not exist.
                   </p>
                   <p>
-                    Please open the Project and select a valid devtool or custom application.
+                    Please select a valid Project to launch.
                   </p>
                 </div>
                 <div
@@ -204,7 +182,7 @@ exports[`Storyshots Pages/importing/ImportError ImportError Default 1`] = `
                     onClick={[Function]}
                     type="button"
                   >
-                    Open Project
+                    View Project Listing
                   </button>
                 </div>
               </div>

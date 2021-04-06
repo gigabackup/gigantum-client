@@ -27,7 +27,7 @@ const JobStatus = {
           jobStatusQuery,
           variables,
           { force: true },
-        ).then((response) => {
+        ).then((response, error) => {
           if (
             (response.data.jobStatus.status === 'started')
             || (response.data.jobStatus.status === 'queued')
@@ -37,6 +37,10 @@ const JobStatus = {
             }, 250);
           } else if (response.data.jobStatus.status === 'finished') {
             resolve(response.data);
+          } else if (response.data.jobStatus.status === 'failed') {
+            reject(response.data);
+          } else if (error) {
+            reject(error);
           } else {
             reject(response.data);
           }

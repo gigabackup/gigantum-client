@@ -11,8 +11,7 @@ import ImportError from '../ImportError';
 const props = {
   devTool: 'jarpyter',
   isVisible: true,
-  openProject: jest.fn,
-  toggleDevtoolFailedModal: jest.fn,
+  headerStep: 'Importing',
 };
 
 storiesOf('Pages/importing/ImportError', module)

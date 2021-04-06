@@ -57,9 +57,8 @@ exports[`Storyshots Pages/importing/Importing ImportError Default 1`] = `
       togglePopupModal={[Function]}
     />
     <ImportError
+      headerStep="Importing"
       isVisible={false}
-      openProject={[Function]}
-      toggleDevtoolFailedModal={[Function]}
     />
     <div
       className="Importing__status"

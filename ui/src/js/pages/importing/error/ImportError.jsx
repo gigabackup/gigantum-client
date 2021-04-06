@@ -7,18 +7,93 @@ import './ImportError.scss';
 
 type Props = {
   devTool: String,
+  headerStep: String,
   isVisible: boolean,
-  openProject: Function,
 }
 
 const ImportError = ({
   devTool,
+  headerStep,
   isVisible,
-  openProject,
 }: Props) => {
   if (!isVisible) {
     return null;
   }
+
+  /**
+  * Opens the project
+  * @param {}
+  * @return {}
+  */
+  const clearState = () => {
+    window.location.hash = '';
+    sessionStorage.removeItem('autoImport');
+    sessionStorage.removeItem('devTool');
+    sessionStorage.removeItem('filePath');
+  };
+
+  /**
+  * Opens the project
+  * @param {}
+  * @return {}
+  */
+  const openProject = () => {
+    clearState();
+    window.location.reload();
+  };
+
+  /**
+  * Opens project listing
+  * @param {}
+  * @return {}
+  */
+  const viewProjects = () => {
+    clearState();
+    window.location.pathname = '/projects/local';
+  };
+
+  /**
+  * Opens project environment
+  * @param {}
+  * @return {}
+  */
+  const viewEnvironment = () => {
+    clearState();
+    window.location.pathname = `${window.location.pathname}environment`;
+  };
+
+  const errorState = {
+    Importing: {
+      headerText: 'Project Failed to Launch',
+      bodyText: 'Gigantum failed to launch the Project. This is most likely because the Project does not exist.',
+      subText: 'Please select a valid Project to launch.',
+      buttonText: 'View Project Listing',
+      buttonAction: viewProjects,
+    },
+    Building: {
+      headerText: 'Gigantum Failed to Build',
+      bodyText: 'Gigantum failed to build the Project. This is most likely due to an issue with the Project\'s environment.',
+      subText: 'Please modify the environment and try again.',
+      buttonText: 'View Environment',
+      buttonAction: viewEnvironment,
+
+    },
+    Launching: {
+      headerText: 'Devtool Failed to Launch',
+      bodyText: `Gigantum failed to launch ${devTool}. This is most likely because the devtool or custom app does not exist.`,
+      subText: 'Please open the Project and select a valid devtool or custom application.',
+      buttonText: 'Open Project',
+      buttonAction: openProject,
+    },
+  };
+
+  const {
+    headerText,
+    bodyText,
+    subText,
+    buttonText,
+    buttonAction,
+  } = errorState[headerStep];
 
   return (
     <Modal
@@ -26,25 +101,23 @@ const ImportError = ({
     >
       <div className="ImportError flex flex--column align-items--center">
         <div className="ImportError__header">
-          <h2 className="ImportError__header-text">Devtool Failed to Launch</h2>
+          <h2 className="ImportError__header-text">{headerText}</h2>
         </div>
         <div className="ImportError__message">
           <p>
-            Gigantum failed to launch
-            {` ${devTool} `}
-            . This is most likely because the devtool or custom app does not exist.
+            {bodyText}
           </p>
           <p>
-            Please open the Project and select a valid devtool or custom application.
+            {subText}
           </p>
         </div>
         <div className="ImportError__buttonContainer flex justify--right">
           <button
             className="Btn Btn--inverted Btn--popup-blocked"
-            onClick={openProject}
+            onClick={buttonAction}
             type="button"
           >
-            Open Project
+            {buttonText}
           </button>
         </div>
       </div>
