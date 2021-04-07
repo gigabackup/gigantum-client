@@ -85,6 +85,7 @@ class ImageBuilder(object):
 
         fields = self._import_baseimage_fields()
         generation_ts = str(datetime.datetime.now())
+        docker_server = fields['image']['server']
         docker_owner_ns = fields['image']['namespace']
         docker_repo = fields['image']['repository']
         docker_tag = fields['image']['tag']
@@ -97,7 +98,10 @@ class ImageBuilder(object):
         
         # Must remove '_' if its in docker hub namespace.
         prefix = '' if '_' in docker_owner_ns else f'{docker_owner_ns}/'
-        docker_lines.append("FROM {}{}:{}".format(prefix, docker_repo, docker_tag))
+        if docker_server == 'hub.docker.com':
+            docker_lines.append("FROM {}{}:{}".format(prefix, docker_repo, docker_tag))
+        else:
+            docker_lines.append("FROM {}/{}{}:{}".format(docker_server, prefix, docker_repo, docker_tag))
 
         return docker_lines
 

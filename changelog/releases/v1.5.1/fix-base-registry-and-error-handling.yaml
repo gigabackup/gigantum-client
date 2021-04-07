@@ -1,0 +1,10 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1729"
+changelog:
+  - type: FIX
+    description: Fixed bug that prevented the use of non-Dockerhub registries for base images in custom base repositories.
+  - type: IMPROVEMENT
+    description: When an error occurs during base repository indexing, the repos are now removed and re-cloned on restart.
+  - type: IMPROVEMENT
+    description: When token validation fails, cached JWKs are removed and refetched.
+  - type: NON_USER_FACING
+    description: Updated conda tests due to nltk version bump
