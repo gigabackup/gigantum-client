@@ -103,10 +103,10 @@ class Repositories extends Component<Props> {
     window.addEventListener('click', this._closeFilterMenu);
 
     if (
-        project
+      project
         && (projectList === null)
         && !loading
-      ) {
+    ) {
       UserIdentity.getUserIdentity().then((response) => {
         if (response.data && response.data.userIdentity.isSessionValid) {
           setErrorMessage(null, null, 'Failed to fetch Projects.', [{ message: 'There was an error while fetching Projects. This likely means you have a corrupted Project directory.' }]);
@@ -318,7 +318,7 @@ class Repositories extends Component<Props> {
     if (
       selectedSection === 'remoteProjects'
       || selectedSection === 'remoteDatasets'
-      ) {
+    ) {
       UserIdentity.getUserIdentity().then((response) => {
         if (navigator.onLine) {
           if (response.data) {
@@ -431,10 +431,10 @@ class Repositories extends Component<Props> {
     });
 
     if (
-        (projectList !== null)
+      (projectList !== null)
         || (datasetList !== null)
         || loading
-      ) {
+    ) {
       const localNavItemCSS = classNames({
         Tab: true,
         'Tab--local': true,
@@ -499,8 +499,7 @@ class Repositories extends Component<Props> {
                       >
                         Clear
                       </button>
-                    )
-                  }
+                    )}
                 <input
                   type="text"
                   ref={(modal) => { this.repositorySearch = modal; }}

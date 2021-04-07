@@ -1,0 +1,70 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots Header/ShareLink/form/DevtoolsOptions DevtoolsOptions Default 1`] = `
+<DevtoolsOptionsWrapped>
+  <DevtoolsOptions
+    repository={
+      Object {
+        "environment": Object {
+          "base": Object {
+            "developmentTools": Array [
+              "jupyterLab",
+              "notebook",
+            ],
+          },
+          "bundledApps": Array [
+            Object {
+              "name": "tensor-brd",
+            },
+          ],
+        },
+        "name": "projectname",
+        "owner": "ownername",
+      }
+    }
+    updateDevtoolUrl={[MockFunction]}
+  >
+    <div
+      className="DevtoolsOptions"
+      data-selenium-id="DevtoolsOptionsx"
+    >
+      <h6
+        className="DevtoolsOptions__h6 relative"
+      >
+        Tool
+        <span
+          className="Tooltip-data Tooltip-data--info"
+          data-tooltip="If selected the tool will automatically launch."
+        />
+      </h6>
+      <div
+        className="DevtoolsOptions__container"
+      >
+        <Dropdown
+          itemAction={[Function]}
+          label="none"
+          listAction={[Function]}
+          listItems={
+            Array [
+              "none",
+              "jupyterLab",
+              "notebook",
+              undefined,
+            ]
+          }
+          visibility={false}
+        >
+          <div
+            className="Dropdown relative Dropdown--collapsed"
+            data-selenium-id="Dropdown"
+            onClick={[Function]}
+            role="presentation"
+          >
+            none
+          </div>
+        </Dropdown>
+      </div>
+    </div>
+  </DevtoolsOptions>
+</DevtoolsOptionsWrapped>
+`;

@@ -310,7 +310,7 @@ class LocalListing extends Component<Props> {
       (sectionList && sectionList.edges)
       || loading
     ) {
-      const Repositories = !loading
+      const repositories = !loading
         ? filterRepositories(sectionList.edges, filterState)
         : [];
       const importVisible = (section === 'local' || !loading) && !filterText;
@@ -333,7 +333,7 @@ class LocalListing extends Component<Props> {
                   history={history}
                 />
                 )}
-            { Repositories.length ? Repositories.map((edge) => {
+            { repositories.length ? repositories.map((edge) => {
               const visibility = visibilityList.has(edge.node.id)
                 ? visibilityList.get(edge.node.id).visibility
                 : 'loading';

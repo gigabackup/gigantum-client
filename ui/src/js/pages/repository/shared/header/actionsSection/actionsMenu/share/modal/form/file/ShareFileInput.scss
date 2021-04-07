@@ -1,0 +1,35 @@
+@import '~Styles/_imports.scss';
+
+.ShareFileInput {
+  margin: 0 0 0 3em;
+
+  &__h6 {
+    width: 6em;
+  }
+
+  &__input-text {
+    width: 28.5em !important;
+    padding-left: 3.1em !important;
+    margin: 0 !important;
+
+    &:disabled {
+      background: $backgroundGrey;
+      opacity: 0.5;
+    }
+  }
+
+  &__overlay {
+    height: 2em;
+    width: 2em;
+    color: $font-grey;
+    font-size: 1em;
+    opacity: 0.5;
+    top: 0px;
+  }
+
+  &__p {
+    margin: 0;
+    padding: 4px 0 4px .5em;
+    font-size: 18px;
+  }
+}

@@ -31,6 +31,7 @@ import Tooltip from 'Components/tooltip/Tooltip';
 import LoginPrompt from 'Pages/repository/shared/modals/LoginPrompt';
 import DeleteLabbook from 'Pages/repository/shared/modals/DeleteLabbook';
 import DeleteDataset from 'Pages/repository/shared/modals/DeleteDataset';
+import ShareLink from './share/ShareLink';
 import CopyUrl from './copy/CopyUrl';
 import ChangeVisibility from './visibility/ChangeVisibility';
 // assets
@@ -599,6 +600,7 @@ class ActionsMenu extends Component<Props> {
     } = this.state;
     const deleteText = (sectionType === 'labbook') ? 'Delete Project' : 'Delete Dataset';
     const exportText = getExportText(exporting, name, sectionType);
+    const isShareLinkEnabled = (sectionType === 'labbook') && (window.location.host !== 'localhost:10000');
     // declare css here
     const exportCSS = classNames({
       ActionsMenu__item: true,
@@ -708,7 +710,8 @@ class ActionsMenu extends Component<Props> {
               defaultRemote={defaultRemote}
               resetState={this._resetState}
             />
-
+            { isShareLinkEnabled
+              && <ShareLink />}
             <CopyUrl
               defaultRemote={defaultRemote}
               name={name}
