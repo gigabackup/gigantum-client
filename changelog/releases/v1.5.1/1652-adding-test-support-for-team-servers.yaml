@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1694"
+changelog:
+  - type: NEW
+    description: Adding test support for team servers.

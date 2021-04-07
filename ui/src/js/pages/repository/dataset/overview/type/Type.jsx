@@ -1,6 +1,8 @@
 // @flow
 // vendor
-import React from 'react';
+import React, { useContext } from 'react';
+// context
+import ServerContext from 'Pages/ServerContext';
 // assets
 import './Type.scss';
 
@@ -21,6 +23,10 @@ const Type = ({
     icon,
     name,
   } = type;
+  const { currentServer } = useContext(ServerContext);
+  const isHub = currentServer.name === 'Gigantum Hub';
+  const displayedName = isHub ? name : 'Gigantum';
+  const displayedDescription = isHub ? description : 'Versioned Dataset storage supporting individual files up to 5GB in size';
   return (
     <div className="Type">
       <div className="Type__info grid">
@@ -37,10 +43,10 @@ const Type = ({
 
           <div className="Type__cardText">
             <div className="Type__title">
-              <h6 className="Type__name">{name}</h6>
+              <h6 className="Type__name">{displayedName}</h6>
             </div>
             <div>
-              <p className="Type__paragraph">{description}</p>
+              <p className="Type__paragraph">{displayedDescription}</p>
             </div>
           </div>
         </div>

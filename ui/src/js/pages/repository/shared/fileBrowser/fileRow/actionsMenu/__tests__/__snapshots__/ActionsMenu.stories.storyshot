@@ -1,0 +1,125 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots FileBrowser/ActionsMenu Snapshots: ActionsMenu Default 1`] = `
+<ActionsMenuWrapped>
+  <ActionsMenu
+    addFolderVisible={[Function]}
+    closeLinkModal={[Function]}
+    edge={
+      Object {
+        "cursor": "MQ==",
+        "node": Object {
+          "__typename": "LabbookFile",
+          "id": "TGFiYm9va0ZpbGU6Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZSZOZXRmbGl4Vmlld2luZ0hpc3RvcnlKLmNzdg==",
+          "isDir": false,
+          "key": "NetflixViewingHistoryJ.csv",
+          "modifiedAt": 1580742580,
+          "size": "65168",
+        },
+      }
+    }
+    fileData={
+      Object {
+        "edge": Object {
+          "cursor": "MQ==",
+          "node": Object {
+            "__typename": "LabbookFile",
+            "id": "TGFiYm9va0ZpbGU6Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZSZOZXRmbGl4Vmlld2luZ0hpc3RvcnlKLmNzdg==",
+            "isDir": false,
+            "key": "NetflixViewingHistoryJ.csv",
+            "modifiedAt": 1580742580,
+            "size": "65168",
+          },
+        },
+      }
+    }
+    folder={false}
+    mutationData={
+      Object {
+        "connection": "CodeBrowser_allFiles",
+        "favoriteConnection": "CodeFavorite_favorites",
+        "labbookName": "ui-test-project",
+        "owner": "uitest",
+        "parentId": "TGFiYm9vazpjYnV0bGVyJnVpLXRlc3QtcHJvamVjdA==",
+        "section": "code",
+      }
+    }
+    mutations={
+      Object {
+        "moveLabbookFile": [Function],
+      }
+    }
+    renameEditMode={[Function]}
+    togglePopup={[Function]}
+  >
+    <div
+      className="ActionsMenu"
+      data-selenium-id="ActionsMenu"
+      key="TGFiYm9va0ZpbGU6Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZSZOZXRmbGl4Vmlld2luZ0hpc3RvcnlKLmNzdg==-action-menu}"
+    >
+      <button
+        className="ActionsMenu__item Btn Btn--fileBrowser Btn--round Btn__addFolder visibility-hidden"
+        data-click-id="addFolder"
+        data-tip="Add Subfolder"
+        onClick={[Function]}
+        type="button"
+      />
+      <div
+        className="relative"
+      >
+        <button
+          className="ActionsMenu__item Btn Btn--fileBrowser Btn__delete-secondary Btn--round"
+          data-tip="Delete"
+          disabled={false}
+          onClick={[Function]}
+          type="button"
+        />
+        <div
+          className="ActionsMenu__popup hidden Tooltip__message"
+        >
+          <div
+            className="Tooltip__pointer"
+          />
+          <p>
+            Are you sure?
+          </p>
+          <div
+            className="flex justify--space-around"
+          >
+            <button
+              className="File__btn--round File__btn--cancel"
+              onClick={[Function]}
+              type="button"
+            />
+            <button
+              className="File__btn--round File__btn--add"
+              onClick={[Function]}
+              type="button"
+            />
+          </div>
+        </div>
+      </div>
+      <button
+        className="ActionsMenu__item Btn Btn--fileBrowser Btn__rename  Btn--round"
+        data-tip="Rename"
+        disabled={false}
+        onClick={[Function]}
+        type="button"
+      />
+      <ReactTooltip
+        clickable={false}
+        effect="solid"
+        insecure={true}
+        place="bottom"
+        resizeHide={true}
+        wrapper="div"
+      >
+        <div
+          className="__react_component_tooltip place-bottom type-dark "
+          data-id="tooltip"
+        />
+      </ReactTooltip>
+    </div>
+  </ActionsMenu>
+</ActionsMenuWrapped>
+`;

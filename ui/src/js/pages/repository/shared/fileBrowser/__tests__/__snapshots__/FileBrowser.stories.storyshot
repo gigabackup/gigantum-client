@@ -1,0 +1,458 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots FileBrowser/FileBrowser Snapshots: FileBrowser Default 1`] = `
+<DragDropContext(FileBrowserComponent)>
+  <FileBrowserComponent>
+    <DropTarget(FileBrowser)
+      clearSelectedFiles={[Function]}
+      code={
+        Object {
+          "allFiles": Object {
+            "edges": Array [
+              Object {
+                "cursor": "MA==",
+                "node": Object {
+                  "__typename": "LabbookFile",
+                  "id": "TGFiYm9va0ZpbGU6Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZSZmb2xkZXIv",
+                  "isDir": true,
+                  "key": "folder/",
+                  "modifiedAt": 1580742607,
+                  "size": "0",
+                },
+              },
+              Object {
+                "cursor": "MQ==",
+                "node": Object {
+                  "__typename": "LabbookFile",
+                  "id": "TGFiYm9va0ZpbGU6Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZSZOZXRmbGl4Vmlld2luZ0hpc3RvcnlKLmNzdg==",
+                  "isDir": false,
+                  "key": "NetflixViewingHistoryJ.csv",
+                  "modifiedAt": 1580742580,
+                  "size": "65168",
+                },
+              },
+            ],
+            "pageInfo": Object {
+              "endCursor": "MQ==",
+              "hasNextPage": false,
+              "hasPreviousPage": false,
+              "startCursor": "MA==",
+            },
+          },
+          "id": "TGFiYm9va1NlY3Rpb246Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZQ==",
+        }
+      }
+      codeId="TGFiYm9va1NlY3Rpb246Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZQ=="
+      files={
+        Object {
+          "edges": Array [
+            Object {
+              "cursor": "MA==",
+              "node": Object {
+                "__typename": "LabbookFile",
+                "id": "TGFiYm9va0ZpbGU6Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZSZmb2xkZXIv",
+                "isDir": true,
+                "key": "folder/",
+                "modifiedAt": 1580742607,
+                "size": "0",
+              },
+            },
+            Object {
+              "cursor": "MQ==",
+              "node": Object {
+                "__typename": "LabbookFile",
+                "id": "TGFiYm9va0ZpbGU6Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZSZOZXRmbGl4Vmlld2luZ0hpc3RvcnlKLmNzdg==",
+                "isDir": false,
+                "key": "NetflixViewingHistoryJ.csv",
+                "modifiedAt": 1580742580,
+                "size": "65168",
+              },
+            },
+          ],
+          "pageInfo": Object {
+            "endCursor": "MQ==",
+            "hasNextPage": false,
+            "hasPreviousPage": false,
+            "startCursor": "MA==",
+          },
+        }
+      }
+      isLocked={false}
+      labbook={
+        Object {
+          "code": Object {
+            "allFiles": Object {
+              "edges": Array [
+                Object {
+                  "cursor": "MA==",
+                  "node": Object {
+                    "__typename": "LabbookFile",
+                    "id": "TGFiYm9va0ZpbGU6Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZSZmb2xkZXIv",
+                    "isDir": true,
+                    "key": "folder/",
+                    "modifiedAt": 1580742607,
+                    "size": "0",
+                  },
+                },
+                Object {
+                  "cursor": "MQ==",
+                  "node": Object {
+                    "__typename": "LabbookFile",
+                    "id": "TGFiYm9va0ZpbGU6Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZSZOZXRmbGl4Vmlld2luZ0hpc3RvcnlKLmNzdg==",
+                    "isDir": false,
+                    "key": "NetflixViewingHistoryJ.csv",
+                    "modifiedAt": 1580742580,
+                    "size": "65168",
+                  },
+                },
+              ],
+              "pageInfo": Object {
+                "endCursor": "MQ==",
+                "hasNextPage": false,
+                "hasPreviousPage": false,
+                "startCursor": "MA==",
+              },
+            },
+            "id": "TGFiYm9va1NlY3Rpb246Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZQ==",
+          },
+          "description": "",
+          "id": "TGFiYm9vazpjYnV0bGVyJnVpLXRlc3QtcHJvamVjdA==",
+        }
+      }
+      labbookId="TGFiYm9vazpjYnV0bGVyJnVpLXRlc3QtcHJvamVjdA=="
+      loadStatus={[Function]}
+      selectedFiles={Array []}
+    >
+      <FileBrowser
+        canDrop={false}
+        clearSelectedFiles={[Function]}
+        code={
+          Object {
+            "allFiles": Object {
+              "edges": Array [
+                Object {
+                  "cursor": "MA==",
+                  "node": Object {
+                    "__typename": "LabbookFile",
+                    "id": "TGFiYm9va0ZpbGU6Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZSZmb2xkZXIv",
+                    "isDir": true,
+                    "key": "folder/",
+                    "modifiedAt": 1580742607,
+                    "size": "0",
+                  },
+                },
+                Object {
+                  "cursor": "MQ==",
+                  "node": Object {
+                    "__typename": "LabbookFile",
+                    "id": "TGFiYm9va0ZpbGU6Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZSZOZXRmbGl4Vmlld2luZ0hpc3RvcnlKLmNzdg==",
+                    "isDir": false,
+                    "key": "NetflixViewingHistoryJ.csv",
+                    "modifiedAt": 1580742580,
+                    "size": "65168",
+                  },
+                },
+              ],
+              "pageInfo": Object {
+                "endCursor": "MQ==",
+                "hasNextPage": false,
+                "hasPreviousPage": false,
+                "startCursor": "MA==",
+              },
+            },
+            "id": "TGFiYm9va1NlY3Rpb246Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZQ==",
+          }
+        }
+        codeId="TGFiYm9va1NlY3Rpb246Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZQ=="
+        connectDropTarget={[Function]}
+        files={
+          Object {
+            "edges": Array [
+              Object {
+                "cursor": "MA==",
+                "node": Object {
+                  "__typename": "LabbookFile",
+                  "id": "TGFiYm9va0ZpbGU6Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZSZmb2xkZXIv",
+                  "isDir": true,
+                  "key": "folder/",
+                  "modifiedAt": 1580742607,
+                  "size": "0",
+                },
+              },
+              Object {
+                "cursor": "MQ==",
+                "node": Object {
+                  "__typename": "LabbookFile",
+                  "id": "TGFiYm9va0ZpbGU6Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZSZOZXRmbGl4Vmlld2luZ0hpc3RvcnlKLmNzdg==",
+                  "isDir": false,
+                  "key": "NetflixViewingHistoryJ.csv",
+                  "modifiedAt": 1580742580,
+                  "size": "65168",
+                },
+              },
+            ],
+            "pageInfo": Object {
+              "endCursor": "MQ==",
+              "hasNextPage": false,
+              "hasPreviousPage": false,
+              "startCursor": "MA==",
+            },
+          }
+        }
+        isLocked={false}
+        isOver={false}
+        isOverCurrent={false}
+        labbook={
+          Object {
+            "code": Object {
+              "allFiles": Object {
+                "edges": Array [
+                  Object {
+                    "cursor": "MA==",
+                    "node": Object {
+                      "__typename": "LabbookFile",
+                      "id": "TGFiYm9va0ZpbGU6Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZSZmb2xkZXIv",
+                      "isDir": true,
+                      "key": "folder/",
+                      "modifiedAt": 1580742607,
+                      "size": "0",
+                    },
+                  },
+                  Object {
+                    "cursor": "MQ==",
+                    "node": Object {
+                      "__typename": "LabbookFile",
+                      "id": "TGFiYm9va0ZpbGU6Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZSZOZXRmbGl4Vmlld2luZ0hpc3RvcnlKLmNzdg==",
+                      "isDir": false,
+                      "key": "NetflixViewingHistoryJ.csv",
+                      "modifiedAt": 1580742580,
+                      "size": "65168",
+                    },
+                  },
+                ],
+                "pageInfo": Object {
+                  "endCursor": "MQ==",
+                  "hasNextPage": false,
+                  "hasPreviousPage": false,
+                  "startCursor": "MA==",
+                },
+              },
+              "id": "TGFiYm9va1NlY3Rpb246Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZQ==",
+            },
+            "description": "",
+            "id": "TGFiYm9vazpjYnV0bGVyJnVpLXRlc3QtcHJvamVjdA==",
+          }
+        }
+        labbookId="TGFiYm9vazpjYnV0bGVyJnVpLXRlc3QtcHJvamVjdA=="
+        loadStatus={[Function]}
+        selectedFiles={Array []}
+      >
+        <div
+          className="FileBrowser FileBrowser--dropzone"
+          data-selenium-id="FileBrowser"
+          style={
+            Object {
+              "zIndex": 0,
+            }
+          }
+        >
+          <h4
+            className="margin--0 regular"
+          >
+            Files
+          </h4>
+          <FileBrowserTools
+            allFilesLocal={true}
+            downloadingAll={false}
+            handleDownloadAll={[Function]}
+            mutations={
+              FileBrowserMutations {
+                "state": Object {
+                  "connection": undefined,
+                  "name": undefined,
+                  "owner": undefined,
+                  "parentId": undefined,
+                  "section": undefined,
+                },
+              }
+            }
+            readOnly={false}
+            updateConfirmVisible={[Function]}
+            updateSearchState={[Function]}
+            updateUnmanagedDatasetMutation={[Function]}
+            updateVisibleFolder={[Function]}
+            uploadFiles={[Function]}
+          >
+            <div
+              className="FileBrowser__tools flex justify--space-between"
+              data-selenium-id="FileBrowserTools"
+            >
+              <div
+                className="FileBrowser__search flex-1"
+              >
+                <input
+                  className="FileBrowser__input search"
+                  onChange={[Function]}
+                  onKeyUp={[Function]}
+                  placeholder="Search Files Here"
+                  type="text"
+                />
+              </div>
+              <div
+                className="flex justify--right FileBrowser__Primary-actions"
+              >
+                <button
+                  className="Btn Btn--action Btn__FileBrowserAction Btn__FileBrowserAction--newFolder"
+                  data-click-id="addFolder"
+                  onClick={[Function]}
+                  type="button"
+                >
+                  New Folder
+                </button>
+                <label
+                  className="FileBrowser__upload-label"
+                  htmlFor="browser_upload"
+                >
+                  <div
+                    className="Btn__FileBrowserAction Btn__FileBrowserAction--upload inline-block Btn"
+                  >
+                    Add Files
+                  </div>
+                  <input
+                    className="hidden"
+                    id="browser_upload"
+                    multiple={true}
+                    onChange={[Function]}
+                    type="file"
+                  />
+                </label>
+              </div>
+            </div>
+          </FileBrowserTools>
+          <div
+            className="FileBrowser__header"
+          >
+            <div
+              className="FileBrowser__multiselect flex justify--start"
+            >
+              <button
+                className="CheckboxMultiselect CheckboxMultiselect__uncheck"
+                onClick={[Function]}
+                type="button"
+              />
+            </div>
+            <button
+              className="FileBrowser__name-text FileBrowser__header--name flex justify--start Btn--noStyle FileBroser__sort--asc"
+              onClick={[Function]}
+              type="button"
+            >
+              File
+            </button>
+            <button
+              className="FileBrowser__header--size Btn--noStyle"
+              onClick={[Function]}
+              type="button"
+            >
+              Size
+            </button>
+            <button
+              className="FileBrowser__header--date Btn--noStyle"
+              onClick={[Function]}
+              type="button"
+            >
+              Modified
+            </button>
+            <div
+              className="FileBrowser__header--menu flex flex--row justify--left"
+            >
+              Actions
+            </div>
+          </div>
+          <div
+            className="FileBrowser__body"
+          >
+            <AddSubfolder
+              folderKey=""
+              key="rootAddSubfolder"
+              mutationData={
+                Object {
+                  "connection": undefined,
+                  "name": undefined,
+                  "owner": undefined,
+                  "parentId": undefined,
+                  "section": undefined,
+                }
+              }
+              mutations={
+                FileBrowserMutations {
+                  "state": Object {
+                    "connection": undefined,
+                    "name": undefined,
+                    "owner": undefined,
+                    "parentId": undefined,
+                    "section": undefined,
+                  },
+                }
+              }
+              setAddFolderVisible={[Function]}
+            >
+              <div
+                className="AddSubfolder hidden"
+                data-click-id="addFolder"
+                data-selenium-id="AddSubfolder"
+                onClick={[Function]}
+                role="presentation"
+              >
+                <div
+                  className="AddSubfolder__text"
+                >
+                  Add Folder
+                </div>
+                <div
+                  className="AddSubfolder__edit Input--clear hidden"
+                >
+                  <div
+                    className="AddSubfolder__container"
+                  >
+                    <input
+                      className="AddSubfolder__input"
+                      data-click-id="addFolder"
+                      maxLength="255"
+                      onKeyUp={[Function]}
+                      placeholder="Enter Folder Name"
+                      type="text"
+                    />
+                  </div>
+                </div>
+                <div
+                  className="flex justify--space-around"
+                >
+                  <button
+                    className="File__btn--round File__btn--cancel"
+                    onClick={[Function]}
+                    type="button"
+                  />
+                  <button
+                    className="File__btn--round File__btn--add"
+                    onClick={[Function]}
+                    type="button"
+                  />
+                </div>
+              </div>
+            </AddSubfolder>
+            <div
+              className="flex flex--column align-items--center"
+            >
+              <div
+                className="Dropbox--menu"
+              >
+                Files are currently being processed. Please wait.
+              </div>
+            </div>
+          </div>
+        </div>
+      </FileBrowser>
+    </DropTarget(FileBrowser)>
+  </FileBrowserComponent>
+</DragDropContext(FileBrowserComponent)>
+`;

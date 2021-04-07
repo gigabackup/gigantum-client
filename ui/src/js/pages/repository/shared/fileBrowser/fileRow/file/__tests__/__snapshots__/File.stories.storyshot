@@ -1,0 +1,376 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots FileBrowser/File Snapshots: File Default 1`] = `
+<DragDropContext(Filecomponent)>
+  <Filecomponent>
+    <DragSource(File)
+      childrenState={Object {}}
+      closeLinkModal={[Function]}
+      codeDirUpload={[Function]}
+      connectDragSource={[Function]}
+      fileData={
+        Object {
+          "edge": Object {
+            "cursor": "MQ==",
+            "node": Object {
+              "__typename": "LabbookFile",
+              "id": "TGFiYm9va0ZpbGU6Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZSZOZXRmbGl4Vmlld2luZ0hpc3RvcnlKLmNzdg==",
+              "isDir": false,
+              "key": "NetflixViewingHistoryJ.csv",
+              "modifiedAt": 1580742580,
+              "size": "65168",
+            },
+          },
+        }
+      }
+      filename="NetflixViewingHistoryJ.csv"
+      isDragging={false}
+      isSelected={true}
+      key="NetflixViewingHistoryJ.csv"
+      multiSelect={false}
+      mutationData={
+        Object {
+          "connection": "CodeBrowser_allFiles",
+          "favoriteConnection": "CodeFavorite_favorites",
+          "labbookName": "ui-test-project",
+          "owner": "uitest",
+          "parentId": "TGFiYm9vazpjYnV0bGVyJnVpLXRlc3QtcHJvamVjdA==",
+          "section": "code",
+        }
+      }
+      mutations={
+        Object {
+          "moveLabbookFile": [Function],
+        }
+      }
+      reverse={true}
+      section="code"
+      setState={[Function]}
+      sort="all"
+      updateChildState={[Function]}
+    >
+      <File
+        childrenState={Object {}}
+        closeLinkModal={[Function]}
+        codeDirUpload={[Function]}
+        connectDragPreview={[Function]}
+        connectDragSource={[Function]}
+        fileData={
+          Object {
+            "edge": Object {
+              "cursor": "MQ==",
+              "node": Object {
+                "__typename": "LabbookFile",
+                "id": "TGFiYm9va0ZpbGU6Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZSZOZXRmbGl4Vmlld2luZ0hpc3RvcnlKLmNzdg==",
+                "isDir": false,
+                "key": "NetflixViewingHistoryJ.csv",
+                "modifiedAt": 1580742580,
+                "size": "65168",
+              },
+            },
+          }
+        }
+        filename="NetflixViewingHistoryJ.csv"
+        isDragging={false}
+        isSelected={true}
+        multiSelect={false}
+        mutationData={
+          Object {
+            "connection": "CodeBrowser_allFiles",
+            "favoriteConnection": "CodeFavorite_favorites",
+            "labbookName": "ui-test-project",
+            "owner": "uitest",
+            "parentId": "TGFiYm9vazpjYnV0bGVyJnVpLXRlc3QtcHJvamVjdA==",
+            "section": "code",
+          }
+        }
+        mutations={
+          Object {
+            "moveLabbookFile": [Function],
+          }
+        }
+        reverse={true}
+        section="code"
+        setState={[Function]}
+        sort="all"
+        updateChildState={[Function]}
+      >
+        <div
+          className="File"
+          data-selenium-id="File"
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          onMouseOut={[Function]}
+          onMouseOver={[Function]}
+        >
+          <div
+            className="File__row"
+            style={
+              Object {
+                "paddingLeft": "NaNpx",
+              }
+            }
+          >
+            <button
+              className="CheckboxMultiselect CheckboxMultiselect__check"
+              onClick={[Function]}
+              type="button"
+            />
+            <div
+              className="File__cell File__cell--name"
+            >
+              <div
+                className="File__icon graph-icon"
+              />
+              <div
+                className="File__text"
+                data-for="Tooltip--file"
+                data-tip="NetflixViewingHistoryJ.csv"
+                onClick={[Function]}
+                role="presentation"
+              >
+                <t
+                  className=""
+                  ellipsis="..."
+                  end={0}
+                  onResizeDebounceMs={100}
+                  smartCopy={true}
+                  start={0}
+                  style={Object {}}
+                  text="NetflixViewingHistoryJ.csv"
+                >
+                  <div
+                    className=""
+                    end={0}
+                    onCopy={[Function]}
+                    start={0}
+                    style={
+                      Object {
+                        "display": "block",
+                        "overflow": "hidden",
+                        "whiteSpace": "nowrap",
+                      }
+                    }
+                  >
+                    <span
+                      style={
+                        Object {
+                          "display": "none",
+                        }
+                      }
+                    >
+                      NetflixViewingHistoryJ.csv
+                    </span>
+                    <span
+                      style={
+                        Object {
+                          "display": "none",
+                        }
+                      }
+                    >
+                      ...
+                    </span>
+                    NetflixViewingHistoryJ.csv
+                  </div>
+                </t>
+              </div>
+              <ReactTooltip
+                clickable={false}
+                delayShow={500}
+                id="Tooltip--file"
+                insecure={true}
+                place="bottom"
+                resizeHide={true}
+                wrapper="div"
+              >
+                <div
+                  className="__react_component_tooltip place-bottom type-dark "
+                  data-id="tooltip"
+                  id="Tooltip--file"
+                />
+              </ReactTooltip>
+            </div>
+            <div
+              className="File__cell File__cell--edit hidden"
+            >
+              <div
+                className="File__container"
+              >
+                <input
+                  className="File__input"
+                  draggable={true}
+                  maxLength="255"
+                  onChange={[Function]}
+                  onClick={[Function]}
+                  onDragStart={[Function]}
+                  onKeyDown={[Function]}
+                  type="text"
+                  value="NetflixViewingHistoryJ.csv"
+                />
+              </div>
+              <div
+                className="flex justify-space-around"
+              >
+                <button
+                  className="File__btn--round File__btn--cancel File__btn--rename-cancel"
+                  onClick={[Function]}
+                  type="button"
+                />
+                <button
+                  className="File__btn--round File__btn--add File__btn--rename-add"
+                  disabled={true}
+                  onClick={[Function]}
+                  type="button"
+                />
+              </div>
+            </div>
+            <div
+              className="File__cell File__cell--size"
+            >
+              65.2 KB
+            </div>
+            <div
+              className="File__cell File__cell--date"
+            >
+              a year ago
+            </div>
+            <div
+              className="File__cell File__cell--menu"
+            >
+              <ActionsMenu
+                childrenState={Object {}}
+                closeLinkModal={[Function]}
+                codeDirUpload={[Function]}
+                connectDragPreview={[Function]}
+                connectDragSource={[Function]}
+                edge={
+                  Object {
+                    "cursor": "MQ==",
+                    "node": Object {
+                      "__typename": "LabbookFile",
+                      "id": "TGFiYm9va0ZpbGU6Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZSZOZXRmbGl4Vmlld2luZ0hpc3RvcnlKLmNzdg==",
+                      "isDir": false,
+                      "key": "NetflixViewingHistoryJ.csv",
+                      "modifiedAt": 1580742580,
+                      "size": "65168",
+                    },
+                  }
+                }
+                fileData={
+                  Object {
+                    "edge": Object {
+                      "cursor": "MQ==",
+                      "node": Object {
+                        "__typename": "LabbookFile",
+                        "id": "TGFiYm9va0ZpbGU6Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZSZOZXRmbGl4Vmlld2luZ0hpc3RvcnlKLmNzdg==",
+                        "isDir": false,
+                        "key": "NetflixViewingHistoryJ.csv",
+                        "modifiedAt": 1580742580,
+                        "size": "65168",
+                      },
+                    },
+                  }
+                }
+                filename="NetflixViewingHistoryJ.csv"
+                isDragging={false}
+                isSelected={true}
+                multiSelect={false}
+                mutationData={
+                  Object {
+                    "connection": "CodeBrowser_allFiles",
+                    "favoriteConnection": "CodeFavorite_favorites",
+                    "labbookName": "ui-test-project",
+                    "owner": "uitest",
+                    "parentId": "TGFiYm9vazpjYnV0bGVyJnVpLXRlc3QtcHJvamVjdA==",
+                    "section": "code",
+                  }
+                }
+                mutations={
+                  Object {
+                    "moveLabbookFile": [Function],
+                  }
+                }
+                renameEditMode={[Function]}
+                reverse={true}
+                section="code"
+                setState={[Function]}
+                sort="all"
+                updateChildState={[Function]}
+              >
+                <div
+                  className="ActionsMenu"
+                  data-selenium-id="ActionsMenu"
+                  key="TGFiYm9va0ZpbGU6Y2J1dGxlciZ1aS10ZXN0LXByb2plY3QmY29kZSZOZXRmbGl4Vmlld2luZ0hpc3RvcnlKLmNzdg==-action-menu}"
+                >
+                  <button
+                    className="ActionsMenu__item Btn Btn--fileBrowser Btn--round Btn__addFolder visibility-hidden"
+                    data-click-id="addFolder"
+                    data-tip="Add Subfolder"
+                    onClick={[Function]}
+                    type="button"
+                  />
+                  <div
+                    className="relative"
+                  >
+                    <button
+                      className="ActionsMenu__item Btn Btn--fileBrowser Btn__delete-secondary Btn--round"
+                      data-tip="Delete"
+                      disabled={false}
+                      onClick={[Function]}
+                      type="button"
+                    />
+                    <div
+                      className="ActionsMenu__popup hidden Tooltip__message"
+                    >
+                      <div
+                        className="Tooltip__pointer"
+                      />
+                      <p>
+                        Are you sure?
+                      </p>
+                      <div
+                        className="flex justify--space-around"
+                      >
+                        <button
+                          className="File__btn--round File__btn--cancel"
+                          onClick={[Function]}
+                          type="button"
+                        />
+                        <button
+                          className="File__btn--round File__btn--add"
+                          onClick={[Function]}
+                          type="button"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    className="ActionsMenu__item Btn Btn--fileBrowser Btn__rename  Btn--round"
+                    data-tip="Rename"
+                    disabled={false}
+                    onClick={[Function]}
+                    type="button"
+                  />
+                  <ReactTooltip
+                    clickable={false}
+                    effect="solid"
+                    insecure={true}
+                    place="bottom"
+                    resizeHide={true}
+                    wrapper="div"
+                  >
+                    <div
+                      className="__react_component_tooltip place-bottom type-dark "
+                      data-id="tooltip"
+                    />
+                  </ReactTooltip>
+                </div>
+              </ActionsMenu>
+            </div>
+          </div>
+        </div>
+      </File>
+    </DragSource(File)>
+  </Filecomponent>
+</DragDropContext(Filecomponent)>
+`;

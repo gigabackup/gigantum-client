@@ -6,5 +6,5 @@ configuration:
   browsers: ["chrome", "firefox"]
   incognito: True
   headless: False
-  default_server: "gigantum-com"
   api_url: "http://localhost:10000/api/labbook"
+  server_api_url: "http://localhost:10000/api/servers"

@@ -1,5 +1,8 @@
 """Test call for exercise linked published dataset"""
+import time
+
 import pytest
+from client_app.helper.local_project_helper_utility import ProjectHelperUtility
 from configuration.configuration import ConfigurationManager
 from client_app.pages.landing.landing_page import LandingPage
 from client_app.pages.dataset_listing.dataset_listing_page import DatasetListingPage
@@ -12,6 +15,9 @@ from tests.test_fixtures import clean_up_project
 from tests.test_fixtures import clean_up_dataset
 from tests.test_fixtures import clean_up_remote_project
 from tests.test_fixtures import clean_up_remote_dataset
+from client_app.pages.login.login_factory import LoginFactory
+from tests.test_fixtures import server_data_fixture
+import time
 
 
 @pytest.mark.linkPublishedDataset
@@ -19,15 +25,16 @@ class TestCreatePublishDataset:
     """Includes test methods for basic dataset creation, publish, link and its dependent tests"""
 
     @pytest.mark.run(order=1)
-    def test_log_in_success(self):
+    def test_log_in_success(self, server_data_fixture):
         """ Test method to check the successful log-in."""
         landing_page = LandingPage(self.driver)
-        assert landing_page.landing_component.get_server_button_text() == "Gigantum Hub"
-        log_in_page = landing_page.landing_component.load_log_in_page()
-        assert log_in_page.sign_up_component.get_sign_up_title() == "Sign Up"
-        user_credentials = ConfigurationManager.getInstance().get_user_credentials(LoginUser.User1)
-        log_in_page.sign_up_component.move_to_log_in_tab()
-        project_list = log_in_page.login(user_credentials.user_name, user_credentials.password)
+        ProjectHelperUtility().set_server_details(server_data_fixture)
+        landing_page.landing_component.click_server(server_data_fixture.server_name)
+        login_page = LoginFactory().load_login_page(server_data_fixture.login_type, self.driver)
+        assert login_page.check_login_page_title()
+        user_credentials = ConfigurationManager.getInstance().get_user_credentials(server_data_fixture.server_id,
+                                                                                   LoginUser.User1)
+        project_list = login_page.login(user_credentials.user_name, user_credentials.password)
         assert project_list.project_listing_component.get_project_title() == "Projects"
 
     @pytest.mark.depends(on=['test_log_in_success'])
@@ -59,6 +66,7 @@ class TestCreatePublishDataset:
         # Click "Data" tab
         is_clicked = dataset_list.dataset_menu_component.click_data_tab()
         assert is_clicked, "Could not click Data tab"
+        time.sleep(3)
 
         # Drag and drop text file with contents "created"
         is_dropped = dataset_list.dataset_data_component.drag_and_drop_text_file_in_data_drop_zone('file1', 'created')
@@ -189,17 +197,17 @@ class TestCreatePublishDataset:
         is_clicked = dataset_list.project_menu_component.click_projects_menu()
         assert is_clicked, "Could not click Projects menu"
 
-        # Click Gigantum Hub tab
-        is_clicked = dataset_list.gigantum_hub_component.click_gigantum_hub_tab()
-        assert is_clicked, "Could not click Gigantum Hub tab"
+        # Click server tab
+        is_clicked = dataset_list.server_component.click_server_tab()
+        assert is_clicked, "Could not click server tab"
 
-        # Verify project in Gigantum Hub page
-        is_verified = dataset_list.gigantum_hub_component.verify_title_in_gigantum_hub(project_title)
-        assert is_verified, "Could not verify project in Gigantum Hub"
+        # Verify project in server page
+        is_verified = dataset_list.server_component.verify_title_in_server(project_title)
+        assert is_verified, "Could not verify project in server"
 
-        # Click import button in Gigantum Hub page
-        is_clicked = dataset_list.gigantum_hub_component.click_import_button(project_title)
-        assert is_clicked, "Could not click import button in Gigantum Hub page"
+        # Click import button in server page
+        is_clicked = dataset_list.server_component.click_project_import_button(project_title)
+        assert is_clicked, "Could not click import button in server page"
 
         # Monitor container status to go through Stopped -> Building
         is_status_changed = dataset_list.container_status_component.monitor_container_status("Building", 60)

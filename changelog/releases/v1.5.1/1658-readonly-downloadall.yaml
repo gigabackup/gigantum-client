@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1683"
+changelog:
+  - type: FIX
+    description: Fixes issues with remote Dataset listing and remote import/delete following a recent code refactor
