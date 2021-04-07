@@ -82,13 +82,13 @@ class DatasetListingComponent(BaseComponent):
             datasets_list = self.driver.find_elements_by_xpath(element)
             if datasets_list is not None:
                 for dataset in datasets_list:
-                    project_name = dataset.find_element_by_xpath(".//div[@class='LocalDatasets__row--text']/div/h5/div")
-                    if dataset_title == project_name.get_text().strip():
+                    dataset_name = dataset.find_element_by_xpath(".//div[@class='LocalPanel__row--text']/div/h5/div")
+                    if dataset_title == dataset_name.get_text().strip():
                         dataset.click()
                         return True
         return False
 
-    def verify_dataset_in_project_listing(self, dataset_title) -> bool:
+    def verify_dataset_in_dataset_listing(self, dataset_title) -> bool:
         """ Verify whether the dataset is present in the dataset listing page or not
 
         Args:
@@ -102,7 +102,7 @@ class DatasetListingComponent(BaseComponent):
             datasets_list = self.driver.find_elements_by_xpath(element)
             if datasets_list is not None:
                 for dataset in datasets_list:
-                    dataset_name = dataset.find_element_by_xpath(".//div[@class='LocalDatasets__row--text']/div/h5/div")
+                    dataset_name = dataset.find_element_by_xpath(".//div[@class='LocalPanel__row--text']/div/h5/div")
                     if dataset_title == dataset_name.get_text().strip():
                         return False
         return True
