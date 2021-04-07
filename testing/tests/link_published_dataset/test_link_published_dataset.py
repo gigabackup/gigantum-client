@@ -181,7 +181,7 @@ class TestCreatePublishDataset:
         assert is_success_msg == ProjectConstants.SUCCESS.value, is_success_msg
 
         # Verify dataset is not listed in project listing page
-        is_verified = dataset_list.dataset_listing_component.verify_dataset_in_project_listing(dataset_title)
+        is_verified = dataset_list.dataset_listing_component.verify_dataset_in_dataset_listing(dataset_title)
         assert is_verified, "Dataset is exist in the dataset listing page"
 
     def import_project_and_verify_dataset(self, dataset_list, project_title, dataset_title):
@@ -222,7 +222,7 @@ class TestCreatePublishDataset:
         assert is_clicked, "Could not click dataset menu"
 
         # Verify dataset is listed in project listing page
-        is_verified = dataset_list.dataset_listing_component.verify_dataset_in_project_listing(dataset_title)
+        is_verified = dataset_list.dataset_listing_component.verify_dataset_in_dataset_listing(dataset_title)
         assert not is_verified, "Dataset is exist in the dataset listing page"
 
         # Select dataset

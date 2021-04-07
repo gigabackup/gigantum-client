@@ -39,13 +39,13 @@ class ServerComponent(BaseComponent):
         Returns: returns the result of title verification
 
         """
-        element = "//div[@data-selenium-id='RemoteLabbookPanel']"
+        element = "//div[@data-selenium-id='RemotePanel']"
         if self.check_element_presence(LocatorType.XPath, element, 30):
             title_list = self.driver.find_elements_by_xpath(element)
             if title_list is not None:
                 for title in title_list:
                     title_name = title.find_element_by_xpath\
-                        (".//div[@class='RemoteLabbooks__row RemoteLabbooks__row--text']/div[1]")
+                        (".//div[@class='RemotePanel__row RemotePanel__row--text']/div[1]")
                     if title_text == title_name.get_text().strip():
                         return True
         return False
@@ -59,13 +59,13 @@ class ServerComponent(BaseComponent):
         Returns: returns the result of click action
 
         """
-        element = "//div[@data-selenium-id='RemoteLabbookPanel']"
+        element = "//div[@data-selenium-id='RemotePanel']"
         if self.check_element_presence(LocatorType.XPath, element, 30):
             projects_list = self.driver.find_elements_by_xpath(element)
             if projects_list is not None:
                 for project in projects_list:
                     project_name = project.find_element_by_xpath \
-                        (".//div[@class='RemoteLabbooks__row RemoteLabbooks__row--text']/div[1]")
+                        (".//div[@class='RemotePanel__row RemotePanel__row--text']/div[1]")
                     if project_title == project_name.get_text().strip():
                         import_button = project.find_element_by_xpath(".//button[contains(text(),'Import')]")
                         if import_button is not None:
@@ -82,13 +82,13 @@ class ServerComponent(BaseComponent):
         Returns: returns the result of click action
 
         """
-        element = "//div[@data-selenium-id='RemoteLabbookPanel']"
+        element = "//div[@data-selenium-id='RemotePanel']"
         if self.check_element_presence(LocatorType.XPath, element, 30):
             projects_list = self.driver.find_elements_by_xpath(element)
             if projects_list is not None:
                 for project in projects_list:
                     project_name = project.find_element_by_xpath\
-                        (".//div[@class='RemoteLabbooks__row RemoteLabbooks__row--text']/div[1]")
+                        (".//div[@class='RemotePanel__row RemotePanel__row--text']/div[1]")
                     if project_title == project_name.get_text().strip():
                         delete_button = project.find_element_by_xpath(".//button[contains(text(),'Delete')]")
                         if delete_button is not None:
@@ -158,13 +158,13 @@ class ServerComponent(BaseComponent):
         Returns: returns the result of dataset verification
 
         """
-        element = "//div[@data-selenium-id='RemoteDatasetsPanel']"
+        element = "//div[@data-selenium-id='RemotePanel']"
         if self.check_element_presence(LocatorType.XPath, element, 30):
             title_list = self.driver.find_elements_by_xpath(element)
             if title_list is not None:
                 for title in title_list:
                     title_name = title.find_element_by_xpath\
-                        (".//div[@class='RemoteDatasets__row RemoteDatasets__row--title']/h5/div[1]")
+                        (".//div[@class='RemotePanel__row RemotePanel__row--title']/h5/div[1]")
                     if dataset_title == title_name.get_text().strip():
                         return True
         return False
@@ -178,13 +178,13 @@ class ServerComponent(BaseComponent):
         Returns: returns the result of click action
 
         """
-        element = "//div[@data-selenium-id='RemoteDatasetsPanel']"
+        element = "//div[@data-selenium-id='RemotePanel']"
         if self.check_element_presence(LocatorType.XPath, element, 30):
             datasets_list = self.driver.find_elements_by_xpath(element)
             if datasets_list is not None:
                 for dataset in datasets_list:
                     dataset_name = dataset.find_element_by_xpath \
-                        (".//div[@class='RemoteDatasets__row RemoteDatasets__row--title']/h5/div[1]")
+                        (".//div[@class='RemotePanel__row RemotePanel__row--title']/h5/div[1]")
                     if dataset_title == dataset_name.get_text().strip():
                         import_button = dataset.find_element_by_xpath(".//button[contains(text(),'Import')]")
                         if import_button is not None:
@@ -201,13 +201,13 @@ class ServerComponent(BaseComponent):
         Returns: returns the result of click action
 
         """
-        element = "//div[@data-selenium-id='RemoteDatasetsPanel']"
+        element = "//div[@data-selenium-id='RemotePanel']"
         if self.check_element_presence(LocatorType.XPath, element, 30):
             datasets_list = self.driver.find_elements_by_xpath(element)
             if datasets_list is not None:
                 for dataset in datasets_list:
                     dataset_name = dataset.find_element_by_xpath\
-                        (".//div[@class='RemoteDatasets__row RemoteDatasets__row--title']/h5/div[1]")
+                        (".//div[@class='RemotePanel__row RemotePanel__row--title']/h5/div[1]")
                     if dataset_title == dataset_name.get_text().strip():
                         delete_button = dataset.find_element_by_xpath(".//button[contains(text(),'Delete')]")
                         if delete_button is not None:

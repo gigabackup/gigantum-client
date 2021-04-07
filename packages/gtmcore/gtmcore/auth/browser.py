@@ -1,5 +1,6 @@
 import os
 from typing import Optional
+import glob
 
 from gtmcore.logging import LMLogger
 from gtmcore.auth.identity import IdentityManager, User, AuthenticationError
@@ -85,4 +86,11 @@ class BrowserIdentityManager(IdentityManager):
         """
         self.user = None
         self.rsa_key = None
+
+        # Remove the public key. If it even happens to get updated, this is a path to automatically fix
+        for f in glob.glob(os.path.join(self.auth_dir, '*jwks.json')):
+            if os.path.exists(f):
+                logger.info(f"Removed cached jwks file: {f}.")
+                os.remove(f)
+                
         logger.info("Logout complete.")

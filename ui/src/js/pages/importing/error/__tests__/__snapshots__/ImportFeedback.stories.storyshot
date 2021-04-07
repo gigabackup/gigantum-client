@@ -1,0 +1,30 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots Header/importing/ImportFeedback ImportFeedback Default 1`] = `
+<ImportFeedback
+  feedback="This is some feedback 
+ That should render on 3 lines. 
+ STEP1/1 Step complete"
+>
+  <div
+    className="Importing__feedback"
+    data-selenium-id="ImportFeedbackx"
+    onScroll={[Function]}
+  >
+    <OutputMessage
+      message="This is some feedback 
+ That should render on 3 lines. 
+ STEP1/1 Step complete"
+    >
+      <div
+        dangerouslySetInnerHTML={
+          Object {
+            "__html": "This is some feedback <br /> That should render on 3 lines. <br /> STEP1/1 Step complete",
+          }
+        }
+        data-selenium-id="OutputMessagex"
+      />
+    </OutputMessage>
+  </div>
+</ImportFeedback>
+`;

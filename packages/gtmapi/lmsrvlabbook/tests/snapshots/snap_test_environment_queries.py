@@ -429,7 +429,7 @@ snapshots['TestEnvironmentServiceQueries.test_package_query_with_errors_conda 1'
                     'description': 'Natural Language Toolkit',
                     'id': 'UGFja2FnZUNvbXBvbmVudDpjb25kYTMmbmx0ayYxMDAuMDA=',
                     'isValid': False,
-                    'latestVersion': '3.5',
+                    'latestVersion': '3.6',
                     'manager': 'conda3',
                     'package': 'nltk',
                     'version': '100.00'
@@ -557,12 +557,12 @@ snapshots['TestEnvironmentServiceQueries.test_package_query_no_version 3'] = {
             'checkPackages': [
                 {
                     'description': 'Natural Language Toolkit',
-                    'id': 'UGFja2FnZUNvbXBvbmVudDpjb25kYTMmbmx0ayYzLjU=',
+                    'id': 'UGFja2FnZUNvbXBvbmVudDpjb25kYTMmbmx0ayYzLjY=',
                     'isValid': True,
-                    'latestVersion': '3.5',
+                    'latestVersion': '3.6',
                     'manager': 'conda3',
                     'package': 'nltk',
-                    'version': '3.5'
+                    'version': '3.6'
                 },
                 {
                     'description': None,

@@ -1,6 +1,8 @@
 // vendor
 import React from 'react';
 import classNames from 'classnames';
+// Loaders
+import ProgressLoader from './progress/ProgressLoader';
 // assets
 import './Loader.scss';
 
@@ -19,5 +21,9 @@ const Loader = (props: Props) => {
   );
 };
 
-
 export default Loader;
+
+export {
+  ProgressLoader,
+  Loader,
+};

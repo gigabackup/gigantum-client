@@ -15,6 +15,7 @@
     "expect": true,
   },
   "rules": {
+    "import/no-named-as-default": 0,
     "no-multiple-empty-lines": 1,
     "react/jsx-curly-newline": 1,
     "react/jsx-props-no-spreading": 0,
@@ -125,6 +126,7 @@
       "alias": [
         ["JS", "./src/js/"],
         ["Components", "./src/js/components/"],
+        ["Hooks", "./src/js/hooks/"],
         ["Pages", "./src/js/pages/"],
         ["Mutations", "./src/js/mutations"],
         ["Submodules", "./submodules"],

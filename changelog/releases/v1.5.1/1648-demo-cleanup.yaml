@@ -1,0 +1,5 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1700"
+changelog:
+  - type: NEW
+    description: Adds first pass at import sharing, cleans up code from demo branch. Adds the ability to open a link and have a project import, build, launch and start development tool without any user actions.
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1648

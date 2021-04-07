@@ -27,7 +27,9 @@ class Server extends Component<Props> {
     const { auth, server, setLoggingInServerId } = this.props;
     const serverId = server.server_id;
     const freshLoginText = localStorage.getItem('fresh_login') ? '&freshLogin=true' : '';
-    const hash = `#route=${window.location.origin}${freshLoginText}&serverId=${serverId}`;
+    const route = sessionStorage.getItem('route') ? `${window.location.origin}${sessionStorage.getItem('route')}` : window.location.href;
+
+    const hash = `#route=${route}${freshLoginText}&serverId=${serverId}`;
     setLoggingInServerId(serverId);
     auth.login(server, hash);
   }
