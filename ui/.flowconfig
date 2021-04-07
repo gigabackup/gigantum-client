@@ -1,0 +1,24 @@
+[ignore]
+
+[include]
+
+[libs]
+flow-typed/
+declare module 'relay-runtime' {
+  declare type ConcreteFragment = any;
+  declare type ConcreteBatch = any;
+  declare type ConcreteRequest = any;
+}
+[lints]
+
+[options]
+module.name_mapper='^JS' ->'<PROJECT_ROOT>/src/js'
+module.name_mapper='^Components' ->'<PROJECT_ROOT>/src/js/components'
+module.name_mapper='^Mutations' ->'<PROJECT_ROOT>/src/js/mutations'
+module.name_mapper='^Pages' ->'<PROJECT_ROOT>/src/js/pages'
+module.name_mapper='^Styles' ->'<PROJECT_ROOT>/src/js/styles'
+module.name_mapper='^Images![a-zA-Z0-9$_]+$' -> 'ImageStub'
+module.name_mapper='.*\(.graphql\)' -> 'empty/object'
+module.name_mapper.extension='scss' -> '<PROJECT_ROOT>/flow/GraphQLStub.js.flow'
+
+[strict]
