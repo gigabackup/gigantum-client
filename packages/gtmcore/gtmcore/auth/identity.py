@@ -299,16 +299,20 @@ class IdentityManager(metaclass=abc.ABCMeta):
                         return payload
 
                     except Exception:
+                        self.logout()
                         raise AuthenticationError({"code": "invalid_header",
                                                    "description": "Unable to validate authentication token."}, 400)
                 else:
+                    self.logout()
                     raise AuthenticationError({"code": "invalid_claims",
                                                "description":
                                                    "incorrect claims, please check the audience and issuer"}, 401)
             except Exception:
+                self.logout()
                 raise AuthenticationError({"code": "invalid_header",
                                            "description": "Unable to parse authentication token."}, 400)
         else:
+            self.logout()
             raise AuthenticationError({"code": "invalid_header", "description": "Unable to find appropriate key"}, 400)
 
     @abc.abstractmethod

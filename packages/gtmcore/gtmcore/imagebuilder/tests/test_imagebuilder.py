@@ -1,5 +1,5 @@
 import os
-
+import yaml
 import tempfile
 import git
 import shutil
@@ -20,6 +20,20 @@ def populate_with_pkgs(lb):
                     os.path.join(lb.root_dir, ".gigantum", "env", "base"))
 
 
+def populate_with_pkgs_private_registry(lb):
+    with tempfile.TemporaryDirectory() as checkoutdir:
+        repo = git.Repo.clone_from("https://github.com/gigantum/base-images-testing.git", checkoutdir)
+        shutil.copy(os.path.join(checkoutdir, "quickstart-jupyterlab/quickstart-jupyterlab_r0.yaml"),
+                    os.path.join(lb.root_dir, ".gigantum", "env", "base"))
+        with open(os.path.join(lb.root_dir, ".gigantum", "env", "base", "quickstart-jupyterlab_r0.yaml"), 'rt') as f:
+            data = yaml.safe_load(f)
+
+        data['image']['server'] = "myregistry.mycompany.com"
+
+        with open(os.path.join(lb.root_dir, ".gigantum", "env", "base", "quickstart-jupyterlab_r0.yaml"), 'wt') as f:
+            yaml.safe_dump(data, f)
+
+
 class TestImageBuilder(object):
 
     def test_temp_labbook_dir(self, mock_labbook):
@@ -34,6 +48,14 @@ class TestImageBuilder(object):
         ib = ImageBuilder(lb)
         docker_lines = ib._load_baseimage()
         assert any(["FROM gigdev/gm-quickstart" in l for l in docker_lines])
+
+    def test_load_baseimage_private_registry(self, mock_labbook):
+        """Ensure the FROM line exists in the _load_baseimage function. """
+        lb = mock_labbook[2]
+        populate_with_pkgs_private_registry(lb)
+        ib = ImageBuilder(lb)
+        docker_lines = ib._load_baseimage()
+        assert any(["FROM myregistry.mycompany.com/gigdev/gm-quickstart" in l for l in docker_lines])
 
     def test_load_baseimage_only_from(self, mock_labbook):
         """Ensure that _load_baseimage ONLY sets the FROM line, all others are comments or empty"""
