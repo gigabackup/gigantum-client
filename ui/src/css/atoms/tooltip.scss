@@ -33,10 +33,6 @@
         width: auto;
       }
     }
-
-    &--action {
-      left: calc(50% - 30px);
-    }
     &--visible::after,
     &:hover::after{
       text-transform: capitalize;

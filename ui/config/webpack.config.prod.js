@@ -113,7 +113,6 @@ module.exports = {
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
       'react-native': 'react-native-web',
       'Components': path.resolve(__dirname, '../src/js/components/'),
-      'Hooks': path.resolve(__dirname, '../src/js/hooks/'),
       'Mutations': path.resolve(__dirname, '../src/js/mutations/'),
       'JS': path.resolve(__dirname, '../src/js/'),
       'Submodules': path.resolve(__dirname, '../submodules/'),

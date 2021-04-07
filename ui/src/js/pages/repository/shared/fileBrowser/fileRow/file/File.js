@@ -216,6 +216,7 @@ class File extends Component<Props> {
               } else if (props.fileData.edge.node.key.indexOf('.Rmd') === -1) {
                 path = `${path}/lab/tree/${props.section}/${props.fileData.edge.node.key}`;
               }
+
               window[tabName] = window.open(path, tabName);
               window[tabName].close();
               window[tabName] = window.open(path, tabName);
@@ -440,12 +441,16 @@ class File extends Component<Props> {
         onMouseEnter={() => { this._mouseEnter(); }}
         className="File"
       >
-        <PopupBlocked
-          togglePopupModal={this._togglePopupModal}
-          devTool={devTool}
-          attemptRelaunch={() => this._validateFile(isLaunchable, devTool)}
-          isVisible={showPopupBlocked}
-        />
+        {
+          showPopupBlocked
+          && (
+            <PopupBlocked
+              togglePopupModal={this._togglePopupModal}
+              devTool={devTool}
+              attemptRelaunch={() => this._validateFile(isLaunchable, devTool)}
+            />
+          )
+        }
         <div
           className={fileRowCSS}
           style={rowStyle}

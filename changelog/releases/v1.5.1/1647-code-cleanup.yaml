@@ -1,5 +1,0 @@
-prLink: "https://github.com/gigantum/gigantum-client/pull/1728"
-changelog:
-  - type: NEW
-    description:  Cleans up code and adds checks for serverId and for when share link widget should be enabled.
-    issueLink: https://github.com/gigantum/gigantum-client/issues/1647

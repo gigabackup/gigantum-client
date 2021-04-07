@@ -47,7 +47,6 @@ module.exports = {
     "^react-native$": "react-native-web",
     "^react-markdown$": "react-markdown",
     "^Components[/](.+)": "<rootDir>/src/js/components/$1",
-    "^Hooks[/](.+)": "<rootDir>/src/js/hooks/$1",
     "^Mutations[/](.+)": "<rootDir>/src/js/mutations/$1",
     "^Styles[/](.+)": "<rootDir>/src/css/$1",
     "^Tests[/](.+)": "<rootDir>/__tests__/$1",

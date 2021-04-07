@@ -11,20 +11,18 @@ import environment from 'JS/createRelayEnvironment';
 import history from 'JS/history';
 // auth
 import Auth from 'JS/Auth/Auth';
-import stateMachine from 'JS/Auth/machine/AuthStateMachine';
+import stateMachine from 'JS/Auth/AuthStateMachine';
 import {
   LOADING,
   ERROR,
   LOGGED_IN,
   LOGGED_OUT,
-  IMPORTING,
-} from 'JS/Auth/machine/AuthMachineConstants';
+} from 'JS/Auth/AuthMachineConstants';
 // assets
 import gigantumLogo from 'Images/logos/gigantum-client.svg';
 // components
 import Login from 'Pages/login/Login';
 import Routes from 'Pages/Routes';
-import Importing from 'Pages/importing/ImportingWrapper';
 import Interstitial from 'Components/interstitial/Interstitial';
 // css
 import './App.scss';
@@ -35,14 +33,7 @@ const AppQuery = graphql`
   }
 `;
 
-type State = {
-  availableServers: Array,
-  errors: Array,
-  isLoggedIn: boolean | null,
-  machine: string,
-}
-
-class App extends Component<State> {
+class App extends Component {
   state = {
     availableServers: [],
     errors: [],
@@ -60,35 +51,12 @@ class App extends Component<State> {
       hash,
       this.auth,
     ));
-
-    if (hash.autoImport) {
-      sessionStorage.setItem('autoImport', true);
-      sessionStorage.setItem('devtool', hash.devtool);
-      sessionStorage.setItem('route', window.location.pathname);
-      sessionStorage.setItem('serverId', hash.serverId);
-
-      if (hash.filePath) {
-        sessionStorage.setItem('filePath', hash.filePath);
-      }
-    }
-
     promise.then((data) => {
       if (data.isLoggedIn) {
-        const autoImport = JSON.parse(sessionStorage.getItem('autoImport'));
-        const { pathname } = window.location;
-        const pathArray = pathname.split('/');
-        if (autoImport && (pathArray.length > 3)) {
-          this.transition(IMPORTING, {
-            availableServers: data.availableServers,
-            isLoggedIn: data.isLoggedIn,
-            data,
-          });
-        } else {
-          this.transition(LOGGED_IN, {
-            availableServers: data.availableServers,
-            isLoggedIn: data.isLoggedIn,
-          });
-        }
+        this.transition(LOGGED_IN, {
+          availableServers: data.availableServers,
+          isLoggedIn: data.isLoggedIn,
+        });
       } else {
         this.transition(LOGGED_OUT, {
           availableServers: data.availableServers,
@@ -172,12 +140,6 @@ class App extends Component<State> {
         <Interstitial
           message="There was problem loading app data. Refresh to try again, if the problem persists you may need to restart GigantumClient"
           messageType="error"
-        />
-      ),
-      [IMPORTING]: (
-        <Importing
-          environment={environment}
-          transition={this.transition}
         />
       ),
       [LOGGED_IN]: (

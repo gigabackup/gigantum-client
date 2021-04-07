@@ -7,7 +7,6 @@ import {
   LOGGED_OUT,
   ERROR,
   BACK,
-  IMPORTING,
 } from './AuthMachineConstants';
 
 const stateMachine = Machine({
@@ -19,7 +18,6 @@ const stateMachine = Machine({
         LOGGED_IN,
         ERROR,
         LOGGED_OUT,
-        IMPORTING,
       },
     },
     [LOGGED_IN]: {
@@ -32,12 +30,6 @@ const stateMachine = Machine({
       meta: { message: '' },
       on: {
         ERROR,
-      },
-    },
-    IMPORTING: {
-      meta: { message: '' },
-      on: {
-        LOGGED_IN,
       },
     },
     [ERROR]: {

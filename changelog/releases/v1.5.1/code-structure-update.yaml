@@ -1,4 +1,0 @@
-prLink: "https://github.com/gigantum/gigantum-client/pull/1704"
-changelog:
-  - type: NON_USER_FACING
-    description: Moves importing folder into pages directory.

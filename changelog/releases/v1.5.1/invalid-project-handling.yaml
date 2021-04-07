@@ -1,4 +1,0 @@
-prLink: "https://github.com/gigantum/gigantum-client/pull/1723"
-changelog:
-  - type: FIX
-    description: Error handling added for invalid Project imported via Share URL.

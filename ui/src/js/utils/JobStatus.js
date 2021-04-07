@@ -27,7 +27,7 @@ const JobStatus = {
           jobStatusQuery,
           variables,
           { force: true },
-        ).then((response, error) => {
+        ).then((response) => {
           if (
             (response.data.jobStatus.status === 'started')
             || (response.data.jobStatus.status === 'queued')
@@ -37,10 +37,6 @@ const JobStatus = {
             }, 250);
           } else if (response.data.jobStatus.status === 'finished') {
             resolve(response.data);
-          } else if (response.data.jobStatus.status === 'failed') {
-            reject(response.data);
-          } else if (error) {
-            reject(error);
           } else {
             reject(response.data);
           }
@@ -64,37 +60,6 @@ const JobStatus = {
           { force: true },
         ).then((response) => {
           resolve(response);
-        }).catch((error) => {
-          console.log(error);
-          reject(error);
-        });
-      };
-
-      fetchData();
-    });
-  },
-  getJobStatusUpdates: (jobKey, callback) => {
-    const variables = { jobKey };
-    return new Promise((resolve, reject) => {
-      const fetchData = () => {
-        fetchQuery(
-          jobStatusQuery,
-          variables,
-          { force: true },
-        ).then((response) => {
-          callback(response);
-          if (
-            (response.data.jobStatus.status === 'started')
-            || (response.data.jobStatus.status === 'queued')
-          ) {
-            setTimeout(() => {
-              fetchData();
-            }, 250);
-          } else if (response.data.jobStatus.status === 'finished') {
-            resolve(response.data);
-          } else {
-            reject(response.data);
-          }
         }).catch((error) => {
           console.log(error);
           reject(error);

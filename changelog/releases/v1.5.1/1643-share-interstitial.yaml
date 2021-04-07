@@ -1,5 +1,0 @@
-prLink: "https://github.com/gigantum/gigantum-client/pull/1720"
-changelog:
-  - type: NEW
-    description: Adds interstitial screen that handles importing, building and launching a project. UI Displays progress and loads error messages if any system or input errors occur. UI will open juypyter, jupyterlab and rstudio for user when using this import link.
-    issueLink: https://github.com/gigantum/gigantum-client/issues/1643

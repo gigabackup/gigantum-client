@@ -118,7 +118,6 @@ module.exports = {
       'react-native': 'react-native-web',
       '@Components': path.resolve(__dirname, '../src/js/components/'),
       'Components': path.resolve(__dirname, '../src/js/components/'),
-      'Hooks': path.resolve(__dirname, '../src/js/hooks/'),
       'Mutations': path.resolve(__dirname, '../src/js/mutations/'),
       'JS': path.resolve(__dirname, '../src/js/'),
       'Submodules': path.resolve(__dirname, '../submodules/'),

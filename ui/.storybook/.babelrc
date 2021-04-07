@@ -35,7 +35,6 @@
           "Subscriptions": "./src/js/subscriptions",
           "JS": "./src/js",
           "Components": "./src/js/components",
-          "Hooks": "./src/js/hooks",
           "Submodules": "./submodules",
           "Images": "./src/images",
           "Results": "./results",

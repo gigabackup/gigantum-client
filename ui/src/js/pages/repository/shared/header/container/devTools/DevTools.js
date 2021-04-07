@@ -326,12 +326,16 @@ class DevTools extends Component<Props> {
 
     return (
       <div className="DevTools">
-        <PopupBlocked
-          togglePopupModal={this._togglePopupModal}
-          devTool={selectedDevTool}
-          attemptRelaunch={() => { this._openDevToolMuation(selectedDevTool); }}
-          isVisible={showPopupBlocked}
-        />
+        {
+          showPopupBlocked
+          && (
+            <PopupBlocked
+              togglePopupModal={this._togglePopupModal}
+              devTool={selectedDevTool}
+              attemptRelaunch={() => { this._openDevToolMuation(selectedDevTool); }}
+            />
+          )
+        }
         <div className="DevTools__flex">
           <button
             type="submit"

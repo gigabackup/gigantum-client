@@ -103,12 +103,6 @@ exports[`Storyshots FileBrowser/File Snapshots: File Default 1`] = `
           onMouseOut={[Function]}
           onMouseOver={[Function]}
         >
-          <PopupBlocked
-            attemptRelaunch={[Function]}
-            devTool=""
-            isVisible={false}
-            togglePopupModal={[Function]}
-          />
           <div
             className="File__row"
             style={

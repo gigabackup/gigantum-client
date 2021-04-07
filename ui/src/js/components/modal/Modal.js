@@ -12,7 +12,7 @@ type Props = {
   icon: string,
   noPadding: Boolean,
   noPaddingModal: Boolean,
-  overflow: Boolean,
+  overlfow: Boolean,
   preHeader: string,
   size: string,
 }
@@ -38,11 +38,11 @@ class Modal extends Component<Props> {
       icon,
       noPadding,
       noPaddingModal,
-      overflow,
+      overlfow,
       preHeader,
       size,
     } = this.props;
-    const overflowStyle = (overflow === 'visible') ? 'visible' : 'hidden';
+    const overflow = (overlfow === 'visible') ? 'visible' : 'hidden';
     // declare css here
     const modalContentCSS = classNames({
       Modal__content: true,
@@ -64,28 +64,28 @@ class Modal extends Component<Props> {
             role="presentation"
           />
 
-          <div className={modalContentCSS} style={{ overflow: overflowStyle }}>
+          <div className={modalContentCSS} style={{ overflow }}>
             { handleClose && (
-            <button
-              type="button"
-              className="Btn Btn--flat Modal__close padding--small "
-              onClick={(evt) => handleClose(evt)}
-            />
+              <button
+                type="button"
+                className="Btn Btn--flat Modal__close padding--small "
+                onClick={() => handleClose()}
+              />
             )}
             <div className="Modal__container">
               { preHeader && (
-              <p className="Modal__pre-header">
-                {preHeader}
-              </p>
+                <p className="Modal__pre-header">
+                  {preHeader}
+                </p>
               )}
               { header && (
-              <>
-                <h1 className="Modal__header">
-                  <div className={`Icon Icon--${icon}`} />
-                  {header}
-                </h1>
-                <hr />
-              </>
+                <>
+                  <h1 className="Modal__header">
+                    <div className={`Icon Icon--${icon}`} />
+                    {header}
+                  </h1>
+                  <hr />
+                </>
               )}
               <div className={modalContainerCSS}>
                 {children}

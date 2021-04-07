@@ -111,14 +111,8 @@
       color: $primaryText;
     }
 
-    &:hover, &:hover button {
+    &:hover button {
       background-color: $background-color;
-    }
-
-    &--copy {
-      &:hover, &:hover button {
-        background-color: transparent;
-      }
     }
 
     &--export {

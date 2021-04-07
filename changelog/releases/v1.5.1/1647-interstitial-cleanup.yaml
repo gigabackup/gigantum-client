@@ -1,5 +1,0 @@
-prLink: "https://github.com/gigantum/gigantum-client/pull/1725"
-changelog:
-  - type: NEW
-    description: Cleans up styling for interstial error states. Fixes redirect when a dev tool has not been included in the hash.
-    issueLink: https://github.com/gigantum/gigantum-client/issues/1647

@@ -1,5 +1,0 @@
-prLink: "https://github.com/gigantum/gigantum-client/pull/1726"
-changelog:
-  - type: NON_USER_FACING
-    description:  Merges shareable links feature branch into integration.
-    issueLink: https://github.com/gigantum/gigantum-client/issues/1647
