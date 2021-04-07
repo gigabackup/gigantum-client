@@ -600,6 +600,7 @@ class ActionsMenu extends Component<Props> {
     } = this.state;
     const deleteText = (sectionType === 'labbook') ? 'Delete Project' : 'Delete Dataset';
     const exportText = getExportText(exporting, name, sectionType);
+    const isShareLinkEnabled = (sectionType === 'labbook') && (window.location.host !== 'localhost:10000');
     // declare css here
     const exportCSS = classNames({
       ActionsMenu__item: true,
@@ -708,9 +709,8 @@ class ActionsMenu extends Component<Props> {
               defaultRemote={defaultRemote}
               resetState={this._resetState}
             />
-
-            <ShareLink />
-
+            { isShareLinkEnabled
+              && <ShareLink />}
             <CopyUrl
               defaultRemote={defaultRemote}
               name={name}

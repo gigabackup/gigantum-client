@@ -73,7 +73,6 @@ class App extends Component<State> {
     }
 
     promise.then((data) => {
-      console.log(data);
       if (data.isLoggedIn) {
         const autoImport = JSON.parse(sessionStorage.getItem('autoImport'));
         const { pathname } = window.location;
