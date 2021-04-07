@@ -38,14 +38,23 @@ class Importing extends Component<Props, State> {
     headerStep: 'Importing',
     importErrorVisible: false,
     showPopupBlocked: false,
+    serverId: sessionStorage.getItem('serverId'),
     devTool: sessionStorage.getItem('devTool'),
     filePath: sessionStorage.getItem('filePath'),
   }
 
   componentDidMount() {
+    const { currentServer } = this.props.currentServer;
+    const { serverId } = this.state;
     const pathArray = window.location.pathname.split('/');
     const owner = pathArray[2];
     const name = pathArray[3];
+
+    if (serverId !== currentServer.serverId) {
+      this.setState({ importErrorVisible: true, headerStep: 'Server' });
+      return;
+    }
+
     importingUtils.projectExists(
       owner,
       name,

@@ -85,6 +85,13 @@ const ImportError = ({
       buttonText: 'Open Project',
       buttonAction: openProject,
     },
+    Server: {
+      headerText: 'Server Mismatch',
+      bodyText: 'You are currently logged in to a different server than specified in the import link.',
+      subText: 'Please logout and login to the specified server and try again.',
+      buttonText: 'View My Projects',
+      buttonAction: viewProjects,
+    },
   };
 
   const {
