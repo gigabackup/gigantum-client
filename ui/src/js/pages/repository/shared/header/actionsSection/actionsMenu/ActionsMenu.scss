@@ -115,6 +115,10 @@
       background-color: $background-color;
     }
 
+    &:hover button:disabled  {
+      background-color: $white;
+    }
+
     &--copy {
       &:hover, &:hover button {
         background-color: transparent;

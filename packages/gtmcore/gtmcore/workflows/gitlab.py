@@ -7,6 +7,7 @@ from typing import List, Optional, Tuple, Dict, Any
 from urllib.parse import quote_plus, urlparse
 
 from gtmcore.logging import LMLogger
+from gtmcore.configuration import Configuration
 
 logger = LMLogger.get_logger()
 REQUEST_TIMEOUT = 30
@@ -46,8 +47,31 @@ def check_and_add_user(hub_api: str, access_token: str, id_token: str) -> None:
         raise GitLabException(f"Failed to synchronize user account with git backend: {result.get('errors')}")
 
 
+def check_backup_in_progress(git_url=None):
+
+    # if git url isn't provided, use current server's git url
+    if not git_url:
+        config = Configuration()
+        server_config = config.get_server_configuration()
+        git_url = server_config.git_url
+
+    try:
+        gitlab_response = requests.get(f"{git_url}backup", timeout=5)
+        if gitlab_response.status_code == 503 and "backup in progress" in str(gitlab_response.content).lower():
+            return True
+        else:
+            return False
+    except Exception:
+        return False
+
+
 class GitLabException(Exception):
-    pass
+    def __init__(self, e):
+        if check_backup_in_progress():
+            super().__init__("backup in progress")
+            return
+
+        super().__init__(e)
 
 
 class StaleCredentialsException(GitLabException):
@@ -188,7 +212,7 @@ class GitLabManager(object):
         if response.status_code != 200:
             logger.error(f"Failed to query for user ID from username. Status Code: {response.status_code}")
             logger.error(response.json())
-            raise ValueError("Failed to query for user ID from username.")
+            raise GitLabException("Failed to query for user ID from username.")
 
         user_id = None
         for user in response.json():
@@ -197,7 +221,7 @@ class GitLabManager(object):
                 break
 
         if user_id is None:
-            raise ValueError(f"User ID not found when querying by username: {username}")
+            raise GitLabException(f"User ID not found when querying by username: {username}")
 
         return user_id
 
@@ -218,6 +242,10 @@ class GitLabManager(object):
                                 timeout=REQUEST_TIMEOUT)
 
         if response.status_code == 200:
+            # if a backup is in progress, the api is redirected to the gigantum api url and returns a 200, so we
+            # need to also check that the content-type is json to make sure the response is from the gitlab api
+            if response.headers.get('content-type') != 'application/json':
+                return False
             return True
         elif response.status_code == 404:
             return False
@@ -225,7 +253,7 @@ class GitLabManager(object):
             msg = f"Failed to check if {namespace}/{repository_name} exists. Status Code: {response.status_code}"
             logger.error(msg)
             logger.error(response.json())
-            raise ValueError(msg)
+            raise GitLabException(msg)
 
     def set_visibility(self, namespace: str, repository_name: str, visibility: str) -> None:
         """ Change public/private visibility for a given project
@@ -239,6 +267,9 @@ class GitLabManager(object):
             None (Exception on failure)
 
         """
+        if not self.repository_exists(namespace, repository_name):
+            raise GitLabException("Cannot set visibility for remote repository that does not exist")
+
         repo_id = self.get_repository_id(namespace, repository_name)
         update_data = {'visibility': visibility}
         response = requests.put(f"{self.remote_host}api/v4/projects/{repo_id}",
@@ -247,11 +278,11 @@ class GitLabManager(object):
         if response.status_code != 200:
             msg = f"Could not set visibility for remote repository {namespace}/{repository_name} " \
                   f"to {visibility}: Status code {response.status_code}"
-            raise ValueError(msg)
+            raise GitLabException(msg)
 
         details = self.repo_details(namespace, repository_name)
         if details.get('visibility') != visibility:
-            raise ValueError(f"Visibility could not be set for {namespace}/{repository_name} to {visibility}")
+            raise GitLabException(f"Visibility could not be set for {namespace}/{repository_name} to {visibility}")
 
     def repo_details(self, namespace: str, repository_name: str) -> Dict[str, Any]:
         """ Get all properties of a given Gitlab Repository, see API documentation
@@ -290,7 +321,7 @@ class GitLabManager(object):
 
         """
         if self.repository_exists(namespace, labbook_name):
-            raise ValueError("Cannot create remote repository that already exists")
+            raise GitLabException("Cannot create remote repository that already exists")
 
         # Raises ValueError if given visibility is not valid
         Visibility(visibility)
@@ -317,7 +348,7 @@ class GitLabManager(object):
         if response.status_code != 201:
             logger.error("Failed to create remote repository")
             logger.error(response.json())
-            raise ValueError("Failed to create remote repository")
+            raise GitLabException("Failed to create remote repository")
         else:
             logger.info(f"Created remote repository {namespace}/{labbook_name}")
 
@@ -332,7 +363,7 @@ class GitLabManager(object):
             None
         """
         if not self.repository_exists(namespace, repository_name):
-            raise ValueError("Cannot remove remote repository that does not exist")
+            raise GitLabException("Cannot remove remote repository that does not exist")
 
         # Call API to remove project
         repo_id = self.get_repository_id(namespace, repository_name)
@@ -343,7 +374,7 @@ class GitLabManager(object):
         if response.status_code != 202:
             logger.error(f"Failed to remove remote repository. Status Code: {response.status_code}")
             logger.error(response.json())
-            raise ValueError("Failed to remove remote repository")
+            raise GitLabException("Failed to remove remote repository")
         else:
             logger.info(f"Deleted remote repository {namespace}/{repository_name}")
 
@@ -359,7 +390,7 @@ class GitLabManager(object):
             list of tuples (user-id, username, permission-type)
         """
         if not self.repository_exists(namespace, repository_name):
-            raise ValueError("Cannot get collaborators of a repository that does not exist")
+            raise GitLabException("Cannot get collaborators of a repository that does not exist")
 
         # Call API to get all collaborators
         collaborators = list()
@@ -374,8 +405,8 @@ class GitLabManager(object):
 
             if response.status_code != 200:
                 logger.error(f"Failed to get remote repository collaborators for {repo_id}, page {page}")
-                logger.error(response.json())
-                raise ValueError("Failed to get remote repository collaborators")
+                logger.error(response.content)
+                raise GitLabException("Failed to get remote repository collaborators")
             else:
                 # Will load one of ProjectPermissions enum fields, else throwing value err
                 c = [(x['id'], x['username'], ProjectPermissions(x['access_level'])) for x in response.json()]
@@ -400,7 +431,7 @@ class GitLabManager(object):
             list of all collaborators
         """
         if not self.repository_exists(namespace, labbook_name):
-            raise ValueError("Cannot add a collaborator to a repository that does not exist")
+            raise GitLabException("Cannot add a collaborator to a repository that does not exist")
 
         # Call API to get ID of the user
         user_id = self._get_user_id_from_username(username)
@@ -436,7 +467,7 @@ class GitLabManager(object):
             None
         """
         if not self.repository_exists(namespace, labbook_name):
-            raise ValueError("Cannot remove a collaborator to a repository that does not exist")
+            raise GitLabException("Cannot remove a collaborator to a repository that does not exist")
 
         # Lookup username
         user_id = self._get_user_id_from_username(username)
@@ -450,7 +481,7 @@ class GitLabManager(object):
         if response.status_code != 204:
             logger.error("Failed to remove collaborator")
             logger.error(response.json())
-            raise ValueError("Failed to remove collaborator")
+            raise GitLabException("Failed to remove collaborator")
         else:
             logger.info(f"Removed user id `{user_id}` as a collaborator to {labbook_name}")
 

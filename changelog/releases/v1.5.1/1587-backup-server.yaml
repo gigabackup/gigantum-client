@@ -1,0 +1,5 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1699"
+changelog:
+  - type: NON_USER_FACING
+    description:  Merges backup in progress feature branch into integration.
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1587

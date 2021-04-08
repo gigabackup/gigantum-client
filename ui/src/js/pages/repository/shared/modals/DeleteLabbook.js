@@ -1,6 +1,8 @@
 // @flow
 // vendor
 import React, { Component } from 'react';
+// utils
+import { checkBackupMode } from 'JS/utils/checkBackupMode';
 // Mutations
 import DeleteLabbookMutation from 'Mutations/repository/delete/DeleteLabbookMutation';
 import DeleteRemoteLabbookMutation from 'Mutations/repository/delete/DeleteRemoteLabbookMutation';
@@ -97,6 +99,7 @@ export default class DeleteLabbook extends Component<Props> {
                 if (document.getElementById('deleteInput')) {
                   document.getElementById('deleteInput').value = '';
                 }
+                checkBackupMode();
               }, 1000);
             } else {
               setInfoMessage(owner, name, `${name} has been remotely deleted`);
@@ -131,6 +134,7 @@ export default class DeleteLabbook extends Component<Props> {
               setTimeout(() => {
                 this.setState({ deleteLabbookButtonState: '' });
               }, 2000);
+              checkBackupMode();
             } else {
               setInfoMessage(owner, name, `${name} has been deleted`);
               this.setState({ deleteLabbookButtonState: 'finished' });

@@ -1,0 +1,5 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1681"
+changelog:
+  - type: NEW
+    description: Adds error handling when repository name cannot be verified. Block repository creation when backup mode has been detected.
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1674

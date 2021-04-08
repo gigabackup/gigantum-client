@@ -1,19 +1,21 @@
 // @flow
 // vendor
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 // redux
 import { setPublishFromCollaborators } from 'JS/redux/actions/shared/collaborators/collaborators';
-// context
-import ServerContext from 'Pages/ServerContext';
 // css
 import './NoCollaborators.scss';
 
 type Props = {
   collaborators: Array<Object>,
+  currentServer: {
+    backupInProgress: boolean,
+    name: string,
+  },
   toggleCollaborators: Function,
 }
 
-class NoCollaborators extends PureComponent<Props> {
+class NoCollaborators extends Component<Props> {
   /**
    * @param {} -
    * triggers publish modal
@@ -28,11 +30,8 @@ class NoCollaborators extends PureComponent<Props> {
     }, 100);
   }
 
-  static contextType = ServerContext;
-
   render() {
-    const { collaborators } = this.props;
-    const { currentServer } = this.context;
+    const { currentServer, collaborators } = this.props;
 
     if (collaborators && collaborators.length) {
       return (
@@ -64,6 +63,7 @@ class NoCollaborators extends PureComponent<Props> {
         <div className="NoCollaborators__container">
           <button
             className="Btn Btn--inverted NoCollaborators__button--publish"
+            disabled={currentServer.backupInProgress}
             onClick={() => { this._pusblishModal(); }}
             type="button"
           >

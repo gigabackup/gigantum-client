@@ -34,15 +34,15 @@ const AppQuery = graphql`
     ...Routes_currentServer
   }
 `;
+// todo fix state not being recognized
+// type State = {
+//   availableServers: Array,
+//   errors: Array,
+//   isLoggedIn: boolean | null,
+//   machine: string,
+// }
 
-type State = {
-  availableServers: Array,
-  errors: Array,
-  isLoggedIn: boolean | null,
-  machine: string,
-}
-
-class App extends Component<State> {
+class App extends Component {
   state = {
     availableServers: [],
     errors: [],
@@ -189,7 +189,6 @@ class App extends Component<State> {
             if (props) {
               return (
                 <Routes
-                  {...props}
                   auth={this.auth}
                   currentServer={props}
                   isLoggedIn={isLoggedIn}

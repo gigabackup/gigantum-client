@@ -1,0 +1,14 @@
+@import '~Styles/_imports.scss';
+
+
+.BackupInProgressModal {
+  padding-top: 3em;
+
+  &__span--highlight {
+  text-decoration: underline;
+  }
+
+  &__p {
+    padding: 1em 0;
+  }
+}

@@ -4,6 +4,8 @@ import React, { Component } from 'react';
 import classNames from 'classnames';
 // store
 import { setErrorMessage } from 'JS/redux/actions/footer';
+// utils
+import { checkBackupMode } from 'JS/utils/checkBackupMode';
 // components
 import ButtonLoader from 'Components/buttonLoader/ButtonLoader';
 // css
@@ -25,6 +27,17 @@ type Props = {
   sectionType: string,
 }
 
+/**
+  Method checks error message, if the backup string matches then it checks backup mode.
+  @param {Array} error
+  @param {string} error[i].message
+*/
+const checkErrorForBackup = (error) => {
+  if (error[0].message.indexOf('backup in progress') > -1) {
+    checkBackupMode();
+  }
+};
+
 class CollaboratorsRow extends Component<Props> {
   state = {
     buttonState: '',
@@ -43,7 +56,6 @@ class CollaboratorsRow extends Component<Props> {
   componentWillUnmount() {
     window.removeEventListener('click', this._closePermissionsMenu);
   }
-
 
   /**
     *  @param {event} evt
@@ -88,6 +100,8 @@ class CollaboratorsRow extends Component<Props> {
         if (error) {
           setErrorMessage(owner, name, 'Could not remove collaborator', error);
 
+          checkErrorForBackup(error);
+
           this.setState({ buttonState: 'error' });
         } else {
           this.setState({ buttonState: 'finished' });
@@ -124,6 +138,7 @@ class CollaboratorsRow extends Component<Props> {
       mutationData,
       (response, error) => {
         if (error) {
+          checkErrorForBackup(error);
           this.setState({ buttonState: 'error' });
         } else {
           this.setState({ buttonState: 'finished' });

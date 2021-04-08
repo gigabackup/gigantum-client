@@ -1,6 +1,8 @@
 // @flow
 // vendor
 import React, { Component } from 'react';
+// utils
+import { checkBackupMode } from 'JS/utils/checkBackupMode';
 // store
 import {
   setErrorMessage,
@@ -88,11 +90,13 @@ class DeleteDataset extends Component<Props> {
             if (document.getElementById('deleteInput')) {
               document.getElementById('deleteInput').value = '';
             }
+            checkBackupMode();
           }, 1000);
         } else if (deleteRemote) {
           setInfoMessage(owner, name, `${name} has been remotely deleted`);
 
           this.setState({ deleteDatasetButtonState: 'finished' });
+
           setTimeout(() => {
             this.setState({
               userInputName: '',

@@ -132,7 +132,7 @@ class CreateBranchModal extends Component<Props> {
       });
 
       if (toggleModal) {
-        toggleModal('createBranchVisible');
+        toggleModal(false);
       }
     }
   }

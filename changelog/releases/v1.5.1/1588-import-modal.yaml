@@ -1,0 +1,7 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1673"
+changelog:
+  - type: NEW
+    description: Adds locking to import remote projects on the import modal. Handes errors and checks for backup mode on failure.
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1588
+  - type: NEW
+    description: Adds backup in progress modal that pops up when backup mode has been detected.

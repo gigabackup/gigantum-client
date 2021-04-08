@@ -21,7 +21,7 @@ type Props = {
   toggleSyncModal: Function,
 };
 
-export default class ForceSync extends Component<Props> {
+class ForceSync extends Component<Props> {
   /**
   *  @param {}
   *  Triggers sync with the correct override method
@@ -163,3 +163,5 @@ export default class ForceSync extends Component<Props> {
     );
   }
 }
+
+export default ForceSync;

@@ -1,0 +1,5 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1666"
+changelog:
+  - type: NEW
+    description: Blocks collaborator remote options in the ui when the remote gitlab server is in backup mode. Adds check on remote operations and switches ui into backup mode that blocks all remote gitlab operations.
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1591
