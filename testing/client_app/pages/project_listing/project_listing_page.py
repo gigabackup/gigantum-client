@@ -283,7 +283,13 @@ class ProjectListingPage(BasePage):
         else:
             raise ValueError(f"Unsupported browser type while checking if guide is active: {agent}")
 
-        slider_background = self.__click_helper_guide_slider.value_of_css_property(css_property)
+        try:
+            slider_background = self.__click_helper_guide_slider.value_of_css_property(css_property)
+        except:
+            # DMK Note: sometimes the page fails to load?
+            self.driver.refresh()
+            slider_background = self.__click_helper_guide_slider.value_of_css_property(css_property)
+
         if "url" in slider_background:
             return True
         return False

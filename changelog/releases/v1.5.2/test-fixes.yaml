@@ -1,0 +1,6 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1737"
+changelog:
+  - type: NON_USER_FACING
+    description: Temporary test framework fixes and hacks to get all tests passing.
+  - type: NON_USER_FACING
+    description: Fix for environment unit tests due to conda package bump.

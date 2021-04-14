@@ -2,6 +2,7 @@ import json
 import tempfile
 from pathlib import Path
 import shutil
+import time
 import docker
 import os
 from configuration.configuration import ConfigurationManager
@@ -62,7 +63,13 @@ class ProjectHelperUtility(object):
         if user_projects:
             for project in user_projects:
                 if project.exists():
-                    shutil.rmtree(user_directory / project.name)
+                    try:
+                        shutil.rmtree(user_directory / project.name)
+                    except:
+                        # Sometimes the delete happens while git still has a lock on the files. In windows, this can
+                        # prevent the delete operation from succeeding
+                        time.sleep(3)
+                        shutil.rmtree(user_directory / project.name)
         return True
 
     def check_project_removed_from_disk(self, project_title) -> bool:

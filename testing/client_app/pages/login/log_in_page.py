@@ -1,3 +1,6 @@
+import selenium
+import time
+
 from framework.base.page_base import BasePage
 from framework.factory.models_enums.page_config import PageConfig
 from framework.factory.models_enums.page_config import ComponentModel
@@ -59,4 +62,17 @@ class AuthLogInPage(BasePage, Login):
         Returns: returns the result of title checking
 
         """
-        return self.log_in_component.check_login_page_title()
+        status = None
+        for _ in range(3):
+            try:
+                status = self.log_in_component.check_login_page_title()
+                break
+            except selenium.common.exceptions.TimeoutException:
+                # DMK NOTE: Sometimes the Auth0 widget fails to load. Refreshing the page and trying again usually works.
+                self.driver.refresh()
+                time.sleep(5)
+
+        if not status:
+            raise Exception("Failed to load Auth0 widget after several page refresh attempts.")
+
+        return status

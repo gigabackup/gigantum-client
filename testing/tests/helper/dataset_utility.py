@@ -1,5 +1,6 @@
 import random
 import time
+import string
 
 from client_app.pages.dataset_listing.dataset_listing_page import DatasetListingPage
 from client_app.pages.project_listing.project_listing_page import ProjectListingPage
@@ -42,9 +43,9 @@ class DatasetUtility:
 
         # Enter dataset title-(unique random name) and description
         # UUID is not given now, since it creates big string
-        # This can be changed along with upcoming  text cases
-        dataset_title = f"d-{str(random.random())}"
-        dataset_title = dataset_title.replace(".", "")
+        # This can be changed along with upcoming text cases
+        rand_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
+        dataset_title = f"d-{rand_string}"
         is_dataset_title_typed = dataset_list.dataset_listing_component.type_dataset_title(dataset_title)
         is_dataset_desc_typed = dataset_list.dataset_listing_component.type_new_dataset_desc_textarea(
             f"{dataset_title} -> Description ")

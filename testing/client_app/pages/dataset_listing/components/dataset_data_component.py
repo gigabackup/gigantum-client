@@ -169,8 +169,8 @@ class DatasetDataComponent(BaseComponent):
 
         """
         element = "//button[@class='Btn__FileBrowserAction Btn--action Btn__FileBrowserAction--download " \
-                  "Btn__FileBrowserAction--download--data  Tooltip-data Tooltip-data--small']"
-        if self.check_element_presence(LocatorType.XPath, element, 120):
+                  "Btn__FileBrowserAction--download--data  Tooltip-data']"
+        if self.check_element_presence(LocatorType.XPath, element, 20):
             return True
         return False
 

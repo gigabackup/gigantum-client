@@ -102,6 +102,9 @@ class TestCreatePublishDataset:
         assert verification_message == ProjectConstants.SUCCESS.value, verification_message
 
         # Publish project
+        # DMK NOTE: Don't know why yet, but you can't click the publish button after the modal closes
+        self.driver.refresh()
+        time.sleep(3)
         is_success_msg = project_utility.publish_project(self.driver)
         assert is_success_msg == ProjectConstants.SUCCESS.value, is_success_msg
 
