@@ -146,7 +146,7 @@ class TestPipPackageManager(object):
         assert result[2].docs_url == 'https://github.com/gigantum/gigantum-client'
         assert result[2].latest_version == "5.0"
 
-        assert result[3].description == 'CLI for the Gigantum Platform'
+        assert result[3].description == 'CLI for the Gigantum Client'
         assert result[3].docs_url == 'https://github.com/gigantum/gigantum-cli'
         assert isinstance(result[3].latest_version, str)
 

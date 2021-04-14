@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1745"
+changelog:
+  - type: NON_USER_FACING
+    description: Fixes test case that used the gigantum CLI as a test pip package
