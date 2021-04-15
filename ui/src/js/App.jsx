@@ -11,18 +11,20 @@ import environment from 'JS/createRelayEnvironment';
 import history from 'JS/history';
 // auth
 import Auth from 'JS/Auth/Auth';
-import stateMachine from 'JS/Auth/AuthStateMachine';
+import stateMachine from 'JS/Auth/machine/AuthStateMachine';
 import {
   LOADING,
   ERROR,
   LOGGED_IN,
   LOGGED_OUT,
-} from 'JS/Auth/AuthMachineConstants';
+  IMPORTING,
+} from 'JS/Auth/machine/AuthMachineConstants';
 // assets
 import gigantumLogo from 'Images/logos/gigantum-client.svg';
 // components
 import Login from 'Pages/login/Login';
 import Routes from 'Pages/Routes';
+import Importing from 'Pages/importing/ImportingWrapper';
 import Interstitial from 'Components/interstitial/Interstitial';
 // css
 import './App.scss';
@@ -32,6 +34,13 @@ const AppQuery = graphql`
     ...Routes_currentServer
   }
 `;
+// todo fix state not being recognized
+// type State = {
+//   availableServers: Array,
+//   errors: Array,
+//   isLoggedIn: boolean | null,
+//   machine: string,
+// }
 
 class App extends Component {
   state = {
@@ -51,12 +60,35 @@ class App extends Component {
       hash,
       this.auth,
     ));
+
+    if (hash.autoImport) {
+      sessionStorage.setItem('autoImport', true);
+      sessionStorage.setItem('devtool', hash.devtool);
+      sessionStorage.setItem('route', window.location.pathname);
+      sessionStorage.setItem('serverId', hash.serverId);
+
+      if (hash.filePath) {
+        sessionStorage.setItem('filePath', hash.filePath);
+      }
+    }
+
     promise.then((data) => {
       if (data.isLoggedIn) {
-        this.transition(LOGGED_IN, {
-          availableServers: data.availableServers,
-          isLoggedIn: data.isLoggedIn,
-        });
+        const autoImport = JSON.parse(sessionStorage.getItem('autoImport'));
+        const { pathname } = window.location;
+        const pathArray = pathname.split('/');
+        if (autoImport && (pathArray.length > 3)) {
+          this.transition(IMPORTING, {
+            availableServers: data.availableServers,
+            isLoggedIn: data.isLoggedIn,
+            data,
+          });
+        } else {
+          this.transition(LOGGED_IN, {
+            availableServers: data.availableServers,
+            isLoggedIn: data.isLoggedIn,
+          });
+        }
       } else {
         this.transition(LOGGED_OUT, {
           availableServers: data.availableServers,
@@ -142,6 +174,12 @@ class App extends Component {
           messageType="error"
         />
       ),
+      [IMPORTING]: (
+        <Importing
+          environment={environment}
+          transition={this.transition}
+        />
+      ),
       [LOGGED_IN]: (
         <QueryRenderer
           environment={environment}
@@ -151,7 +189,6 @@ class App extends Component {
             if (props) {
               return (
                 <Routes
-                  {...props}
                   auth={this.auth}
                   currentServer={props}
                   isLoggedIn={isLoggedIn}

@@ -1,0 +1,6 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1696"
+changelog:
+  - type: NEW
+    description: Adds logic to display backup in progress modal when a remote operation fails due to server being in backup mode.
+  - type: NEW
+    description: Adds logic to block sync dropdown in datasets when backup mode is detected.

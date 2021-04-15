@@ -35,6 +35,9 @@ import Code from './code/Code';
 import InputData from './inputData/Input';
 import OutputData from './outputData/Output';
 import MigrationModal from './modals/migration/MigrationModal';
+import MigrationHeader from './migrate/MigrationHeader';
+// context
+import RepositoryContext from '../RepositoryContext';
 // query
 import fetchMigrationInfoQuery from './queries/fetchMigrationInfoQuery';
 // backend
@@ -554,36 +557,6 @@ class Labbook extends Component<Props> {
   }
 
   /**
-    scrolls to top of window
-    @return {boolean, string}
-  */
-  _getMigrationInfo = () => {
-    const { props, state } = this;
-    const isOwner = (localStorage.getItem('username') === props.labbook.owner);
-    const {
-      isDeprecated,
-      shouldMigrate,
-    } = state;
-    const isPublished = typeof props.labbook.defaultRemote === 'string';
-
-    let migrationText = '';
-    let showMigrationButton = false;
-
-    if ((isOwner && isDeprecated && shouldMigrate && isPublished)
-        || (isDeprecated && !isPublished && shouldMigrate)) {
-      migrationText = 'This Project needs to be migrated to the latest Project format';
-      showMigrationButton = true;
-    } else if (!isOwner && isDeprecated && shouldMigrate && isPublished) {
-      migrationText = 'This Project needs to be migrated to the latest Project format. The project owner must migrate and sync this project to update.';
-    } else if ((isDeprecated && !isPublished && !shouldMigrate)
-      || (isDeprecated && isPublished && !shouldMigrate)) {
-      migrationText = 'This project has been migrated. Master is the new primary branch. Old branches should be removed.';
-    }
-
-    return { showMigrationButton, migrationText };
-  }
-
-  /**
   * @param {Object} state
   * allows child component to update state
   */
@@ -631,11 +604,15 @@ class Labbook extends Component<Props> {
         migrationInProgress,
         migrationModalVisible,
         packageLatestVersions,
+        shouldMigrate,
       } = this.state;
+      const isPublished = typeof defaultRemote === 'string';
       const isSidePanelVisible = !isLocked && sidePanelVisible;
       const branchName = '';
-      const { migrationText, showMigrationButton } = this._getMigrationInfo();
+      const isOwner = (localStorage.getItem('username') === owner);
       const { containerStatus, imageStatus } = labbook.environment;
+      const showMigrationButton = (isOwner && isDeprecated && shouldMigrate && isPublished)
+        || (isDeprecated && !isPublished && shouldMigrate)
       // declare css here
       const labbookCSS = classNames({
         Labbook: true,
@@ -647,272 +624,245 @@ class Labbook extends Component<Props> {
         'Labbook--sidePanelVisible': isSidePanelVisible,
         'Labbook--locked': isLocked,
       });
-      const deprecatedCSS = classNames({
-        Labbook__deprecated: true,
-        'Labbook__deprecated--disk-low': diskLow,
-      });
-      const migrationButtonCSS = classNames({
-        'Tooltip-data': isLocked,
-      });
 
       return (
-        <div className={labbookCSS}>
-          <div id="labbook__cover" className="Labbook__cover hidden">
-            <Loader />
-          </div>
-          <div className="Labbook__spacer flex flex--column">
-            { isDeprecated
-              && (
-              <div className={deprecatedCSS}>
-                {migrationText}
-                <a
-                  target="_blank"
-                  href="https://docs.gigantum.com/docs/project-migration"
-                  rel="noopener noreferrer"
-                >
-                  Learn More.
-                </a>
-                {
-                  showMigrationButton
-                  && (
-                  <div
-                    className={migrationButtonCSS}
-                    data-tooltip="To migrate the project container must be Stopped."
-                  >
-                    <button
-                      className="Button Labbook__deprecated-action"
-                      onClick={() => this._toggleMigrationModal()}
-                      disabled={migrationInProgress || isLocked}
-                      type="button"
-                    >
-                      Migrate
-                    </button>
-                  </div>
-                  )
-                }
-              </div>
-              )
-            }
+        <RepositoryContext.Provider value={labbook}>
+          <div className={labbookCSS}>
+            <div id="labbook__cover" className="Labbook__cover hidden">
+              <Loader />
+            </div>
+            <div className="Labbook__spacer flex flex--column">
+              <MigrationHeader
+                defaultRemote={labbook.defaultRemote}
+                diskLow={diskLow}
+                isDeprecated={isDeprecated}
+                isLocked={isLocked}
+                migrationInProgress={migrationInProgress}
+                owner={owner}
+                shouldMigrate={shouldMigrate}
+                toggleMigrationModal={this._toggleMigrationModal}
+              />
 
-            <MigrationModal
-              branchMutations={branchMutations}
-              buttonState={buttonState}
-              labbook={labbook}
-              migrationModalVisible={migrationModalVisible}
-              migrateComplete={migrateComplete}
-              setParentState={this._setState}
-              toggleMigrationModal={this._toggleMigrationModal}
-            />
+              <MigrationModal
+                branchMutations={branchMutations}
+                buttonState={buttonState}
+                labbook={labbook}
+                migrationModalVisible={migrationModalVisible}
+                migrateComplete={migrateComplete}
+                setParentState={this._setState}
+                toggleMigrationModal={this._toggleMigrationModal}
+              />
 
-            <Header
-              {...this.props}
-              owner={owner}
-              name={name}
-              ref={header => header}
-              description={labbook.description}
-              toggleBranchesView={this._toggleBranchesView}
-              sectionType="labbook"
-              containerStatus={containerStatus}
-              imageStatus={imageStatus}
-              isLocked={isLocked}
-              isLockedSync={isLockedSync}
-              isSticky={isSticky}
-              collaborators={collaborators}
-              canManageCollaborators={canManageCollaborators}
-              visibility={labbook.visibility}
-              defaultRemote={labbook.defaultRemote}
-              branches={branches}
-              setBranchUptodate={this._setBranchUptodate}
-              isDeprecated={isDeprecated}
-              updateMigationState={this._updateMigationState}
-              sidePanelVisible={isSidePanelVisible}
-              showMigrationButton={showMigrationButton}
-            />
-            <div className="Labbook__routes flex flex-1-0-auto">
-              <Switch>
-                <Route
-                  exact
-                  path={`${match.path}`}
-                  render={() => (
-                    <ErrorBoundary type="labbookSectionError">
-                      <Overview
-                        {...this.props}
-                        key={`${labbookName}_overview`}
-                        labbook={labbook}
-                        labbookId={labbook.id}
-                        refetch={this._refetchSection}
-                        isPublishing={isPublishing}
-                        scrollToTop={scrollToTop}
-                        sectionType="labbook"
-                        owner={owner}
-                        name={name}
+              <Header
+                {...this.props}
+                owner={owner}
+                name={name}
+                ref={header => header}
+                description={labbook.description}
+                toggleBranchesView={this._toggleBranchesView}
+                sectionType="labbook"
+                containerStatus={containerStatus}
+                imageStatus={imageStatus}
+                isLocked={isLocked}
+                isLockedSync={isLockedSync}
+                isSticky={isSticky}
+                collaborators={collaborators}
+                canManageCollaborators={canManageCollaborators}
+                visibility={labbook.visibility}
+                defaultRemote={labbook.defaultRemote}
+                branches={branches}
+                setBranchUptodate={this._setBranchUptodate}
+                isDeprecated={isDeprecated}
+                updateMigationState={this._updateMigationState}
+                sidePanelVisible={isSidePanelVisible}
+                showMigrationButton={showMigrationButton}
+              />
+              <div className="Labbook__routes flex flex-1-0-auto">
+                <Switch>
+                  <Route
+                    exact
+                    path={`${match.path}`}
+                    render={() => (
+                      <ErrorBoundary type="labbookSectionError">
+                        <Overview
+                          {...this.props}
+                          key={`${labbookName}_overview`}
+                          labbook={labbook}
+                          labbookId={labbook.id}
+                          refetch={this._refetchSection}
+                          isPublishing={isPublishing}
+                          scrollToTop={scrollToTop}
+                          sectionType="labbook"
+                          owner={owner}
+                          name={name}
+                        />
+                      </ErrorBoundary>
+                    )}
+                  />
+
+                  <Route path={`${match.path}/:labbookMenu`}>
+
+                    <Switch>
+
+                      <Route
+                        path={`${match.path}/overview`}
+                        render={() => (
+
+                          <ErrorBoundary
+                            type="labbookSectionError"
+                            key="overview"
+                          >
+                            <Overview
+                              {...this.props}
+                              key={`${labbookName}_overview`}
+                              labbook={labbook}
+                              description={labbook.description}
+                              labbookId={labbook.id}
+                              refetch={this._refetchSection}
+                              isPublishing={isPublishing}
+                              scrollToTop={scrollToTop}
+                              sectionType="labbook"
+                              owner={owner}
+                              name={name}
+                            />
+                          </ErrorBoundary>
+                        )}
                       />
-                    </ErrorBoundary>
-                  )}
-                />
 
-                <Route path={`${match.path}/:labbookMenu`}>
+                      <Route
+                        path={`${match.path}/activity`}
+                        render={() => (
+                          <ErrorBoundary
+                            type="labbookSectionError"
+                            key="activity"
+                          >
+                            <Activity
+                              {...this.props}
+                              key={`${labbookName}_activity`}
+                              labbook={labbook}
+                              diskLow={diskLow}
+                              refetch={this._refetchSection}
+                              activityRecords={activityRecords}
+                              labbookId={labbook.id}
+                              branchName={branchName}
+                              description={labbook.description}
+                              activeBranch={labbook.activeBranchName}
+                              isMainWorkspace={branchName === 'master'}
+                              sectionType="labbook"
+                              isLocked={isLocked}
+                              isDeprecated={isDeprecated}
+                              owner={owner}
+                              name={name}
+                            />
+                          </ErrorBoundary>
+                        )}
+                      />
 
-                  <Switch>
+                      <Route
+                        path={`${match.url}/environment`}
+                        render={() => (
+                          <ErrorBoundary
+                            type="labbookSectionError"
+                            key="environment"
+                          >
+                            <Environment
+                              {...this.props}
+                              key={`${labbookName}_environment`}
+                              labbook={labbook}
+                              owner={owner}
+                              name={name}
+                              labbookId={labbook.id}
+                              refetch={this._refetchSection}
+                              overview={labbook.overview}
+                              isLocked={isLocked}
+                              packageLatestVersions={packageLatestVersions}
+                              packageLatestRefetch={this._packageLatestRefetch}
+                              cancelRefetch={this._cancelRefetch}
+                            />
+                          </ErrorBoundary>
+                        )}
+                      />
 
-                    <Route
-                      path={`${match.path}/overview`}
-                      render={() => (
+                      <Route
+                        path={`${match.url}/code`}
+                        render={() => (
+                          <ErrorBoundary
+                            type="labbookSectionError"
+                            key="code"
+                          >
+                            <Code
+                              labbook={labbook}
+                              labbookId={labbook.id}
+                              refetch={this._refetchSection}
+                              setContainerState={this._setContainerState}
+                              isLocked={isLocked}
+                              containerStatus={containerStatus}
+                              section="code"
+                              lockFileBrowser={lockFileBrowser}
+                              owner={labbook.owner}
+                              name={labbook.name}
+                            />
 
-                        <ErrorBoundary
-                          type="labbookSectionError"
-                          key="overview"
-                        >
-                          <Overview
-                            {...this.props}
-                            key={`${labbookName}_overview`}
-                            labbook={labbook}
-                            description={labbook.description}
-                            labbookId={labbook.id}
-                            refetch={this._refetchSection}
-                            isPublishing={isPublishing}
-                            scrollToTop={scrollToTop}
-                            sectionType="labbook"
-                            owner={owner}
-                            name={name}
-                          />
-                        </ErrorBoundary>
-                      )}
-                    />
+                          </ErrorBoundary>
+                        )}
+                      />
 
-                    <Route
-                      path={`${match.path}/activity`}
-                      render={() => (
-                        <ErrorBoundary
-                          type="labbookSectionError"
-                          key="activity"
-                        >
-                          <Activity
-                            {...this.props}
-                            key={`${labbookName}_activity`}
-                            labbook={labbook}
-                            diskLow={diskLow}
-                            refetch={this._refetchSection}
-                            activityRecords={activityRecords}
-                            labbookId={labbook.id}
-                            branchName={branchName}
-                            description={labbook.description}
-                            activeBranch={labbook.activeBranchName}
-                            isMainWorkspace={branchName === 'master'}
-                            sectionType="labbook"
-                            isLocked={isLocked}
-                            isDeprecated={isDeprecated}
-                            owner={owner}
-                            name={name}
-                          />
-                        </ErrorBoundary>
-                      )}
-                    />
+                      <Route
+                        path={`${match.url}/inputData`}
+                        render={() => (
+                          <ErrorBoundary
+                            type="labbookSectionError"
+                            key="input"
+                          >
+                            <InputData
+                              labbook={labbook}
+                              labbookId={labbook.id}
+                              isLocked={isLocked}
+                              refetch={this._refetchSection}
+                              containerStatus={containerStatus}
+                              lockFileBrowser={lockFileBrowser}
+                              owner={labbook.owner}
+                              name={labbook.name}
+                              section="input"
+                            />
+                          </ErrorBoundary>
+                        )}
+                      />
 
-                    <Route
-                      path={`${match.url}/environment`}
-                      render={() => (
-                        <ErrorBoundary
-                          type="labbookSectionError"
-                          key="environment"
-                        >
-                          <Environment
-                            {...this.props}
-                            key={`${labbookName}_environment`}
-                            labbook={labbook}
-                            owner={owner}
-                            name={name}
-                            labbookId={labbook.id}
-                            refetch={this._refetchSection}
-                            overview={labbook.overview}
-                            isLocked={isLocked}
-                            packageLatestVersions={packageLatestVersions}
-                            packageLatestRefetch={this._packageLatestRefetch}
-                            cancelRefetch={this._cancelRefetch}
-                          />
-                        </ErrorBoundary>
-                      )}
-                    />
+                      <Route
+                        path={`${match.url}/outputData`}
+                        render={() => (
+                          <ErrorBoundary
+                            type="labbookSectionError"
+                            key="output"
+                          >
+                            <OutputData
+                              labbook={labbook}
+                              labbookId={labbook.id}
+                              isLocked={isLocked}
+                              refetch={this._refetchSection}
+                              containerStatus={containerStatus}
+                              lockFileBrowser={lockFileBrowser}
+                              owner={labbook.owner}
+                              name={labbook.name}
+                              section="output"
+                            />
+                          </ErrorBoundary>
+                        )}
+                      />
 
-                    <Route
-                      path={`${match.url}/code`}
-                      render={() => (
-                        <ErrorBoundary
-                          type="labbookSectionError"
-                          key="code"
-                        >
-                          <Code
-                            labbook={labbook}
-                            labbookId={labbook.id}
-                            refetch={this._refetchSection}
-                            setContainerState={this._setContainerState}
-                            isLocked={isLocked}
-                            containerStatus={containerStatus}
-                            section="code"
-                            lockFileBrowser={lockFileBrowser}
-                            owner={labbook.owner}
-                            name={labbook.name}
-                          />
+                    </Switch>
 
-                        </ErrorBoundary>
-                      )}
-                    />
+                  </Route>
 
-                    <Route
-                      path={`${match.url}/inputData`}
-                      render={() => (
-                        <ErrorBoundary
-                          type="labbookSectionError"
-                          key="input"
-                        >
-                          <InputData
-                            labbook={labbook}
-                            labbookId={labbook.id}
-                            isLocked={isLocked}
-                            refetch={this._refetchSection}
-                            containerStatus={containerStatus}
-                            lockFileBrowser={lockFileBrowser}
-                            owner={labbook.owner}
-                            name={labbook.name}
-                            section="input"
-                          />
-                        </ErrorBoundary>
-                      )}
-                    />
+                </Switch>
 
-                    <Route
-                      path={`${match.url}/outputData`}
-                      render={() => (
-                        <ErrorBoundary
-                          type="labbookSectionError"
-                          key="output"
-                        >
-                          <OutputData
-                            labbook={labbook}
-                            labbookId={labbook.id}
-                            isLocked={isLocked}
-                            refetch={this._refetchSection}
-                            containerStatus={containerStatus}
-                            lockFileBrowser={lockFileBrowser}
-                            owner={labbook.owner}
-                            name={labbook.name}
-                            section="output"
-                          />
-                        </ErrorBoundary>
-                      )}
-                    />
-
-                  </Switch>
-
-                </Route>
-
-              </Switch>
+              </div>
 
             </div>
-
+            <div className="Labbook__veil" />
           </div>
-          <div className="Labbook__veil" />
-        </div>
+        </RepositoryContext.Provider>
       );
     }
     const { authenticated } = this.state;

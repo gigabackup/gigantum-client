@@ -4,6 +4,7 @@ import React from 'react';
 import classNames from 'classnames';
 // utilities
 import validation from 'JS/utils/Validation';
+import { checkBackupMode } from 'JS/utils/checkBackupMode';
 // components
 import LoginPrompt from 'Pages/repository/shared/modals/LoginPrompt';
 // queries
@@ -45,10 +46,19 @@ class CreateLabbook extends React.Component<Props> {
 
     setButtonState('loading');
 
-    RepositoryNameIsAvailable.checkRespositoryName(name).then((response) => {
+    RepositoryNameIsAvailable.checkRespositoryName(name).then((response, error) => {
       if (response.data.repositoryNameIsAvailable) {
         createLabbookCallback(name, description);
         setButtonState('');
+      } else if (error && error[0].message.indexOf('backup in progress') > -1) {
+        checkBackupMode();
+
+        this.setState({
+          name: '',
+          showError: true,
+          errorType: 'backup',
+        });
+        setButtonState('error');
       } else {
         this.setState({
           name: '',
@@ -114,6 +124,8 @@ class CreateLabbook extends React.Component<Props> {
         return 'Error: Last character cannot be a hyphen.';
       case 'validation':
         return 'Name is already in use, please enter another name.';
+      case 'backup':
+        return 'Cannot validate project names when backup is in progress.';
       default:
         return 'Error: Title may only contain lowercase alphanumeric and `-`. (e.g. lab-book-title)';
     }

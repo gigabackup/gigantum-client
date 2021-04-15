@@ -6,6 +6,8 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 // environment
 import environment from 'JS/createRelayEnvironment';
+// context
+import ServerContext from 'Pages/ServerContext';
 // store
 import store from 'JS/redux/store';
 import { setCollaborators, setCanManageCollaborators } from 'JS/redux/actions/shared/collaborators/collaborators';
@@ -186,134 +188,128 @@ class CollaboratorButton extends Component<Props> {
     const { collaborators, canManageCollaborators } = this._getCollabororInfo(name);
 
     return (
-      <QueryRenderer
-        query={query}
-        environment={environment}
-        variables={{
-          name,
-          owner,
-        }}
-        render={(response) => {
-          const { props } = response;
+      <ServerContext.Consumer>
+        { value => (
+          <QueryRenderer
+            query={query}
+            environment={environment}
+            variables={{
+              name,
+              owner,
+            }}
+            render={(response) => {
+              const { props } = response;
 
-          if (props && sessionChecked) {
-            const section = (sectionType === 'dataset')
-              ? props.dataset
-              : props.labbook;
-            if (sectionType === 'dataset') {
-              allowFileUpload(props);
-            }
-            const collaboratorFilteredArr = getCollaboratorFiltered(section.collaborators, owner);
-            const collaboratorNames = self._getCollaboratorList(
-              section.collaborators,
-              collaboratorFilteredArr,
-            );
-
-            this.canManageCollaborators = section.canManageCollaborators;
-            this.collaborators = section.collaborators;
-
-            setCollaborators({ [name]: this.collaborators });
-            setCanManageCollaborators({ [name]: this.canManageCollaborators });
-            // declare css here
-            const collaboratorButtonCSS = classNames({
-              'Collaborators__btn Btn--flat Btn--no-underline': true,
-            });
-            const collaboratorCSS = classNames({
-              Collaborators: true,
-            });
-
-            return (
-
-              <div className={collaboratorCSS}>
-                <button
-                  type="button"
-                  onClick={() => this._toggleCollaborators()}
-                  className={collaboratorButtonCSS}
-                >
-                  Collaborators
-                  <p className="BranchMenu__collaborator-names">{collaboratorNames}</p>
-
-                  { (collaboratorNames.length === 0)
-                    && (
-                      <p>
-                        Click to add
-                      </p>
-                    )
-                  }
-                </button>
-
-                { collaboratorModalVisible
-                    && (
-                      <CollaboratorsModal
-                        sectionType={sectionType}
-                        key="CollaboratorsModal"
-                        collaborators={section.collaborators}
-                        owner={owner}
-                        name={name}
-                        toggleCollaborators={this._toggleCollaborators}
-                        canManageCollaborators={section.canManageCollaborators}
-                      />
-                    )
+              if (props && sessionChecked) {
+                // TODO Move this to it's own component
+                const section = (sectionType === 'dataset')
+                  ? props.dataset
+                  : props.labbook;
+                if (sectionType === 'dataset') {
+                  allowFileUpload(props);
                 }
-              </div>
-            );
-          } if ((collaborators !== null) && sessionChecked) {
-            const collaboratorFilteredArr = getCollaboratorFiltered(collaborators, owner);
-            const collaboratorNames = self._getCollaboratorList(
-              collaborators,
-              collaboratorFilteredArr,
-            );
+                const collaboratorFilteredArr = getCollaboratorFiltered(
+                  section.collaborators,
+                  owner,
+                );
+                const collaboratorNames = self._getCollaboratorList(
+                  section.collaborators,
+                  collaboratorFilteredArr,
+                );
 
-            // declare css here
-            const collaboratorButtonCSS = classNames({
-              Collaborators__btn: true,
-              'Btn--flat': true,
-            });
-            const collaboratorCSS = classNames({
-              Collaborators: true,
-            });
+                this.canManageCollaborators = section.canManageCollaborators;
+                this.collaborators = section.collaborators;
 
-            return (
+                setCollaborators({ [name]: this.collaborators });
+                setCanManageCollaborators({ [name]: this.canManageCollaborators });
+                const collabButtonCSS = classNames({
+                  'Collaborators__btn Btn--flat Btn--no-underline': true,
+                  'Tooltip-data': value.currentServer.backupInProgress,
+                });
+                return (
 
-              <div className={collaboratorCSS}>
-                <button
-                  type="button"
-                  onClick={() => this._toggleCollaborators()}
-                  className={collaboratorButtonCSS}
-                >
-                  Collaborators
-                  <p className="BranchMenu__collaborator-names">{collaboratorNames}</p>
-                </button>
+                  <div className="Collaborators">
+                    <button
+                      className={collabButtonCSS}
+                      disabled={value.currentServer.backupInProgress}
+                      data-tooltip="Can't modify collaborators when backup is in progress"
+                      onClick={() => this._toggleCollaborators()}
+                      type="button"
+                    >
+                      Collaborators
+                      <p className="BranchMenu__collaborator-names">{collaboratorNames}</p>
 
-                { collaboratorModalVisible
-                  && (
+                      { (collaboratorNames.length === 0)
+                        && (
+                          <p>
+                            Click to add
+                          </p>
+                        )}
+                    </button>
                     <CollaboratorsModal
-                      key="CollaboratorsModal"
-                      collaborators={collaborators}
-                      canManageCollaborators={canManageCollaborators}
+                      canManageCollaborators={section.canManageCollaborators}
+                      collaborators={section.collaborators}
+                      currentServer={value.currentServer}
+                      isVisible={collaboratorModalVisible}
+                      name={name}
                       owner={owner}
-                      labbookName={name}
+                      sectionType={sectionType}
                       toggleCollaborators={this._toggleCollaborators}
                     />
-                  )
-                 }
-              </div>
-            );
-          }
-          return (
-            <div className="Collaborators disabled">
-              <button
-                type="button"
-                onClick={() => showLoginPrompt()}
-                className="Collaborators__btn Btn--flat disabled"
-              >
-                Collaborators
-              </button>
-            </div>
-          );
-        }}
-      />
+                  </div>
+                );
+              } if ((collaborators !== null) && sessionChecked) {
+                // TODO Move this to it's own component
+                const collaboratorFilteredArr = getCollaboratorFiltered(collaborators, owner);
+                const collaboratorNames = self._getCollaboratorList(
+                  collaborators,
+                  collaboratorFilteredArr,
+                );
+                const collabButtonCSS = classNames({
+                  'Collaborators__btn Btn--flat ': true,
+                  'Tooltip-data': value.currentServer.backupInProgress,
+                });
+                return (
+                  <div className="Collaborators">
+                    <button
+                      className={collabButtonCSS}
+                      disabled={value.currentServer.backupInProgress}
+                      data-tooltip="Can't modify collaborators when backup is in progress"
+                      onClick={() => this._toggleCollaborators()}
+                      type="button"
+                    >
+                      Collaborators
+                      <p className="BranchMenu__collaborator-names">{collaboratorNames}</p>
+                    </button>
 
+                    <CollaboratorsModal
+                      canManageCollaborators={canManageCollaborators}
+                      collaborators={collaborators}
+                      currentServer={value.currentServer}
+                      isVisible={collaboratorModalVisible}
+                      name={name}
+                      owner={owner}
+                      sectionType={sectionType}
+                      toggleCollaborators={this._toggleCollaborators}
+                    />
+                  </div>
+                );
+              }
+              return (
+                <div className="Collaborators disabled">
+                  <button
+                    type="button"
+                    onClick={() => showLoginPrompt()}
+                    className="Collaborators__btn Btn--flat disabled"
+                  >
+                    Collaborators
+                  </button>
+                </div>
+              );
+            }}
+          />
+        )}
+      </ServerContext.Consumer>
     );
   }
 }

@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1675"
+changelog:
+  - type: NON_USER_FACING
+    description: Updates packages easymde and webpack-bundle-analyzer. Packages were identified by snyk to be updated.

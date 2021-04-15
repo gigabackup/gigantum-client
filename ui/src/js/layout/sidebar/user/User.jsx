@@ -1,8 +1,6 @@
 // vendor
 import React, { Component } from 'react';
 import classNames from 'classnames';
-// context
-import ServerContext from 'Pages/ServerContext';
 // assets
 import serverImg from 'Images/icons/server.svg';
 import './User.scss';
@@ -10,6 +8,11 @@ import './User.scss';
 type Props = {
   auth: {
     logout: Function,
+  },
+  currentServer: {
+    backupInProgress: boolean,
+    baseUrl: string,
+    name: string,
   },
 }
 
@@ -32,7 +35,7 @@ class User extends Component<Props> {
     @param {} -
   */
   logout = () => {
-    const { currentServer } = this.context;
+    const { currentServer } = this.props;
     const { auth } = this.props;
     auth.logout(currentServer);
     localStorage.setItem('fresh_login', true);
@@ -66,12 +69,10 @@ class User extends Component<Props> {
     });
   }
 
-  static contextType = ServerContext;
-
   render() {
     const { dropdownVisible, username } = this.state;
-    const { currentServer } = this.context;
-    const { baseUrl, name } = currentServer;
+    const { currentServer } = this.props;
+    const { backupInProgress, baseUrl, name } = currentServer;
     const firstInitial = username.charAt(0).toUpperCase();
     // declare css here
     const usernameCSS = classNames({
@@ -94,12 +95,22 @@ class User extends Component<Props> {
         key="user"
       >
         <div className="User__server flex flex-row">
-          <img
-            alt="Server"
-            className="User__icon"
-            src={serverImg}
-          />
+          <div className="relative">
+            <img
+              alt="Server"
+              className="User__icon"
+              src={serverImg}
+            />
+            { backupInProgress && (
+            <div className="User__loader absolute" />
+            )}
+          </div>
           <h6 className="User__server-name">{name}</h6>
+          {
+            backupInProgress && (
+              <div className="User__info Tooltip-data Tooltip-data--info--white" data-tooltip="The remote git repository is currently being backed up. You can still work locally, but your changes cannot be pushed until backup has complete. Contact your administrator for more information regarding backup." />
+            )
+          }
         </div>
         <div className="User__image">{firstInitial}</div>
         <h6
@@ -127,8 +138,7 @@ class User extends Component<Props> {
               >
                 Profile
               </a>
-            )
-          }
+            )}
           {
             (process.env.BUILD_TYPE !== 'cloud')
             && (

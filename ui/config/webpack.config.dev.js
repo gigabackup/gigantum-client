@@ -53,7 +53,7 @@ module.exports = {
     // the line below with these two lines if you prefer the stock client:
     // require.resolve('webpack-dev-server/client') + '?/',
     // require.resolve('webpack/hot/dev-server'),
-    devUtils: require.resolve('react-dev-utils/webpackHotDevClient'),
+    devUtils: require.resolve('webpack/hot/dev-server'),
     // We ship a few polyfills by default:
     polyfill: require.resolve('./polyfills'),
     // Errors should be considered fatal in development
@@ -118,6 +118,7 @@ module.exports = {
       'react-native': 'react-native-web',
       '@Components': path.resolve(__dirname, '../src/js/components/'),
       'Components': path.resolve(__dirname, '../src/js/components/'),
+      'Hooks': path.resolve(__dirname, '../src/js/hooks/'),
       'Mutations': path.resolve(__dirname, '../src/js/mutations/'),
       'JS': path.resolve(__dirname, '../src/js/'),
       'Submodules': path.resolve(__dirname, '../submodules/'),
@@ -153,7 +154,8 @@ module.exports = {
         loader: "eslint-loader",
         include: paths.appSrc,
         exclude: [
-          /\__tests__/
+          /\__tests__/,
+          /\.test.(js|jsx)$/,
         ]
       },
       // ** ADDING/UPDATING LOADERS **
@@ -168,6 +170,7 @@ module.exports = {
       {
         exclude: [
           /\__tests__/,
+          /\.test.(js|jsx)$/,
           /\.html$/,
           /\.(js|jsx)$/,
           /\.css$/,
@@ -188,7 +191,7 @@ module.exports = {
       // smaller than specified limit in bytes as data URLs to avoid requests.
       // A missing `test` is equivalent to a match.
       {
-        test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.svg$/, ],
+        test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/, /\.svg$/, /\.test.(js|jsx)$/],
         loader: require.resolve('url-loader'),
         options: {
           limit: 10000,
@@ -201,7 +204,8 @@ module.exports = {
         include: paths.appSrc,
         loader: require.resolve('babel-loader'),
         exclude: [
-          /\__tests__/
+          /\__tests__/,
+          /\.test.(js|jsx)$/,
         ],
         options: {
           // This is a feature of `babel-loader` for webpack (not Babel itself).
@@ -214,7 +218,8 @@ module.exports = {
         test: /\.(js|jsx)$/,
         include: paths.submodules,
         exclude: [
-          /\__tests__/
+          /\__tests__/,
+          /\.test.(js|jsx)$/,
         ],
         loader: require.resolve('babel-loader'),
         options: {

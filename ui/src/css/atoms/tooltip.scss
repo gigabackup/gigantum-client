@@ -33,6 +33,10 @@
         width: auto;
       }
     }
+
+    &--action {
+      left: calc(50% - 30px);
+    }
     &--visible::after,
     &:hover::after{
       text-transform: capitalize;
@@ -114,6 +118,18 @@
         width: 15px;
         height: 15px;
         background: url('~Images/icons/info-icon.svg') no-repeat center center;
+        background-size: 15px;
+        position: absolute;
+        right: 10px;
+        top: calc(50% - 7px);
+        cursor: pointer;
+    }
+
+
+    &--info--white {
+        width: 15px;
+        height: 15px;
+        background: url('~Images/icons/info-icon-white.svg') no-repeat center center;
         background-size: 15px;
         position: absolute;
         right: 10px;

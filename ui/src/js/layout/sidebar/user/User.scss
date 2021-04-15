@@ -17,6 +17,7 @@
     width: 120px;
     margin: 0 auto;
     align-items: center;
+    flex-wrap: nowrap;
   }
 
   &__server-name {
@@ -29,92 +30,111 @@
     width: 20px;
     margin: 0 .5em 0 0;
   }
-}
 
-.User__image {
-  width: 40px;
-  height: 40px;
-  text-align: center;
-  line-height: 40px;
-  font-size: 20px;
-  align-self: center;
-  background: $grey;
-  color: $mineShaft;
+  &__loader {
+    height: 16px;
+    width: 16px;
+    background: url(~Images/loaders/server-loader.svg) no-repeat center center;
+    background-size: 16px;
+    border-radius: 10px;
+    top: 10px;
+    right: 3px;
+    animation: spin 2s infinite linear;
+  }
 
-  border-radius: 20px;
-}
+  &__info {
+    position: relative !important;;
+    flex-wrap: nowrap;
+    top: initial !important;
+    right: 0px !important;
+    margin-left: 5px;
+  }
 
-.User__name {
-  overflow: hidden;
-  align-self: center;
+  &__image {
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 20px;
+    align-self: center;
+    background: $grey;
+    color: $mineShaft;
 
-  max-width: 105px;
-  height: 30px;
-  margin: 0 0 0 5px;
-  padding: 5px 20px 5px 0;
+    border-radius: 20px;
+  }
 
-  cursor: pointer;
-  text-align: center;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  &__name {
+    overflow: hidden;
+    align-self: center;
 
-  color: $white;
-  border-right: solid 5px rgba(0, 0, 0, 0);
-  background: url('~Images/icons/down-arrow-white.svg') no-repeat center right;
-  background-size: 16px;
+    max-width: 105px;
+    height: 30px;
+    margin: 0 0 0 5px;
+    padding: 5px 20px 5px 0;
 
-  font-size: 14px;
-  line-height: 20px;
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 
-  &--long:hover:after {
-    position: absolute;
-    z-index: 1;
-    top: 50px;
-    left: 30px;
+    color: $white;
+    border-right: solid 5px rgba(0, 0, 0, 0);
+    background: url('~Images/icons/down-arrow-white.svg') no-repeat center right;
+    background-size: 16px;
 
-    min-width: 100px;
-    margin: 0;
+    font-size: 14px;
+    line-height: 20px;
+
+    &--long:hover:after {
+      position: absolute;
+      z-index: 1;
+      top: 50px;
+      left: 30px;
+
+      min-width: 100px;
+      margin: 0;
+      padding: 5px;
+
+      content: attr(data-tooltip);
+
+      color: $white;
+      border-radius: 5px;
+      background: $primary;
+
+      font-size: .7em;
+      font-weight: 100;
+      line-height: 1.3em;
+    }
+
+    &--active {
+      background: url('~Images/icons/up-arrow-white.svg') no-repeat center right;
+      background-size: 16px;
+    }
+  }
+
+  &__dropdown {
+    width: 100px;
+    margin: 0 auto;
     padding: 5px;
 
-    content: attr(data-tooltip);
+    border: 1px solid $white;
+    border-radius: 8px;
 
-    color: $white;
-    border-radius: 5px;
-    background: $primary;
-
-    font-size: .7em;
-    font-weight: 100;
-    line-height: 1.3em;
+    @include flex(space-between, column)
   }
 
-  &--active {
-    background: url('~Images/icons/up-arrow-white.svg') no-repeat center right;
-    background-size: 16px;
-  }
-}
 
-.User__dropdown {
-  width: 100px;
-  margin: 0 auto;
-  padding: 5px;
+  &__button {
+    align-self: center;
 
-  border: 1px solid $white;
-  border-radius: 8px;
+    margin: 5px 0;
 
-  @include flex(space-between, column)
-}
+    color: $white !important;
 
+    text-decoration: none !important;
 
-.User__button {
-  align-self: center;
-
-  margin: 5px 0;
-
-  color: $white !important;
-
-  text-decoration: none !important;
-
-  &:hover {
-    color: $white;
+    &:hover {
+      color: $white;
+    }
   }
 }

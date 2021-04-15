@@ -15,6 +15,7 @@ type Props = {
     isAuthenticated: Function,
     logout: Function,
   },
+  currentServer: Object,
   diskLow: boolean,
 }
 

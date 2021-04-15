@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1636"
+changelog:
+  - type: NON_USER_FACING
+    description: Fixes issues with refactored branching code in backup server and sync/publish error handling in integration.

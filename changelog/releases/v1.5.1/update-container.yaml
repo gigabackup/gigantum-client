@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1715"
+changelog:
+  - type: IMPROVEMENT
+    description: Updates packages for security fixes and base container to Ubuntu 20.04

@@ -13,7 +13,7 @@ import { setIsSyncing, setIsExporting } from 'JS/redux/actions/dataset/dataset';
 import ErrorBoundary from 'Components/errorBoundary/ErrorBoundary';
 import TitleSection from './titleSection/TitleSection';
 import ActionsSection from './actionsSection/ActionsSection';
-import BranchMenu from './branches/BranchMenu';
+import Branches from './branches/Branches';
 import Container from './container/Container';
 import Navigation from './navigation/Navigation';
 // assets
@@ -49,6 +49,7 @@ const getBranches = (props) => {
 };
 
 type Props = {
+  auth: Object,
   branchName: string,
   branchesOpen: string,
   dataset: {
@@ -61,17 +62,17 @@ type Props = {
   isPublishing: boolean,
   isSticky: boolean,
   isSyncing: boolean,
+  isLocked: boolean,
+  isLockedSync: boolean,
   labbook: {
     name: string,
     owner: string,
   },
+  mergeFilter: boolean,
   modalVisible: boolean,
   sectionType: string,
-  toggleBranchesView: Function,
-  mergeFilter: boolean,
-  auth: Object,
-  isLocked: boolean,
   setBranchUptodate: Function,
+  toggleBranchesView: Function,
 };
 
 class Header extends Component<Props> {
@@ -202,6 +203,7 @@ class Header extends Component<Props> {
       mergeFilter,
       auth,
       isLocked,
+      isLockedSync,
       setBranchUptodate,
     } = this.props;
     const {
@@ -244,25 +246,26 @@ class Header extends Component<Props> {
                 type={branchesErrorCSS}
                 key="branches"
               >
-                <BranchMenu
+                <Branches
                   {...this.props}
-                  defaultRemote={section.defaultRemote}
-                  branchesOpen={branchesOpen}
-                  section={section}
-                  branches={branches}
-                  sectionId={section.id}
                   activeBranch={section.activeBranchName || 'master'}
-                  toggleBranchesView={toggleBranchesView}
-                  mergeFilter={mergeFilter}
-                  isSticky={isSticky}
-                  visibility={visibility}
-                  sectionType={sectionType}
                   auth={auth}
-                  setSyncingState={this._setSyncingState}
-                  setPublishingState={this._setPublishingState}
-                  setExportingState={this._setExportingState}
+                  branches={branches}
+                  branchesOpen={branchesOpen}
+                  defaultRemote={section.defaultRemote}
                   isLocked={isLocked}
+                  isLockedSync={isLockedSync}
+                  isSticky={isSticky}
+                  mergeFilter={mergeFilter}
+                  section={section}
+                  sectionId={section.id}
+                  sectionType={sectionType}
+                  setExportingState={this._setExportingState}
                   setBranchUptodate={setBranchUptodate}
+                  setPublishingState={this._setPublishingState}
+                  setSyncingState={this._setSyncingState}
+                  toggleBranchesView={toggleBranchesView}
+                  visibility={visibility}
                 />
               </ErrorBoundary>
 

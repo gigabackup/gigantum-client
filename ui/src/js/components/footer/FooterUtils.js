@@ -8,13 +8,14 @@ import {
   setUploadMessageUpdate,
   setUploadMessageRemove,
 } from 'JS/redux/actions/footer';
+import { checkBackupMode } from 'JS/utils/checkBackupMode';
 // mutations
 import FetchLabbookEdgeMutation from 'Mutations/repository/fetch/FetchLabbookEdgeMutation';
 import FetchDatasetEdgeMutation from 'Mutations/repository/fetch/FetchDatasetEdgeMutation';
 import FetchDatasetFilesMutation from 'Mutations/repository/fetch/FetchDatasetFilesMutation';
 import FetchLabbookDatasetFilesMutation from 'Mutations/repository/fetch/FetchLabbookDatasetFilesMutation';
 // Queries
-import UpdateDasetCommits from 'Pages/repository/shared/header/branches/UpdateDatasetCommits';
+import UpdateDasetCommits from 'Pages/repository/shared/header/branches/menu/UpdateDatasetCommits';
 
 const ansiUp = new AnsiUp();
 
@@ -99,7 +100,7 @@ const FooterUtils = {
       };
 
       if (resultKey) {
-        JobStatus.updateFooterStatus(result[type][key]).then((response) => {
+        JobStatus.updateFooterStatus(result[type][key]).then((response, error) => {
           if (response.data
               && response.data.jobStatus
               && response.data.jobStatus.jobMetadata
@@ -183,6 +184,8 @@ const FooterUtils = {
                 buildProgress: type === 'buildImage',
               };
               setMultiInfoMessage(owner, name, messageData);
+
+              checkBackupMode();
             } else {
               // refetch status data not ready
               refetch();

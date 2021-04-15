@@ -81,6 +81,12 @@
     background-size: 42px;
   }
 
+
+  &--share {
+    background: url('~Images/icons/share.svg') no-repeat center center;
+    background-size: 52px;
+  }
+
   &--login {
 
   }
@@ -93,5 +99,23 @@
   &--delete {
     background: url('~Images/icons/branches/delete.svg') no-repeat center center;
     background-size: 60px;
+  }
+
+  &--backup {
+    position: relative;
+    background: url('~Images/icons/server-blue.svg') no-repeat center center;
+    background-size: 60px;
+
+    &::before {
+      content: ' ';
+      position: absolute;
+      top: calc(100% - 20px);
+      right: -13px;
+      background: url('~Images/icons/backup.svg') no-repeat center center;
+      background-size: 26px;
+      height: 26px;
+      width: 26px;
+      animation: spin 2s infinite linear;
+    }
   }
 }

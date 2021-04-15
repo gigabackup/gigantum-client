@@ -12,7 +12,6 @@ class CollboratorsMutations {
       owner,
       sectionType,
     } = props;
-
     this.state = {
       name,
       owner,

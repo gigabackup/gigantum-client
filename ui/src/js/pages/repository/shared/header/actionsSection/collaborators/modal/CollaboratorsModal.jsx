@@ -5,6 +5,7 @@ import React, { Component } from 'react';
 import Modal from 'Components/modal/Modal';
 import CollaboratorsList from './list/CollaboratorList';
 import CollaboratorSearch from './search/CollaboratorSearch';
+
 // mutations
 import CollaboratorMutations from './mutations/CollaboratorMutations';
 // assets
@@ -12,7 +13,9 @@ import './CollaboratorsModal.scss';
 
 type Props = {
   canManageCollaborators: boolean,
+  currentServer: Object,
   collaborators: Array,
+  isVisible: boolean,
   name: string,
   owner: string,
   sectionType: string,
@@ -54,9 +57,14 @@ class CollaboratorsModal extends Component<Props> {
   render() {
     const {
       canManageCollaborators,
+      currentServer,
       toggleCollaborators,
+      isVisible,
     } = this.props;
     const { overflow } = this.state;
+    if (!isVisible) {
+      return null;
+    }
 
     return (
       <Modal
@@ -79,11 +87,12 @@ class CollaboratorsModal extends Component<Props> {
 
             <CollaboratorsList
               {...this.props}
-              setOverflow={this._setOverflow}
-              overflow={overflow}
               canManageCollaborators={canManageCollaborators}
+              currentServer={currentServer}
               getPermissions={this._getPermissions}
               mutations={this.mutations}
+              overflow={overflow}
+              setOverflow={this._setOverflow}
               toggleCollaborators={toggleCollaborators}
             />
           </div>

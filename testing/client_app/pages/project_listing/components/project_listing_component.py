@@ -50,7 +50,7 @@ class ProjectListingComponent(BaseComponent):
             projects_list = self.driver.find_elements_by_xpath(element)
             if projects_list is not None:
                 for project in projects_list:
-                    project_name = project.find_element_by_xpath(".//div[@class='LocalLabbooks__row--text']/div/h5/div")
+                    project_name = project.find_element_by_xpath(".//div[@class='LocalPanel__row--text']/div/h5/div")
                     if project_title == project_name.get_text().strip():
                         return False
         return True
@@ -69,7 +69,7 @@ class ProjectListingComponent(BaseComponent):
             projects_list = self.driver.find_elements_by_xpath(element)
             if projects_list is not None:
                 for project in projects_list:
-                    project_name = project.find_element_by_xpath(".//div[@class='LocalLabbooks__row--text']/div/h5/div")
+                    project_name = project.find_element_by_xpath(".//div[@class='LocalPanel__row--text']/div/h5/div")
                     if project_title == project_name.get_text().strip():
                         project.click()
                         return True

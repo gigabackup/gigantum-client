@@ -94,7 +94,7 @@ def _calc_mem_free() -> Tuple[int, int]:
 def _calc_disk_free_gb() -> Tuple[float, float]:
     """Call `df` from the Client Container, parse and return as GB"""
     # -BMB asks df to return counts in MB-sized blocks (10**6, NOT 2**20)
-    disk_results = call_subprocess("df -BMB /mnt/gigantum".split(), cwd='/').split('\n')
+    disk_results = call_subprocess("df -BMB /".split(), cwd='/').split('\n')
     _, disk_size, disk_used, disk_avail, use_pct, _ = disk_results[1].split()
 
     disk_size_num, disk_size_unit = float(disk_used[:-2]) / 1000, disk_used[-2:]

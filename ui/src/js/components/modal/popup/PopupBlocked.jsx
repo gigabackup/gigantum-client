@@ -23,18 +23,26 @@ const getIcon = (browserName) => {
 type Props = {
   attemptRelaunch: Function,
   devTool: String,
+  hideCancel: boolean,
+  isVisible: boolean,
   togglePopupModal: Function,
 }
 
 class PopupBlocked extends PureComponent<Props> {
   render() {
     const {
-      togglePopupModal,
-      devTool,
       attemptRelaunch,
+      devTool,
+      hideCancel,
+      isVisible,
+      togglePopupModal,
     } = this.props;
 
     const browser = detect();
+
+    if (!browser || !isVisible) {
+      return null;
+    }
     const icon = getIcon(browser.name);
 
     return (
@@ -59,15 +67,21 @@ class PopupBlocked extends PureComponent<Props> {
           <img
             alt="browser"
             src={icon}
+            className="PopupBlocked__image"
           />
           <div className="PopupBlocked__buttonContainer flex justify--right">
-            <button
-              className="Btn Btn--flat"
-              onClick={() => { togglePopupModal(); }}
-              type="button"
-            >
-              Cancel
-            </button>
+            {
+              !hideCancel
+              && (
+                <button
+                  className="Btn Btn--flat"
+                  onClick={() => { togglePopupModal(); }}
+                  type="button"
+                >
+                  Cancel
+                </button>
+              )
+            }
             <button
               className="Btn Btn--inverted Btn--popup-blocked"
               onClick={attemptRelaunch}

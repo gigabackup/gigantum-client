@@ -1,5 +1,8 @@
+import json
+import tempfile
 from pathlib import Path
 import shutil
+import time
 import docker
 import os
 from configuration.configuration import ConfigurationManager
@@ -34,9 +37,10 @@ class ProjectHelperUtility(object):
 
     def __delete_local_images(self) -> bool:
         """Removes the local project images"""
+        server_details = self.get_server_details()
         images = docker.from_env().images.list()
-        user_credentials = ConfigurationManager.getInstance().get_user_credentials(LoginUser.User1)
-        username = user_credentials.user_name
+        user_credentials = ConfigurationManager.getInstance().get_user_credentials(server_details['server_id'], LoginUser.User1)
+        username = user_credentials.display_name
         username_str = f"{username}-{username}"
         for image in images:
             for tag in image.tags:
@@ -50,14 +54,22 @@ class ProjectHelperUtility(object):
         Args:
             directory_name: Name of the directory to remove
         """
+        server_details = self.get_server_details()
         project_folder_names = self.get_folder_names()
-        user_directory = project_folder_names.home_dir / GigantumConstants.SERVERS_FOLDER.value / project_folder_names.\
-            default_server / project_folder_names.username / project_folder_names.username / directory_name
+        user_directory = project_folder_names.home_dir / GigantumConstants.SERVERS_FOLDER.value / \
+                         server_details['server_id'] / project_folder_names.username / project_folder_names.username / \
+                         directory_name
         user_projects = user_directory.glob('p-*')
         if user_projects:
             for project in user_projects:
                 if project.exists():
-                    shutil.rmtree(user_directory / project.name)
+                    try:
+                        shutil.rmtree(user_directory / project.name)
+                    except:
+                        # Sometimes the delete happens while git still has a lock on the files. In windows, this can
+                        # prevent the delete operation from succeeding
+                        time.sleep(3)
+                        shutil.rmtree(user_directory / project.name)
         return True
 
     def check_project_removed_from_disk(self, project_title) -> bool:
@@ -71,7 +83,7 @@ class ProjectHelperUtility(object):
         """
         project_folder_names = self.get_folder_names()
         user_directory = project_folder_names.home_dir / GigantumConstants.SERVERS_FOLDER.value / project_folder_names.\
-            default_server / project_folder_names.username / project_folder_names.username / GigantumConstants.\
+            server_name / project_folder_names.username / project_folder_names.username / GigantumConstants.\
             PROJECTS_FOLDER.value
         user_projects = user_directory.glob('p-*')
         if user_projects:
@@ -109,7 +121,7 @@ class ProjectHelperUtility(object):
         """
         project_folder_names = self.get_folder_names()
         file_path = project_folder_names.home_dir / GigantumConstants.SERVERS_FOLDER.value / project_folder_names.\
-            default_server / project_folder_names.username / project_folder_names.username/ GigantumConstants.\
+            server_name / project_folder_names.username / project_folder_names.username/ GigantumConstants.\
             PROJECTS_FOLDER.value / project_title / folder_name
         source = file_path / GigantumConstants.DEFAULT_FILE_NAME.value
         destination = file_path / GigantumConstants.UNTRACKED_FOLDER.value / GigantumConstants.DEFAULT_FILE_NAME.value
@@ -127,7 +139,7 @@ class ProjectHelperUtility(object):
         directories = ['code', 'input', 'output']
         project_folder_names = self.get_folder_names()
         user_directory = project_folder_names.home_dir / GigantumConstants.SERVERS_FOLDER.value / project_folder_names.\
-            default_server / project_folder_names.username / project_folder_names.username / GigantumConstants.\
+            server_name / project_folder_names.username / project_folder_names.username / GigantumConstants.\
             PROJECTS_FOLDER.value / project_title
         for directory in directories:
             # Since the untracked folder already contains a hidden file, len() = 1
@@ -149,12 +161,13 @@ class ProjectHelperUtility(object):
         """
         project_folder_names = self.get_folder_names()
         if is_collaborator:
-            collaborator_credentials = ConfigurationManager.getInstance().get_user_credentials(LoginUser.User2)
-            username = collaborator_credentials.user_name
+            collaborator_credentials = ConfigurationManager.getInstance().get_user_credentials(
+                project_folder_names.server_name, LoginUser.User2)
+            username = collaborator_credentials.display_name
         else:
             username = project_folder_names.username
         file_directory = project_folder_names.home_dir / GigantumConstants.SERVERS_FOLDER.value / project_folder_names.\
-            default_server / username / project_folder_names.username / GigantumConstants.\
+            server_name / username / project_folder_names.username / GigantumConstants.\
             PROJECTS_FOLDER.value / project_title / folder_name / GigantumConstants.DEFAULT_FILE_NAME.value
         file = open(file_directory, "r")
         file_content_in_folder = str(file.read()).strip()
@@ -168,17 +181,14 @@ class ProjectHelperUtility(object):
         Returns: returns folder names as namedtuple
 
         """
-        folder_names = namedtuple('folder_names', ('username', 'home_dir', 'default_server'))
-        user_credentials = ConfigurationManager.getInstance().get_user_credentials(LoginUser.User1)
-        username = user_credentials.user_name
+        server_details = self.get_server_details()
+        folder_names = namedtuple('folder_names', ('username', 'home_dir', 'server_name'))
+        user_credentials = ConfigurationManager.getInstance().get_user_credentials(server_details['server_id'],
+                                                                                   LoginUser.User1)
+        username = user_credentials.display_name
         home_dir = Path(GigantumConstants.HOME_DIRECTORY.value).expanduser()
-        # Only the option for the default server set in configuration is taken up.
-        # Fetching the current server id is not included.
-        if ConfigurationManager.getInstance().get_app_setting("default_server"):
-            default_server = ConfigurationManager.getInstance().get_app_setting("default_server")
-        else:
-            raise Exception("Unable to identify default server from configuration")
-        project_folder_names = folder_names(username, home_dir, default_server)
+        server_name = server_details['server_id']
+        project_folder_names = folder_names(username, home_dir, server_name)
         return project_folder_names
 
     def delete_remote_project(self, project_title, driver) -> None:
@@ -189,12 +199,14 @@ class ProjectHelperUtility(object):
             driver: driver instance
 
         """
+        server_details = self.get_server_details()
         if ConfigurationManager.getInstance().get_app_setting("api_url"):
             api_url = ConfigurationManager.getInstance().get_app_setting("api_url")
         else:
             raise Exception("Unable to identify api url from configuration")
-        user_credentials = ConfigurationManager.getInstance().get_user_credentials(LoginUser.User1)
-        namespace = user_credentials.user_name
+        user_credentials = ConfigurationManager.getInstance().get_user_credentials(server_details['server_id'],
+                                                                                   LoginUser.User1)
+        namespace = user_credentials.display_name
         # Set headers
         access_token = driver.execute_script("return window.localStorage.getItem('access_token')")
         id_token = driver.execute_script("return window.localStorage.getItem('id_token')")
@@ -220,3 +232,30 @@ class ProjectHelperUtility(object):
         else:
             if result_data['data']['deleteRemoteLabbook']['success'] is False:
                 raise Exception("Failed to delete remote project")
+
+    def set_server_details(self, server_details):
+        """ Write server details into temporary file
+
+        Args:
+            server_details: Details of the current server
+        """
+        temp_dir = tempfile.gettempdir()
+        server_details_dict = {'server_id': server_details.server_id, 'server_name': server_details.server_name,
+                               'login_type': server_details.login_type}
+        json_data = json.dumps(server_details_dict)
+        with open(os.path.join(temp_dir, 'server_details'), 'w') as temp_file:
+            temp_file.write(json_data)
+
+    def get_server_details(self):
+        """ Read temporary file and return server details
+
+        Returns: returns current server details
+
+        """
+        temp_dir = tempfile.gettempdir()
+        server_details_file = os.path.join(temp_dir, 'server_details')
+        if not os.path.exists(server_details_file):
+            raise Exception("Server details file is not available")
+        with open(os.path.join(temp_dir, 'server_details'), 'r') as temp_file:
+            json_data = json.load(temp_file)
+            return json_data

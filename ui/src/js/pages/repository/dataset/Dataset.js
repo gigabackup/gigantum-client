@@ -246,6 +246,7 @@ class Dataset extends Component<Props> {
   allowFileUpload = (collaboratorProps) => {
     const { dataset } = this.props;
     const { uploadAllowed } = this.state;
+    const username = localStorage.getItem('username');
     if (
       collaboratorProps
       && collaboratorProps.dataset
@@ -254,7 +255,6 @@ class Dataset extends Component<Props> {
       const { collaborators } = collaboratorProps.dataset;
       if (collaborators.length) {
         collaborators.forEach((collaborator) => {
-          const username = localStorage.getItem('username');
           if (
             (username === collaborator.collaboratorUsername)
             && (collaborator.permission !== 'READ_ONLY')
@@ -264,10 +264,11 @@ class Dataset extends Component<Props> {
           }
         });
       }
-
       if (dataset && (dataset.defaultRemote === null) && !uploadAllowed) {
         this.setState({ uploadAllowed: true });
       }
+    } else if ((dataset.owner === username) && !uploadAllowed) {
+      this.setState({ uploadAllowed: true });
     }
   };
 

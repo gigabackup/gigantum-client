@@ -8,7 +8,7 @@ from framework.factory.models_enums.page_config import ComponentModel
 from client_app.pages.project_listing.components.project_listing_component import ProjectListingComponent
 from selenium.webdriver.common.action_chains import ActionChains
 from client_app.pages.project_listing.components.project_delete_component import ProjectDeleteComponent
-from client_app.pages.project_listing.components.gigantum_hub_component import GigantumHubComponent
+from client_app.pages.project_listing.components.server_component import ServerComponent
 from client_app.pages.project_listing.components.project_menu_component import ProjectMenuComponent
 from client_app.pages.project_listing.components.project_code_input_output_data_component import \
     ProjectCodeInputOutputDataComponent
@@ -48,7 +48,7 @@ class ProjectListingPage(BasePage):
         self.__slider_helper_guide = None
         self.__but_helper_close = None
         self._project_delete_component = None
-        self._gigantum_hub_component = None
+        self._server_component = None
         self._code_input_output_component = None
         self._project_menu_component = None
         self._collaborators_modal_component = None
@@ -76,11 +76,11 @@ class ProjectListingPage(BasePage):
         return self._project_delete_component
 
     @property
-    def gigantum_hub_component(self) -> GigantumHubComponent:
-        """ Returns an instance of Gigantum Hub window component."""
-        if self._gigantum_hub_component is None:
-            self._gigantum_hub_component = GigantumHubComponent(self.driver, self.component_model)
-        return self._gigantum_hub_component
+    def server_component(self) -> ServerComponent:
+        """ Returns an instance of server window component."""
+        if self._server_component is None:
+            self._server_component = ServerComponent(self.driver, self.component_model)
+        return self._server_component
 
     @property
     def code_input_output_component(self) -> ProjectCodeInputOutputDataComponent:
@@ -283,7 +283,13 @@ class ProjectListingPage(BasePage):
         else:
             raise ValueError(f"Unsupported browser type while checking if guide is active: {agent}")
 
-        slider_background = self.__click_helper_guide_slider.value_of_css_property(css_property)
+        try:
+            slider_background = self.__click_helper_guide_slider.value_of_css_property(css_property)
+        except:
+            # DMK Note: sometimes the page fails to load?
+            self.driver.refresh()
+            slider_background = self.__click_helper_guide_slider.value_of_css_property(css_property)
+
         if "url" in slider_background:
             return True
         return False

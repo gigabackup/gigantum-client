@@ -1,6 +1,8 @@
 // @flow
 import React, { PureComponent } from 'react';
 import classNames from 'classnames';
+// context
+import ServerContext from 'Pages/ServerContext';
 
 
 class FileBrowserTools extends PureComponent {
@@ -26,12 +28,11 @@ class FileBrowserTools extends PureComponent {
       'FileBrowser__update-modal': true,
       hidden: !confirmUpdateVisible,
     });
-    const downloadAllCSS = classNames({
-      'Btn__FileBrowserAction Btn--action': true,
-      'Btn__FileBrowserAction--download Btn__FileBrowserAction--download--data ': !downloadingAll,
-      'Btn__FileBrowserAction--loading Btn__FileBrowserAction--downloading': downloadingAll,
-      'Tooltip-data Tooltip-data--small': allFilesLocal,
-    });
+    const actionsContainerCSS = classNames({
+      'flex justify--right': true,
+      'FileBrowser__Primary-actions': !readOnly,
+    })
+
     return (
       <div className="FileBrowser__tools flex justify--space-between">
 
@@ -44,10 +45,11 @@ class FileBrowserTools extends PureComponent {
             onKeyUp={(evt) => { updateSearchState(evt); }}
           />
         </div>
-        {
+        <div className={actionsContainerCSS}>
+          {
           !readOnly
           && (
-            <div className="flex justify--right FileBrowser__Primary-actions">
+            <>
               <button
                 className="Btn Btn--action Btn__FileBrowserAction Btn__FileBrowserAction--newFolder"
                 data-click-id="addFolder"
@@ -71,22 +73,40 @@ class FileBrowserTools extends PureComponent {
                   onChange={evt => uploadFiles(Array.prototype.slice.call(evt.target.files))}
                 />
               </label>
-              { (section === 'data')
-                && (
-                <button
-                  className={downloadAllCSS}
-                  disabled={allFilesLocal || downloadingAll}
-                  onClick={() => handleDownloadAll(allFilesLocal)}
-                  data-tooltip="No files to download"
-                  type="button"
-                >
-                  Download All
-                </button>
-                )
-              }
-            </div>
+            </>
           )
-        }
+          }
+          { (section === 'data')
+            && (
+            <ServerContext.Consumer>
+              {
+                value => {
+                  const { backupInProgress } = value.currentServer;
+                  const tooltip = backupInProgress
+                    ? 'Cannot download Dataset files while server backup is in progress'
+                    : 'No files to download'
+                  const downloadAllCSS = classNames({
+                    'Btn__FileBrowserAction Btn--action': true,
+                    'Btn__FileBrowserAction--download Btn__FileBrowserAction--download--data ': !downloadingAll,
+                    'Btn__FileBrowserAction--loading Btn__FileBrowserAction--downloading': downloadingAll,
+                    'Tooltip-data': allFilesLocal || backupInProgress,
+                  });
+                  return (
+                    <button
+                      className={downloadAllCSS}
+                      disabled={allFilesLocal || downloadingAll || backupInProgress}
+                      onClick={() => handleDownloadAll(allFilesLocal)}
+                      data-tooltip={tooltip}
+                      type="button"
+                    >
+                      Download All
+                    </button>
+                  );
+                }
+              }
+            </ServerContext.Consumer>
+            )}
+        </div>
         {
           readOnly && uploadAllowed
           && (

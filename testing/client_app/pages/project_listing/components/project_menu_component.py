@@ -74,7 +74,7 @@ class ProjectMenuComponent(BaseComponent):
         """
         element = "//div[contains(text(), 'Publish')]"
         btn_publish = self.get_locator(LocatorType.XPath, element)
-        if btn_publish is not None:
+        if btn_publish is not None and btn_publish.element_to_be_clickable():
             btn_publish.click()
             return True
         return False
@@ -113,7 +113,7 @@ class ProjectMenuComponent(BaseComponent):
 
         """
         element = "//div[@class='TitleSection__private Tooltip-data Tooltip-data--small']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, 120):
             return True
         return False
 
@@ -123,12 +123,20 @@ class ProjectMenuComponent(BaseComponent):
         Returns: returns the result of click action
 
         """
-        element = "//div[contains(text(), 'Sync')]"
-        if self.check_element_presence(LocatorType.XPath, element, 20):
-            sync_button = self.get_locator(LocatorType.XPath, element)
+        element_sync_needed = "//button[@class='Btn--branch Btn--action SyncBranchButtons__btn Tooltip-data']"
+        element_up_to_date = "//button[@class='Btn--branch Btn--action SyncBranchButtons__btn " \
+                             "SyncBranchButtons__btn--upToDate Tooltip-data']"
+        if self.check_element_presence(LocatorType.XPath, element_sync_needed, 5):
+            sync_button = self.get_locator(LocatorType.XPath, element_sync_needed)
             if sync_button is not None and sync_button.element_to_be_clickable():
                 sync_button.click()
                 return True
+        elif self.check_element_presence(LocatorType.XPath, element_up_to_date, 5):
+            sync_button = self.get_locator(LocatorType.XPath, element_up_to_date)
+            if sync_button is not None and sync_button.element_to_be_clickable():
+                sync_button.click()
+                return True
+
         return False
 
     def click_project_menu_button(self) -> bool:
@@ -175,9 +183,9 @@ class ProjectMenuComponent(BaseComponent):
         Returns: returns True if the element is present
 
         """
-        element = "//p[@class='FooterMessage__title FooterMessage__title--collapsed' and " \
-                  "text()='Upload complete!']"
-        if self.check_element_presence(LocatorType.XPath, element, 40):
+        element = "//p[@class='FooterMessage__title FooterMessage__title--collapsed' and contains(text(), " \
+                  "'Upload complete!')]"
+        if self.check_element_presence(LocatorType.XPath, element, 60):
             return True
         return False
 
@@ -225,5 +233,16 @@ class ProjectMenuComponent(BaseComponent):
         projects_menu = self.get_locator(LocatorType.XPath, element)
         if projects_menu is not None:
             projects_menu.click()
+            return True
+        return False
+
+    def check_sync_button_is_enabled(self) -> bool:
+        """ Check sync button is enabled or not
+
+        Returns:returns the result of sync button enabled state
+
+        """
+        element = "//button[@data-tooltip='Cannot Sync while Dataset is in use']"
+        if self.check_element_absence(LocatorType.XPath, element, 40):
             return True
         return False

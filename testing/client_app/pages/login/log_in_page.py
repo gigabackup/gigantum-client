@@ -1,15 +1,19 @@
+import selenium
+import time
+
 from framework.base.page_base import BasePage
 from framework.factory.models_enums.page_config import PageConfig
 from framework.factory.models_enums.page_config import ComponentModel
 from client_app.pages.login.components.log_in_component import LogInComponent
 from client_app.pages.login.components.sign_up_component import SignUpComponent
 from client_app.pages.project_listing.project_listing_page import ProjectListingPage
+from client_app.pages.login.login_interface import Login
 
 
-class LogInPage(BasePage):
-    """Represents the login page of gigantum client.
+class AuthLogInPage(BasePage, Login):
+    """Represents the login page of gigantum server.
 
-    Holds the locators on the login page of gigantum client. The locators can be
+    Holds the locators on the login page of gigantum server. The locators can be
     presented in its corresponding component or directly on the page. Test functions can
     use these objects for all activities and validations and can avoid those in the
     test functions.
@@ -17,7 +21,7 @@ class LogInPage(BasePage):
 
     def __init__(self, driver) -> None:
         page_config = PageConfig()
-        super(LogInPage, self).__init__(driver, page_config)
+        super(AuthLogInPage, self).__init__(driver, page_config)
         self._log_in_component_model = ComponentModel()
         self._sign_up_component_model = ComponentModel()
         self._sign_up_component = None
@@ -51,3 +55,24 @@ class LogInPage(BasePage):
         """
         self.log_in_component.login(user_name, password)
         return ProjectListingPage(self.driver)
+
+    def check_login_page_title(self):
+        """Check login page title
+
+        Returns: returns the result of title checking
+
+        """
+        status = None
+        for _ in range(3):
+            try:
+                status = self.log_in_component.check_login_page_title()
+                break
+            except selenium.common.exceptions.TimeoutException:
+                # DMK NOTE: Sometimes the Auth0 widget fails to load. Refreshing the page and trying again usually works.
+                self.driver.refresh()
+                time.sleep(5)
+
+        if not status:
+            raise Exception("Failed to load Auth0 widget after several page refresh attempts.")
+
+        return status

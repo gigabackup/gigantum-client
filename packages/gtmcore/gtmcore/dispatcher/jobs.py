@@ -585,8 +585,8 @@ def update_environment_repositories() -> None:
 
     logger.info("Cloning/Updating environment repositories.")
 
+    erm = RepositoryManager()
     try:
-        erm = RepositoryManager()
         update_successful = erm.update_repositories()
         if update_successful:
             logger.info("Indexing environment repositories.")
@@ -599,6 +599,8 @@ def update_environment_repositories() -> None:
         # not in the expected state
         logger.exception(e)
         logger.critical("Not releasing repository lock, restart API service")
+        shutil.rmtree(erm.local_repo_directory)
+        logger.info("Base Image repositories removed. Restart Client to re-clone.")
         raise
 
     lock.release()

@@ -1,5 +1,6 @@
+// @flow
 // vendor
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import classNames from 'classnames';
 import { connect } from 'react-redux';
 import ReactTooltip from 'react-tooltip';
@@ -8,6 +9,8 @@ import { setBuildingState } from 'JS/redux/actions/labbook/labbook';
 // mutations
 import CancelBuildMutation from 'Mutations/container/CancelBuildMutation';
 import BuildImageMutation from 'Mutations/container/BuildImageMutation';
+// components
+import { ProgressLoader } from '../loader/Loader';
 // assets
 import './BuildProgress.scss';
 
@@ -25,8 +28,13 @@ const getSubText = (isComplete, error, cancelingBuild) => {
   return subText;
 };
 
+type Props = {
+  name: string,
+  owner: string,
+}
 
-class BuildProgress extends Component {
+
+class BuildProgress extends Component<Props> {
   state = {
     showBuild: this.props.keepOpen,
     cancelingBuild: false,
@@ -61,8 +69,7 @@ class BuildProgress extends Component {
   *  fires build cancelation
   */
   _cancelBuild = () => {
-    const { props } = this;
-    const { owner, name } = props;
+    const { owner, name } = this.props;
     const callback = () => {
       setTimeout(() => {
         setBuildingState(owner, name, false);
@@ -70,10 +77,12 @@ class BuildProgress extends Component {
     };
 
     setBuildingState(owner, name, true);
+
     this.setState({ cancelingBuild: true });
+
     CancelBuildMutation(
-      props.owner,
-      props.name,
+      owner,
+      name,
       callback,
     );
   }
@@ -121,13 +130,13 @@ class BuildProgress extends Component {
       const { error } = footerMessage[0];
 
       const regexMessage = message.replace(regex, '<span style="color:#fcd430">$1</span>')
-          // Backspace (note funny syntax) deletes any previous character
-          .replace(/.[\b]/g, '')
-          // \r\n should be treated as a regular newline
-          .replace(/\r\n/g, '\n')
-          // Get rid of anything on a line before a carriage return
-          // Using a group because Firefox still doesn't support ES2018 negative look-behind
-          .replace(/(\n|^)[^\n]*\r/g, '$1');
+      // Backspace (note funny syntax) deletes any previous character
+        .replace(/.[\b]/g, '')
+      // \r\n should be treated as a regular newline
+        .replace(/\r\n/g, '\n')
+      // Get rid of anything on a line before a carriage return
+      // Using a group because Firefox still doesn't support ES2018 negative look-behind
+        .replace(/(\n|^)[^\n]*\r/g, '$1');
 
       if (
         ((process.env.BUILD_TYPE === 'cloud') && !props.keepOpen && (status === 'finished'))
@@ -173,16 +182,6 @@ class BuildProgress extends Component {
       'BuildProgress__header-text--completed': isComplete && state.showBuild,
       'BuildProgress__header-text--failed': (state.cancelingBuild || error) && state.showBuild,
     });
-    const progressCSS = classNames({
-      BuildProgress__progress: true,
-      'BuildProgress__progress--completed': isComplete,
-      'BuildProgress__progress--failed': state.cancelingBuild || error,
-    });
-    const progressTextCSS = classNames({
-      BuildProgress__text: true,
-      'BuildProgress__text--completed': isComplete,
-      'BuildProgress__text--failed': state.cancelingBuild || error,
-    });
 
     return (
       <div className="BuildProgress">
@@ -206,12 +205,15 @@ class BuildProgress extends Component {
               <p className="BuildProgress__close-text">
                 Close this window to continue using Gigantum while your environment is building.
               </p>
-              <div className={progressCSS}>
-                {percentageComplete}
-              </div>
-              <p className={progressTextCSS}>
-                {subText}
-              </p>
+
+              <ProgressLoader
+                isCanceling={state.cancelingBuild}
+                isComplete={isComplete}
+                error={error}
+                percentageComplete={percentageComplete}
+                text={subText}
+              />
+
             </div>
           )
         }
@@ -220,30 +222,30 @@ class BuildProgress extends Component {
           {
           !props.keepOpen
           && (
-          <Fragment>
-            <button
-              className="Btn Btn--flat margin-right--auto"
-              type="button"
-              disabled={message.length === 0}
-              onClick={() => this._setShowbuild(!state.showBuild)}
-            >
-              {buildButtonText}
-            </button>
-            <button
-              className="Btn Btn--inverted align-self--end"
-              type="button"
-              disabled={isComplete || state.cancelingBuild}
-              onClick={() => this._cancelBuild()}
-            >
-              Cancel Build
-            </button>
-          </Fragment>
+            <>
+              <button
+                className="Btn Btn--flat margin-right--auto"
+                type="button"
+                disabled={message.length === 0}
+                onClick={() => this._setShowbuild(!state.showBuild)}
+              >
+                {buildButtonText}
+              </button>
+              <button
+                className="Btn Btn--inverted align-self--end"
+                type="button"
+                disabled={isComplete || state.cancelingBuild}
+                onClick={() => this._cancelBuild()}
+              >
+                Cancel Build
+              </button>
+            </>
           )
           }
           {
             error
             && (
-            <Fragment>
+            <>
               <button
                 className="Btn--inverted align-self--end"
                 type="button"
@@ -258,7 +260,7 @@ class BuildProgress extends Component {
                 id="Tooltip--noCache"
                 delayShow={500}
               />
-            </Fragment>
+            </>
             )
           }
           <button

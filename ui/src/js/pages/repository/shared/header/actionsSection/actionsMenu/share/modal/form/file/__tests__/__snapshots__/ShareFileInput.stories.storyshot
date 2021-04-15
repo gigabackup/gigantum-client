@@ -1,0 +1,683 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots Header/ShareLink/ShareFileInput ShareFileInput Disabled 1`] = `
+<ReactRelayQueryRenderer
+  environment={"RelayModernEnvironment(RelayModernMockEnvironment)"}
+  query={
+    Object {
+      "fragment": Object {
+        "argumentDefinitions": Array [
+          Object {
+            "defaultValue": null,
+            "kind": "LocalArgument",
+            "name": "name",
+            "type": "String!",
+          },
+          Object {
+            "defaultValue": null,
+            "kind": "LocalArgument",
+            "name": "owner",
+            "type": "String!",
+          },
+          Object {
+            "defaultValue": null,
+            "kind": "LocalArgument",
+            "name": "first",
+            "type": "Int!",
+          },
+          Object {
+            "defaultValue": null,
+            "kind": "LocalArgument",
+            "name": "cursor",
+            "type": "String",
+          },
+        ],
+        "kind": "Fragment",
+        "metadata": null,
+        "name": "ShareFormQuery",
+        "selections": Array [
+          Object {
+            "alias": null,
+            "args": Array [
+              Object {
+                "kind": "Variable",
+                "name": "name",
+                "variableName": "name",
+              },
+              Object {
+                "kind": "Variable",
+                "name": "owner",
+                "variableName": "owner",
+              },
+            ],
+            "concreteType": "Labbook",
+            "kind": "LinkedField",
+            "name": "labbook",
+            "plural": false,
+            "selections": Array [
+              Object {
+                "args": null,
+                "kind": "FragmentSpread",
+                "name": "ShareFileInput_labbook",
+              },
+            ],
+            "storageKey": null,
+          },
+        ],
+        "type": "LabbookQuery",
+      },
+      "hash": "8044356f0f5f9d82b513b5fbca15bd6d",
+      "kind": "Request",
+      "operation": Object {
+        "argumentDefinitions": Array [
+          Object {
+            "defaultValue": null,
+            "kind": "LocalArgument",
+            "name": "name",
+            "type": "String!",
+          },
+          Object {
+            "defaultValue": null,
+            "kind": "LocalArgument",
+            "name": "owner",
+            "type": "String!",
+          },
+          Object {
+            "defaultValue": null,
+            "kind": "LocalArgument",
+            "name": "first",
+            "type": "Int!",
+          },
+          Object {
+            "defaultValue": null,
+            "kind": "LocalArgument",
+            "name": "cursor",
+            "type": "String",
+          },
+        ],
+        "kind": "Operation",
+        "name": "ShareFormQuery",
+        "selections": Array [
+          Object {
+            "alias": null,
+            "args": Array [
+              Object {
+                "kind": "Variable",
+                "name": "name",
+                "variableName": "name",
+              },
+              Object {
+                "kind": "Variable",
+                "name": "owner",
+                "variableName": "owner",
+              },
+            ],
+            "concreteType": "Labbook",
+            "kind": "LinkedField",
+            "name": "labbook",
+            "plural": false,
+            "selections": Array [
+              Object {
+                "alias": null,
+                "args": null,
+                "concreteType": "LabbookSection",
+                "kind": "LinkedField",
+                "name": "code",
+                "plural": false,
+                "selections": Array [
+                  Object {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "id",
+                    "storageKey": null,
+                  },
+                  Object {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "hasFiles",
+                    "storageKey": null,
+                  },
+                  Object {
+                    "alias": null,
+                    "args": Array [
+                      Object {
+                        "kind": "Variable",
+                        "name": "after",
+                        "variableName": "cursor",
+                      },
+                      Object {
+                        "kind": "Variable",
+                        "name": "first",
+                        "variableName": "first",
+                      },
+                    ],
+                    "concreteType": "LabbookFileConnection",
+                    "kind": "LinkedField",
+                    "name": "allFiles",
+                    "plural": false,
+                    "selections": Array [
+                      Object {
+                        "alias": null,
+                        "args": null,
+                        "concreteType": "LabbookFileEdge",
+                        "kind": "LinkedField",
+                        "name": "edges",
+                        "plural": true,
+                        "selections": Array [
+                          Object {
+                            "alias": null,
+                            "args": null,
+                            "concreteType": "LabbookFile",
+                            "kind": "LinkedField",
+                            "name": "node",
+                            "plural": false,
+                            "selections": Array [
+                              Object {
+                                "alias": null,
+                                "args": null,
+                                "kind": "ScalarField",
+                                "name": "id",
+                                "storageKey": null,
+                              },
+                              Object {
+                                "alias": null,
+                                "args": null,
+                                "kind": "ScalarField",
+                                "name": "isDir",
+                                "storageKey": null,
+                              },
+                              Object {
+                                "alias": null,
+                                "args": null,
+                                "kind": "ScalarField",
+                                "name": "modifiedAt",
+                                "storageKey": null,
+                              },
+                              Object {
+                                "alias": null,
+                                "args": null,
+                                "kind": "ScalarField",
+                                "name": "key",
+                                "storageKey": null,
+                              },
+                              Object {
+                                "alias": null,
+                                "args": null,
+                                "kind": "ScalarField",
+                                "name": "size",
+                                "storageKey": null,
+                              },
+                            ],
+                            "storageKey": null,
+                          },
+                          Object {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "cursor",
+                            "storageKey": null,
+                          },
+                        ],
+                        "storageKey": null,
+                      },
+                      Object {
+                        "alias": null,
+                        "args": null,
+                        "concreteType": "PageInfo",
+                        "kind": "LinkedField",
+                        "name": "pageInfo",
+                        "plural": false,
+                        "selections": Array [
+                          Object {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "hasNextPage",
+                            "storageKey": null,
+                          },
+                          Object {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "hasPreviousPage",
+                            "storageKey": null,
+                          },
+                          Object {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "startCursor",
+                            "storageKey": null,
+                          },
+                          Object {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "endCursor",
+                            "storageKey": null,
+                          },
+                        ],
+                        "storageKey": null,
+                      },
+                    ],
+                    "storageKey": null,
+                  },
+                ],
+                "storageKey": null,
+              },
+              Object {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "id",
+                "storageKey": null,
+              },
+            ],
+            "storageKey": null,
+          },
+        ],
+      },
+      "params": Object {
+        "id": null,
+        "metadata": Object {},
+        "name": "ShareFormQuery",
+        "operationKind": "query",
+        "text": "query ShareFormQuery(
+  $name: String!
+  $owner: String!
+  $first: Int!
+  $cursor: String
+) {
+  labbook(name: $name, owner: $owner) {
+    ...ShareFileInput_labbook
+    id
+  }
+}
+
+fragment ShareFileInput_labbook on Labbook {
+  code {
+    id
+    hasFiles
+    allFiles(after: $cursor, first: $first) {
+      edges {
+        node {
+          id
+          isDir
+          modifiedAt
+          key
+          size
+        }
+        cursor
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+    }
+  }
+}
+",
+      },
+    }
+  }
+  render={[Function]}
+  variables={
+    Object {
+      "cursor": null,
+      "first": 100,
+      "force": true,
+      "name": "projectname",
+      "owner": "ownername",
+    }
+  }
+>
+  <div>
+    Loading...
+  </div>
+</ReactRelayQueryRenderer>
+`;
+
+exports[`Storyshots Header/ShareLink/ShareFileInput ShareFileInput jupyterLab 1`] = `
+<ReactRelayQueryRenderer
+  environment={"RelayModernEnvironment(RelayModernMockEnvironment)"}
+  query={
+    Object {
+      "fragment": Object {
+        "argumentDefinitions": Array [
+          Object {
+            "defaultValue": null,
+            "kind": "LocalArgument",
+            "name": "name",
+            "type": "String!",
+          },
+          Object {
+            "defaultValue": null,
+            "kind": "LocalArgument",
+            "name": "owner",
+            "type": "String!",
+          },
+          Object {
+            "defaultValue": null,
+            "kind": "LocalArgument",
+            "name": "first",
+            "type": "Int!",
+          },
+          Object {
+            "defaultValue": null,
+            "kind": "LocalArgument",
+            "name": "cursor",
+            "type": "String",
+          },
+        ],
+        "kind": "Fragment",
+        "metadata": null,
+        "name": "ShareFormQuery",
+        "selections": Array [
+          Object {
+            "alias": null,
+            "args": Array [
+              Object {
+                "kind": "Variable",
+                "name": "name",
+                "variableName": "name",
+              },
+              Object {
+                "kind": "Variable",
+                "name": "owner",
+                "variableName": "owner",
+              },
+            ],
+            "concreteType": "Labbook",
+            "kind": "LinkedField",
+            "name": "labbook",
+            "plural": false,
+            "selections": Array [
+              Object {
+                "args": null,
+                "kind": "FragmentSpread",
+                "name": "ShareFileInput_labbook",
+              },
+            ],
+            "storageKey": null,
+          },
+        ],
+        "type": "LabbookQuery",
+      },
+      "hash": "8044356f0f5f9d82b513b5fbca15bd6d",
+      "kind": "Request",
+      "operation": Object {
+        "argumentDefinitions": Array [
+          Object {
+            "defaultValue": null,
+            "kind": "LocalArgument",
+            "name": "name",
+            "type": "String!",
+          },
+          Object {
+            "defaultValue": null,
+            "kind": "LocalArgument",
+            "name": "owner",
+            "type": "String!",
+          },
+          Object {
+            "defaultValue": null,
+            "kind": "LocalArgument",
+            "name": "first",
+            "type": "Int!",
+          },
+          Object {
+            "defaultValue": null,
+            "kind": "LocalArgument",
+            "name": "cursor",
+            "type": "String",
+          },
+        ],
+        "kind": "Operation",
+        "name": "ShareFormQuery",
+        "selections": Array [
+          Object {
+            "alias": null,
+            "args": Array [
+              Object {
+                "kind": "Variable",
+                "name": "name",
+                "variableName": "name",
+              },
+              Object {
+                "kind": "Variable",
+                "name": "owner",
+                "variableName": "owner",
+              },
+            ],
+            "concreteType": "Labbook",
+            "kind": "LinkedField",
+            "name": "labbook",
+            "plural": false,
+            "selections": Array [
+              Object {
+                "alias": null,
+                "args": null,
+                "concreteType": "LabbookSection",
+                "kind": "LinkedField",
+                "name": "code",
+                "plural": false,
+                "selections": Array [
+                  Object {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "id",
+                    "storageKey": null,
+                  },
+                  Object {
+                    "alias": null,
+                    "args": null,
+                    "kind": "ScalarField",
+                    "name": "hasFiles",
+                    "storageKey": null,
+                  },
+                  Object {
+                    "alias": null,
+                    "args": Array [
+                      Object {
+                        "kind": "Variable",
+                        "name": "after",
+                        "variableName": "cursor",
+                      },
+                      Object {
+                        "kind": "Variable",
+                        "name": "first",
+                        "variableName": "first",
+                      },
+                    ],
+                    "concreteType": "LabbookFileConnection",
+                    "kind": "LinkedField",
+                    "name": "allFiles",
+                    "plural": false,
+                    "selections": Array [
+                      Object {
+                        "alias": null,
+                        "args": null,
+                        "concreteType": "LabbookFileEdge",
+                        "kind": "LinkedField",
+                        "name": "edges",
+                        "plural": true,
+                        "selections": Array [
+                          Object {
+                            "alias": null,
+                            "args": null,
+                            "concreteType": "LabbookFile",
+                            "kind": "LinkedField",
+                            "name": "node",
+                            "plural": false,
+                            "selections": Array [
+                              Object {
+                                "alias": null,
+                                "args": null,
+                                "kind": "ScalarField",
+                                "name": "id",
+                                "storageKey": null,
+                              },
+                              Object {
+                                "alias": null,
+                                "args": null,
+                                "kind": "ScalarField",
+                                "name": "isDir",
+                                "storageKey": null,
+                              },
+                              Object {
+                                "alias": null,
+                                "args": null,
+                                "kind": "ScalarField",
+                                "name": "modifiedAt",
+                                "storageKey": null,
+                              },
+                              Object {
+                                "alias": null,
+                                "args": null,
+                                "kind": "ScalarField",
+                                "name": "key",
+                                "storageKey": null,
+                              },
+                              Object {
+                                "alias": null,
+                                "args": null,
+                                "kind": "ScalarField",
+                                "name": "size",
+                                "storageKey": null,
+                              },
+                            ],
+                            "storageKey": null,
+                          },
+                          Object {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "cursor",
+                            "storageKey": null,
+                          },
+                        ],
+                        "storageKey": null,
+                      },
+                      Object {
+                        "alias": null,
+                        "args": null,
+                        "concreteType": "PageInfo",
+                        "kind": "LinkedField",
+                        "name": "pageInfo",
+                        "plural": false,
+                        "selections": Array [
+                          Object {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "hasNextPage",
+                            "storageKey": null,
+                          },
+                          Object {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "hasPreviousPage",
+                            "storageKey": null,
+                          },
+                          Object {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "startCursor",
+                            "storageKey": null,
+                          },
+                          Object {
+                            "alias": null,
+                            "args": null,
+                            "kind": "ScalarField",
+                            "name": "endCursor",
+                            "storageKey": null,
+                          },
+                        ],
+                        "storageKey": null,
+                      },
+                    ],
+                    "storageKey": null,
+                  },
+                ],
+                "storageKey": null,
+              },
+              Object {
+                "alias": null,
+                "args": null,
+                "kind": "ScalarField",
+                "name": "id",
+                "storageKey": null,
+              },
+            ],
+            "storageKey": null,
+          },
+        ],
+      },
+      "params": Object {
+        "id": null,
+        "metadata": Object {},
+        "name": "ShareFormQuery",
+        "operationKind": "query",
+        "text": "query ShareFormQuery(
+  $name: String!
+  $owner: String!
+  $first: Int!
+  $cursor: String
+) {
+  labbook(name: $name, owner: $owner) {
+    ...ShareFileInput_labbook
+    id
+  }
+}
+
+fragment ShareFileInput_labbook on Labbook {
+  code {
+    id
+    hasFiles
+    allFiles(after: $cursor, first: $first) {
+      edges {
+        node {
+          id
+          isDir
+          modifiedAt
+          key
+          size
+        }
+        cursor
+      }
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
+    }
+  }
+}
+",
+      },
+    }
+  }
+  render={[Function]}
+  variables={
+    Object {
+      "cursor": null,
+      "first": 100,
+      "force": true,
+      "name": "projectname",
+      "owner": "ownername",
+    }
+  }
+>
+  <div>
+    Loading...
+  </div>
+</ReactRelayQueryRenderer>
+`;

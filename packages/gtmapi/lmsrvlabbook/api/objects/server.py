@@ -1,7 +1,9 @@
 import graphene
 import flask
+import requests
 
 from lmsrvlabbook.api.objects.serverauth import ServerAuth
+from gtmcore.workflows.gitlab import check_backup_in_progress
 
 
 class Server(graphene.ObjectType):
@@ -20,6 +22,7 @@ class Server(graphene.ObjectType):
     user_search_url = graphene.String()
     lfs_enabled = graphene.Boolean()
     auth_config = graphene.Field(ServerAuth)
+    backup_in_progress = graphene.Boolean()
 
     @classmethod
     def get_node(cls, info, id):
@@ -41,9 +44,9 @@ def helper_get_current_server():
     server_config = flask.current_app.config['LABMGR_CONFIG'].get_server_configuration()
     auth_config = flask.current_app.config['LABMGR_CONFIG'].get_auth_configuration()
 
-    if auth_config.login_type == "auth0":
-        type_specific_fields = []
-    elif auth_config.login_type == "internal":
+    # All self-hosted auth types essentially appear as internal, but for now we list other options
+    # because the login screens are different.
+    if auth_config.login_type in ["auth0", "internal", "ldap"]:
         type_specific_fields = []
     else:
         raise ValueError(f"Unsupported authentication system type: {auth_config.login_type}")
@@ -60,6 +63,7 @@ def helper_get_current_server():
                              public_key_url=auth_config.public_key_url,
                              type_specific_fields=type_specific_fields)
 
+
     return Server(server_id=server_config.id,
                   name=server_config.name,
                   base_url=server_config.base_url,
@@ -69,4 +73,5 @@ def helper_get_current_server():
                   object_service_url=server_config.object_service_url,
                   user_search_url=server_config.user_search_url,
                   lfs_enabled=server_config.lfs_enabled,
-                  auth_config=server_auth)
+                  auth_config=server_auth,
+                  backup_in_progress=check_backup_in_progress())

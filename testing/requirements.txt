@@ -1,8 +1,8 @@
 pytest==5.4.3
 pytest-html==2.1.1
-PyYAML==5.3.1
+PyYAML==5.4.1
 selenium==3.141.0
 selenium-page-factory==2.0
-webdriver-manager==3.2.1
+webdriver-manager==3.3.0
 msedge-selenium-tools
-docker
+docker==4.4.4

@@ -1,6 +1,5 @@
 // vendor
 import React, { Component } from 'react';
-import { createPaginationContainer, graphql } from 'react-relay';
 import Tooltip from 'Components/tooltip/Tooltip';
 // components
 import CustomAppsCard from './card/CustomAppsCard';

@@ -3,6 +3,7 @@ from client_app.pages.project_listing.project_listing_page import ProjectListing
 from selenium import webdriver
 from tests.constants_enums.constants_enums import ProjectConstants
 from client_app.pages.jupyter_lab.jupyter_lab_page import JupyterLabPage
+import string
 
 
 class ProjectUtility:
@@ -28,8 +29,8 @@ class ProjectUtility:
         # Enter project title-(unique random name) and description
         # UUID is not given now, since it creates big string
         # This can be changed along with upcoming  text cases
-        project_title = f"p-{str(random.random())}"
-        project_title = project_title.replace(".", "")
+        rand_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
+        project_title = f"p-{rand_string}"
         is_project_title_typed = project_list.type_project_title(project_title)
         is_project_desc_typed = project_list.type_new_project_desc_textarea(f"{project_title} -> Description ")
         if not is_project_title_typed:

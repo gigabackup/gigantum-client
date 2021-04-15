@@ -1,11 +1,13 @@
 import random
+import time
+import string
+
 from client_app.pages.dataset_listing.dataset_listing_page import DatasetListingPage
 from client_app.pages.project_listing.project_listing_page import ProjectListingPage
 from selenium import webdriver
 from tests.constants_enums.constants_enums import ProjectConstants
 from client_app.pages.jupyter_lab.jupyter_lab_page import JupyterLabPage
 from tests.helper.project_utility import ProjectUtility
-import time
 
 
 class DatasetUtility:
@@ -41,9 +43,9 @@ class DatasetUtility:
 
         # Enter dataset title-(unique random name) and description
         # UUID is not given now, since it creates big string
-        # This can be changed along with upcoming  text cases
-        dataset_title = f"d-{str(random.random())}"
-        dataset_title = dataset_title.replace(".", "")
+        # This can be changed along with upcoming text cases
+        rand_string = ''.join(random.choices(string.ascii_lowercase + string.digits, k=10))
+        dataset_title = f"d-{rand_string}"
         is_dataset_title_typed = dataset_list.dataset_listing_component.type_dataset_title(dataset_title)
         is_dataset_desc_typed = dataset_list.dataset_listing_component.type_new_dataset_desc_textarea(
             f"{dataset_title} -> Description ")
@@ -205,11 +207,6 @@ class DatasetUtility:
         is_clicked = dataset_list.project_menu_component.click_publish_window_button()
         if not is_clicked:
             return "Could not click publish button on project publish window"
-
-        # Check for the presence of Upload complete pop up message
-        is_checked = dataset_list.project_menu_component.check_upload_complete_pop_up_presence()
-        if not is_checked:
-            return "Could not get Upload complete pop up window"
 
         # Check private lock icon presence
         is_checked = dataset_list.project_menu_component.check_private_lock_icon_presence()

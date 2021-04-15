@@ -79,9 +79,9 @@
 }
 
 .Btn__dashboard--delete{
-  background: url('~Images/icons/trash-azure.svg') no-repeat left 7px center;
+  background: $lightGrey url('~Images/icons/trash-azure.svg') no-repeat left 7px center;
   background-size: 16px;
-  color: $romanSilver;
+  color: $primary !important;
 
   &:hover,
   &:focus {
@@ -92,9 +92,11 @@
 }
 
 .Btn__dashboard--delete-disabled:disabled,
+.Btn__dashboard--delete:disabled,
+.Btn__dashboard--delete:disabled:hover,
 .Btn__dashboard--delete-disabled:disabled:hover{
   cursor: auto;
-  background: $background-color url('~Images/icons/trash.svg') no-repeat left 7px center;
+  background: $background-color url('~Images/icons/trash.svg') no-repeat left 7px center !important;
   background-color: $background-color !important;
   background-size: 16px;
   color: $romanSilver !important;

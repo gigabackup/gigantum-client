@@ -1,0 +1,8 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1671"
+changelog:
+  - type: NEW
+    description: Adds check on visibilty change to catch backup error. Disables visibility change button when backup mode is detected.
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1669
+  - type: NEW
+    description: Adds loader to side panel server icon when backup mode is detected. Adds info icon with explanation of why backup is running.
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1670

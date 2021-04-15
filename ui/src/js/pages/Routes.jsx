@@ -11,13 +11,16 @@ import {
   Switch,
   Redirect,
 } from 'react-router-dom'; // keep browser router, reloads page with Router in labbook view
-// components
-import Dashboard from 'Pages/dashboard/Dashboard';
-import Layout from 'JS/layout/Layout';
 // history
 import history from 'JS/history';
 // utils
 import getApiURL from 'JS/utils/apiUrl';
+import { pollForServerAvalability } from 'JS/utils/currentServerStatus';
+// mutations
+import { updateCurrentServer } from 'Mutations/localCommits/CurrentServer';
+// components
+import Dashboard from 'Pages/dashboard/Dashboard';
+import Layout from 'JS/layout/Layout';
 // context
 import ServerContext from './ServerContext';
 // assets
@@ -59,8 +62,15 @@ type Props = {
     logout: Function,
   },
   currentServer: {
-    baseUrl: string,
+    currentServer: {
+      backupInProgress: boolean,
+      baseUrl: string,
+      id: string,
+    }
   },
+  relay: {
+    environment: Object,
+  }
 }
 
 class Routes extends Component<Props> {
@@ -84,12 +94,36 @@ class Routes extends Component<Props> {
 
       delete hash.redirect;
       stringifiedValues = queryString.stringify(hash);
-      const path = decodeURI(newPath)
+      const path = decodeURI(newPath);
       history.replace(`/${path}#${stringifiedValues}`);
       document.location.hash = stringifiedValues;
     }
 
     this._checkSysinfo();
+  }
+
+  componentDidMount() {
+    const { currentServer } = this.props;
+    const { backupInProgress } = currentServer.currentServer;
+    if (backupInProgress) {
+      this._pollForBackupStatus();
+    }
+  }
+
+  /**
+    Mehtod logs user in using session instance of auth
+    @param {} -
+  */
+  _pollForBackupStatus = () => {
+    const callback = (currentServer) => {
+      const { relay } = this.props;
+      const { environment } = relay;
+      const { id, backupInProgress } = currentServer;
+
+      updateCurrentServer(id, backupInProgress, environment);
+    };
+
+    pollForServerAvalability(callback);
   }
 
 
@@ -154,6 +188,7 @@ class Routes extends Component<Props> {
     }).catch(() => false);
   }
 
+
   /**
     @param {Error, Object} error, info
     shows error message when runtime error occurs
@@ -172,6 +207,7 @@ class Routes extends Component<Props> {
     if (!hasError) {
       return (
         <ServerContext.Provider value={currentServer}>
+
           <Router
             basename={this.basename}
           >
@@ -180,7 +216,6 @@ class Routes extends Component<Props> {
               auth={auth}
               diskLow={showDiskLow}
             >
-
               <Switch>
 
                 <Route
@@ -218,6 +253,7 @@ class Routes extends Component<Props> {
                       {...this.props}
                       {...parentProps}
                       auth={auth}
+                      currentServer={currentServer.currentServer}
                       datasetName={parentProps.match.params.datasetName}
                       diskLow={showDiskLow}
                       owner={parentProps.match.params.owner}
@@ -234,6 +270,7 @@ class Routes extends Component<Props> {
                       {...this.props}
                       {...parentProps}
                       auth={auth}
+                      currentServer={currentServer.currentServer}
                       diskLow={showDiskLow}
                       labbookName={parentProps.match.params.labbookName}
                       owner={parentProps.match.params.owner}
@@ -279,6 +316,7 @@ const RoutesFragement = createFragmentContainer(
               value
             }
           }
+          backupInProgress
           baseUrl
           gitServerType
           gitUrl
@@ -295,12 +333,10 @@ const RoutesFragement = createFragmentContainer(
   },
 );
 
-const mapStateToProps = (state, ownProps) => {
-  return {
-    ...state.routes,
-    ...ownProps,
-  };
-};
+const mapStateToProps = (state, ownProps) => ({
+  ...state.routes,
+  ...ownProps,
+});
 
 const mapDispatchToProps = () => ({});
 

@@ -1,0 +1,6 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1698"
+changelog:
+  - type: NEW
+    description: Fixes notification popping again afer task completion.
+  - type: NEW
+    description: Adds error reporting to the notification tray, prevents error state where user cannot get out of visibility modal error screen.

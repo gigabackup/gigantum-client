@@ -1,5 +1,6 @@
 """Test call for Add Package using requirements file"""
 import pytest
+from client_app.helper.local_project_helper_utility import ProjectHelperUtility
 from tests.helper.project_utility import ProjectUtility
 from configuration.configuration import ConfigurationManager
 from client_app.pages.landing.landing_page import LandingPage
@@ -8,6 +9,8 @@ from framework.factory.models_enums.constants_enums import LoginUser
 from collections import namedtuple
 from tests.constants_enums.constants_enums import ProjectConstants
 from tests.test_fixtures import clean_up_project
+from client_app.pages.login.login_factory import LoginFactory
+from tests.test_fixtures import server_data_fixture
 
 
 @pytest.mark.addPackageFromFileTest
@@ -15,15 +18,16 @@ class TestAddPackage:
     """Includes test methods for basic project creation add package using requirements file and its dependent tests"""
 
     @pytest.mark.run(order=1)
-    def test_log_in_success(self):
+    def test_log_in_success(self, server_data_fixture):
         """ Test method to check the successful log-in."""
         landing_page = LandingPage(self.driver)
-        assert landing_page.landing_component.get_server_button_text() == "Gigantum Hub"
-        log_in_page = landing_page.landing_component.load_log_in_page()
-        assert log_in_page.sign_up_component.get_sign_up_title() == "Sign Up"
-        user_credentials = ConfigurationManager.getInstance().get_user_credentials(LoginUser.User1)
-        log_in_page.sign_up_component.move_to_log_in_tab()
-        project_list = log_in_page.login(user_credentials.user_name, user_credentials.password)
+        ProjectHelperUtility().set_server_details(server_data_fixture)
+        landing_page.landing_component.click_server(server_data_fixture.server_name)
+        login_page = LoginFactory().load_login_page(server_data_fixture.login_type, self.driver)
+        assert login_page.check_login_page_title()
+        user_credentials = ConfigurationManager.getInstance().get_user_credentials(server_data_fixture.server_id,
+                                                                                   LoginUser.User1)
+        project_list = login_page.login(user_credentials.user_name, user_credentials.password)
         assert project_list.project_listing_component.get_project_title() == "Projects"
 
     @pytest.mark.depends(on=['test_log_in_success'])
@@ -92,7 +96,7 @@ class TestAddPackage:
         # Open Jupyter_lab and verify packages
         commands = namedtuple('command', ('command_text', 'output', 'error_message'))
         command_text = ['pip freeze | grep gtmunit']
-        output = ['gtmunit1==0.12.4', 'gtmunit2==2.1', 'gtmunit3==5.0']
+        output = ['gtmunit1==0.12.4', 'gtmunit2==2.0', 'gtmunit3==5.0']
         error_message = 'Verification of package failed'
         gtmunit_grep_command = commands(command_text, output, error_message)
         verification_message = ProjectUtility().verify_command_execution(self.driver, [gtmunit_grep_command])

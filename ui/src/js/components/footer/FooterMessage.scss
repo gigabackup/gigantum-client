@@ -16,7 +16,7 @@
 
   &--error{
     .FooterMessage__icon{
-      background: $crimson url(~Images/icons/notifications/info-exclamation.svg) no-repeat center center;
+      background: $orange url(~Images/icons/notifications/info-exclamation.svg) no-repeat center center;
       background-size: 26px;
       transform: rotate(0deg);
     }

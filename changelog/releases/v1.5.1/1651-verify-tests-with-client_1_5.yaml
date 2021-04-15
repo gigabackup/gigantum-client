@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1688"
+changelog:
+  - type: NEW
+    description: Verify all tests pass with gigantum client 1.5.

@@ -23,6 +23,7 @@ ServerInfo = NamedTuple('ServerInfo', [('id', str),
                                        ('login_url', str),
                                        ('token_url', str),
                                        ('logout_url', str),
+                                       ('git_url', str)
                                        ])
 
 
@@ -57,7 +58,7 @@ class Configuration:
 
     def __init__(self, config_file: Optional[str] = None, wait_for_cache: int = 10) -> None:
         """
-        
+
         Args:
             config_file(str): Absolute path to the configuration file to load
             wait_for_cache: integer indicating the number of seconds to wait for redis to be available
@@ -231,7 +232,7 @@ class Configuration:
     @staticmethod
     def find_default_config() -> str:
         """Method to find the default client configuration file
-        
+
         Returns:
             (str): Absolute path to the file to load
         """
@@ -349,6 +350,7 @@ class Configuration:
                                                      data['auth']['login_url'],
                                                      data['auth']['token_url'],
                                                      data['auth']['logout_url'],
+                                                     data['server']['git_url']
                                                      ))
 
         return configured_servers

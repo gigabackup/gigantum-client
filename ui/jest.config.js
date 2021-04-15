@@ -23,9 +23,7 @@ module.exports = {
   },
   "transformIgnorePatterns": [
     // "[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$"
-    // "/node_modules/(?!(@my-company)/).*/"
-    "<rootDir>/(node_modules)/",
-    "<rootDir>/node_modules/(?!shared|another)"
+    "/node_modules/(?!file-icons-js).+\\.js$",
   ],
   "unmockedModulePathPatterns": [
     "react",
@@ -49,6 +47,7 @@ module.exports = {
     "^react-native$": "react-native-web",
     "^react-markdown$": "react-markdown",
     "^Components[/](.+)": "<rootDir>/src/js/components/$1",
+    "^Hooks[/](.+)": "<rootDir>/src/js/hooks/$1",
     "^Mutations[/](.+)": "<rootDir>/src/js/mutations/$1",
     "^Styles[/](.+)": "<rootDir>/src/css/$1",
     "^Tests[/](.+)": "<rootDir>/__tests__/$1",

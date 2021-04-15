@@ -7,6 +7,7 @@ import os
 import random
 from pathlib import Path
 import string
+import time
 
 
 class DatasetMenuComponent(BaseComponent):
@@ -39,6 +40,9 @@ class DatasetMenuComponent(BaseComponent):
         datasets_menu = self.get_locator(LocatorType.XPath, element)
         if datasets_menu is not None:
             datasets_menu.click()
+            # DMK NOTE: the 'Create New' button is duplicated now on the Project and Dataset pages. If we don't wait a
+            # tiny bit here, when switching between pages, you can sometimes get a stale ref to the button.
+            time.sleep(.25)
             return True
         return False
 

@@ -8,6 +8,7 @@ from lmsrvcore.auth.user import get_logged_in_username
 from gtmcore.inventory.inventory import InventoryManager
 from gtmcore.logging import LMLogger
 from gtmcore.gitlib.git import GitAuthor
+from gtmcore.workflows.gitlab import check_backup_in_progress
 
 
 logger = LMLogger.get_logger()
@@ -43,11 +44,12 @@ def check_projects():
 def ping():
     """Unauthorized endpoint for validating the API is up"""
     config = current_app.config['LABMGR_CONFIG']
-    app_name, built_on, revision = config.config['build_info'].split(' :: ')
+    app_name, built_on, revision, version_str = config.config['build_info'].split(' :: ')
     return jsonify({
         "application": app_name,
         "built_on": built_on,
-        "revision": revision
+        "revision": revision,
+        "version": version_str
     })
 
 
@@ -62,11 +64,12 @@ def version():
     TODO! By August 2019, remove the .route(f'/version/') route.
     """
     config = current_app.config['LABMGR_CONFIG']
-    app_name, built_on, revision = config.config['build_info'].split(' :: ')
+    app_name, built_on, revision, version_str = config.config['build_info'].split(' :: ')
     return jsonify({
         "application": app_name,
         "built_on": built_on,
-        "revision": revision
+        "revision": revision,
+        "version": version_str
     })
 
 
@@ -116,13 +119,16 @@ def servers():
     """Unauthorized endpoint to check for configured servers. Returns the name and ID of the server for selection
     when logging in. Also indicates the current server (if one is selected)
     """
+
     server_list = []
     for s in current_app.config['LABMGR_CONFIG'].list_available_servers():
+
         server_list.append({"server_id": s.id,
                             "name": s.name,
                             "login_url": s.login_url,
                             "token_url": s.token_url,
-                            "logout_url": s.logout_url})
+                            "logout_url": s.logout_url,
+                            "backup_in_progress": check_backup_in_progress(s.git_url)})
 
     return jsonify({"available_servers": server_list,
                     "current_server": current_app.config['LABMGR_CONFIG'].get_current_server_id()})
@@ -147,4 +153,3 @@ def exchange_tokens(server_id: str, state_token: str):
         return abort(response.status_code)
 
     return jsonify(response.json())
-

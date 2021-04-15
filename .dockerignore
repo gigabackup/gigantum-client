@@ -20,5 +20,6 @@ ui/resources
 *.dump
 
 testing/
+testing-legacy
 
 /packages/gtmcore/gtmcore/auth/tests/auth_config.json

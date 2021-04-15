@@ -11,7 +11,18 @@ import {
   setInfoMessage,
   setMultiInfoMessage,
 } from 'JS/redux/actions/footer';
-import store from 'JS/redux/store';
+// utils
+import { checkBackupMode } from 'JS/utils/checkBackupMode';
+
+/**
+*  Method checks if a backup is running and starts polling for status using utils functions.
+*  @param {Object} error
+*/
+const checkErrorForBackup = (error) => {
+  if (error[0].message.indexOf('backup in progress') > -1) {
+    checkBackupMode();
+  }
+};
 
 /**
 *  @param {}
@@ -43,6 +54,7 @@ const publish = (baseUrl, props, isPublic, callback) => {
             setPublishingState(owner, name, true);
 
             const failureCall = (error) => {
+              checkErrorForBackup(error);
               setPublishingState(owner, name, false);
               resetPublishState(false);
               if (setSyncingState) {
@@ -146,6 +158,7 @@ const changeVisibility = (props, isPublic, callback) => {
                 visibility,
                 (visibilityResponse, error) => {
                   if (error) {
+                    checkErrorForBackup(error);
                     setErrorMessage(owner, name, 'Visibility change failed', error);
                     callback(null, error);
                   } else {
@@ -161,6 +174,7 @@ const changeVisibility = (props, isPublic, callback) => {
                 visibility,
                 (visibilityResponse, error) => {
                   if (error) {
+                    checkErrorForBackup(error);
                     setErrorMessage(owner, name, 'Visibility change failed', error);
                     callback(false, error);
                   } else {

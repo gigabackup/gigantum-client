@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1727"
+changelog:
+  - type: NEW
+    description: Update test framework for Client 1.5.1 support.

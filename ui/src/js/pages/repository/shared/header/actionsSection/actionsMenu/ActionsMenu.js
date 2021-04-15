@@ -25,20 +25,22 @@ import { setContainerMenuWarningMessage, setContainerMenuVisibility } from 'JS/r
 // queries
 import UserIdentity from 'JS/Auth/UserIdentity';
 import LinkedLocalDatasetsQuery from 'Pages/repository/shared/header/actionsSection/queries/LinkedLocalDatasetsQuery';
-// context
-import ServerContext from 'Pages/ServerContext';
 // components
-import CreateBranch from 'Pages/repository/shared/modals/CreateBranch';
+import CreateBranch from 'Pages/repository/shared/modals/createBranch/CreateBranch';
 import Tooltip from 'Components/tooltip/Tooltip';
 import LoginPrompt from 'Pages/repository/shared/modals/LoginPrompt';
 import DeleteLabbook from 'Pages/repository/shared/modals/DeleteLabbook';
 import DeleteDataset from 'Pages/repository/shared/modals/DeleteDataset';
+import ShareLink from './share/ShareLink';
 import CopyUrl from './copy/CopyUrl';
 import ChangeVisibility from './visibility/ChangeVisibility';
 // assets
 import './ActionsMenu.scss';
 
 type Props = {
+  currentServer: {
+    baseUrl: string,
+  },
   defaultRemote: string,
   description: string,
   history: Object,
@@ -564,7 +566,7 @@ class ActionsMenu extends Component<Props> {
   *  @return {}
   */
   _setRemoteSession = () => {
-    const { currentServer } = this.context;
+    const { currentServer } = this.props;
     const { baseUrl } = currentServer;
     const {
       name,
@@ -576,29 +578,29 @@ class ActionsMenu extends Component<Props> {
     });
   }
 
-  static contextType = ServerContext;
-
   render() {
     const {
+      currentServer,
+      defaultRemote,
+      description,
+      history,
+      isLocked,
       name,
       owner,
       sectionType,
-      defaultRemote,
-      history,
-      description,
-      isLocked,
     } = this.props;
     const {
-      menuOpen,
-      showLoginPrompt,
       deleteModalVisible,
-      remoteUrl,
-      justOpened,
       exporting,
       exportPath,
+      justOpened,
+      menuOpen,
+      remoteUrl,
+      showLoginPrompt,
     } = this.state;
     const deleteText = (sectionType === 'labbook') ? 'Delete Project' : 'Delete Dataset';
     const exportText = getExportText(exporting, name, sectionType);
+    const isShareLinkEnabled = (sectionType === 'labbook') && (window.location.host !== 'localhost:10000');
     // declare css here
     const exportCSS = classNames({
       ActionsMenu__item: true,
@@ -629,8 +631,7 @@ class ActionsMenu extends Component<Props> {
               remoteAdded={defaultRemote}
               remoteDelete={false}
             />
-          )
-        }
+          )}
 
         { (deleteModalVisible && (sectionType === 'dataset'))
           && (
@@ -641,8 +642,7 @@ class ActionsMenu extends Component<Props> {
               owner={owner}
               remoteAdded={defaultRemote}
             />
-          )
-        }
+          )}
 
         <CreateBranch
           description={description}
@@ -706,10 +706,12 @@ class ActionsMenu extends Component<Props> {
             <ChangeVisibility
               {...this.props}
               checkSessionIsValid={this._checkSessionIsValid}
+              currentServer={currentServer}
               defaultRemote={defaultRemote}
               resetState={this._resetState}
             />
-
+            { isShareLinkEnabled
+              && <ShareLink />}
             <CopyUrl
               defaultRemote={defaultRemote}
               name={name}
