@@ -5,6 +5,7 @@ function fetchQuery(apiURL) {
   headers.Accept = 'application/json';
   headers['Content-Type'] = 'application/json';
   headers['Access-Control-Allow-Origin'] = '*';
+  headers['Cache-Control'] = 'no-cache';
 
   return fetch(apiURL, {
     method: 'GET',

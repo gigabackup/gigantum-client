@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1738"
+changelog:
+  - type: NON_USER_FACING
+    description:  Fixes imports pointing to the wrong folder for machine paths in cloud entry point.
