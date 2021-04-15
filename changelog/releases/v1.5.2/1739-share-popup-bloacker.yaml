@@ -1,0 +1,5 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1740"
+changelog:
+  - type: NEW
+    description: Fixes launch button on popup blocker not working in import screen. Fixes popup blocker modal appearing when popups are not blocked on import screen.
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1739
