@@ -59,7 +59,7 @@ const ImportError = ({
   */
   const viewEnvironment = () => {
     clearState();
-    window.location.pathname = `${window.location.pathname}/environment`;
+    window.location.pathname = `${window.location.pathname}environment`;
   };
 
   const errorState = {

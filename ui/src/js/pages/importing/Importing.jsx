@@ -39,7 +39,7 @@ class Importing extends Component<Props, State> {
     importErrorVisible: false,
     showPopupBlocked: false,
     serverId: sessionStorage.getItem('serverId'),
-    devTool: sessionStorage.getItem('devTool'),
+    devTool: sessionStorage.getItem('devtool'),
     filePath: sessionStorage.getItem('filePath'),
   }
 
@@ -138,7 +138,7 @@ class Importing extends Component<Props, State> {
       const path = `${window.location.origin}/projects/${owner}/${name}`;
       window.location.hash = '';
       sessionStorage.removeItem('autoImport');
-      sessionStorage.removeItem('devTool');
+      sessionStorage.removeItem('devtool');
       sessionStorage.removeItem('filePath');
       window.open(path, '_self');
       return;
@@ -202,8 +202,6 @@ class Importing extends Component<Props, State> {
         const { jobKey } = response.importRemoteLabbook;
 
         this._jobStatus(jobKey);
-      } else {
-        this.setState({ importErrorVisible: true });
       }
     };
 
