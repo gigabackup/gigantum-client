@@ -1,0 +1,5 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1741"
+changelog:
+  - type: NEW
+    description: Fixes typos and changes text added in backup feature.
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1735

@@ -90,7 +90,7 @@ class BackupInProgressModal extends Component<Props> {
               {name}
             </span>
             {' '}
-            is currently backing up your data. During this time, access to the server is blocked to ensure backup integrity. Once the backup complete, these restrictions will automatically be removed and you will be able to interact with the server again.
+            is currently backing up your data. During this time, access to the server is blocked to ensure backup integrity. Once the backup is complete, these restrictions will automatically be removed and you will be able to interact with the server again.
           </p>
         </div>
         <div className="flex flex--row align-self--end">
