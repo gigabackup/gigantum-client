@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1752"
+changelog:
+  - type: FIX
+    description: Removes header argument that was causing a CORS error.
