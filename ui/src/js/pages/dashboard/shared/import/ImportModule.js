@@ -635,6 +635,7 @@ class ImportModule extends Component<Props> {
           dropZone={this.dropZone}
           files={files}
           importRepository={this._import}
+          isImporting={isImporting}
           isOver={isOver}
           isVisible={showImportModal}
           ready={ready}

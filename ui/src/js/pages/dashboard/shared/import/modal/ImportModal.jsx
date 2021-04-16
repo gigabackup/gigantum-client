@@ -18,6 +18,7 @@ type Props = {
   dropZone: Object,
   files: Array,
   importRepository: Function,
+  isImporting: boolean,
   isOver: boolean,
   isVisible: boolean,
   ready: {
@@ -40,6 +41,7 @@ const ImportModal = ({
   dropZone,
   files,
   importRepository,
+  isImporting,
   isOver,
   isVisible,
   ready,
@@ -110,7 +112,7 @@ const ImportModal = ({
             : (
               <div className="DropZone">
                 <div className="Dropbox--menu">
-                  <h5>{`Drag and drop an exported ${section} here`}</h5>
+                  <h5 className="ImportModal__h5">{`Drag and drop an exported ${section} here`}</h5>
                   <span>or</span>
                 </div>
                 <label
@@ -145,7 +147,7 @@ const ImportModal = ({
             type="button"
             onClick={() => { importRepository(); }}
             className="Btn--last"
-            disabled={!ready || self.state.isImporting}
+            disabled={!ready || isImporting}
           >
             Import
           </button>
