@@ -1,0 +1,5 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1751"
+changelog:
+  - type: FIX
+    description: Fixes css issues on import modal, and fixes import link bug crashing the app.
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1750

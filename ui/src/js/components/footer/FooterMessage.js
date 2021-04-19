@@ -68,6 +68,11 @@ class FooterMessage extends PureComponent<Props> {
       'FooterMessage__title--collapsed': !messageBodyVisible,
     });
 
+    let messageBody = messageItem && messageItem.messageBody && messageItem.messageBody;
+    if (typeof messageBody === 'string') {
+      messageBody = [{ message: messageBody }];
+    }
+
     return (
       <li className={bodyCSS}>
         <div className="FooterMessage__flex">
@@ -106,10 +111,9 @@ class FooterMessage extends PureComponent<Props> {
           }
         </div>
         <div className={messageBodyClasses}>
-
           <ul>
             {
-              messageItem && messageItem.messageBody && messageItem.messageBody.map(item => (
+              messageBody && messageBody.map(item => (
                 <li key={messageItem.id}>
                   <OutputMessage message={item.message} />
                 </li>

@@ -108,7 +108,7 @@ class User extends Component<Props> {
           <h6 className="User__server-name">{name}</h6>
           {
             backupInProgress && (
-              <div className="User__info Tooltip-data Tooltip-data--info--white" data-tooltip="The remote git repository is currently being backed up. You can still work locally, but your changes cannot be pushed until backup has complete. Contact your administrator for more information regarding backup." />
+              <div className="User__info Tooltip-data Tooltip-data--info--white" data-tooltip="The server is currently being backed up. You can still work locally, but your changes cannot be synced at this time. Server operations will automatically re-enable once the backup has completed." />
             )
           }
         </div>

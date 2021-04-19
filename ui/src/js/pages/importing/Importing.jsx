@@ -39,7 +39,7 @@ class Importing extends Component<Props, State> {
     importErrorVisible: false,
     showPopupBlocked: false,
     serverId: sessionStorage.getItem('serverId'),
-    devTool: sessionStorage.getItem('devTool'),
+    devTool: sessionStorage.getItem('devtool'),
     filePath: sessionStorage.getItem('filePath'),
   }
 
@@ -132,14 +132,13 @@ class Importing extends Component<Props, State> {
     const name = pathArray[3];
     const devtool = sessionStorage.getItem('devtool');
     const feedbackUpdated = `${feedback} <br /> Starting ${devtool} in '${owner}/${name}'`;
-    let showPopupBlocked = false;
 
 
     if (devtool === 'undefined') {
       const path = `${window.location.origin}/projects/${owner}/${name}`;
       window.location.hash = '';
       sessionStorage.removeItem('autoImport');
-      sessionStorage.removeItem('devTool');
+      sessionStorage.removeItem('devtool');
       sessionStorage.removeItem('filePath');
       window.open(path, '_self');
       return;
@@ -167,16 +166,14 @@ class Importing extends Component<Props, State> {
         }
 
         window[tabName] = window.open(path, tabName);
+
         if (
           !window[tabName]
           || window[tabName].closed
           || typeof window[tabName].closed === 'undefined'
         ) {
           this.setState({ showPopupBlocked: true });
-          showPopupBlocked = true;
-        }
-
-        if (!showPopupBlocked) {
+        } else {
           window.location.hash = '';
           sessionStorage.removeItem('autoImport');
           sessionStorage.removeItem('devtool');
@@ -205,8 +202,6 @@ class Importing extends Component<Props, State> {
         const { jobKey } = response.importRemoteLabbook;
 
         this._jobStatus(jobKey);
-      } else {
-        this.setState({ importErrorVisible: true });
       }
     };
 
@@ -319,7 +314,7 @@ class Importing extends Component<Props, State> {
         />
 
         <PopupBlocked
-          attemptRelaunch={this.launch}
+          attemptRelaunch={this._launch}
           devTool={devTool}
           hideCancel
           togglePopupModal={this._togglePopupModal}

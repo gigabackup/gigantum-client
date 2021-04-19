@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1755"
+changelog:
+  - type: FIX
+    description: Fixes an issue causing the error modal to always appear when importing via share URL

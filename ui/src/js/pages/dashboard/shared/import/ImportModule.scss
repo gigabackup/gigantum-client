@@ -155,8 +155,7 @@
   }
 
   &__buttonContainer {
-    justify-content: space-between;
-    width: 300px;
+    justify-content: flex-end;
     display: flex;
     margin-top: 10px;
     align-self: flex-end;
@@ -303,6 +302,7 @@ input.Import__input--paste{
   DropZone section
 ************************/
 .ImportDropzone {
+  height: 200px;
   align-self: center;
   min-height: 200px !important;
   width: 100%;
@@ -342,6 +342,13 @@ input.Import__input--paste{
       color: $primary;
     }
 }
+
+.ImportModal {
+  &__h5 {
+    margin-top: 0px !important;
+  }
+}
+
 
 /*******************
   buttons

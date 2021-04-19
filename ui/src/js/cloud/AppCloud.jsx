@@ -10,12 +10,12 @@ import fetchQuery from 'JS/fetch';
 // auth
 import Auth from 'JS/Auth/Auth';
 import { getIsLoggedIn } from 'JS/Auth/AuthHandler';
-import stateMachine from 'JS/Auth/AuthStateMachine';
+import stateMachine from 'JS/Auth/machine/AuthStateMachine';
 import {
   LOADING,
   ERROR,
   LOGGED_IN,
-} from 'JS/Auth/AuthMachineConstants';
+} from 'JS/Auth/machine/AuthMachineConstants';
 // components
 import Routes from 'Pages/Routes';
 import Interstitial from 'Components/interstitial/Interstitial';
@@ -30,25 +30,18 @@ const AppCloudQuery = graphql`
   }
 `;
 
-type State = {
-  availableServers: array,
-  isLoggedIn: boolean | null,
-  machine?: string,
-
-}
 
 class App extends Component {
   state = {
     availableServers: [],
     isLoggedIn: null,
-    machine: null,
+    machine: stateMachine.initialState,
   }
 
   auth = new Auth();
 
   componentDidMount() {
     const serverUrl = apiURL('server');
-    this.setState({ machine: stateMachine.initialState });
     fetchQuery(
       serverUrl,
     ).then(serverResponse => {
