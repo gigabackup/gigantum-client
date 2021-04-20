@@ -17,8 +17,11 @@ class ProjectListingComponent(BaseComponent):
 
     def get_project_title(self) -> str:
         """Returns the title of project listing page."""
-        txt_project_title = self.get_locator(LocatorType.XPath, "//h1[contains(text(),'Projects')]")
-        return txt_project_title.get_text()
+        element = "//h1[contains(text(),'Projects')]"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            txt_project_title = self.get_locator(LocatorType.XPath, element)
+            if txt_project_title is not None:
+                return txt_project_title.get_text()
 
     def profile_menu_click(self) -> bool:
         """Performs click event of profile menu item."""

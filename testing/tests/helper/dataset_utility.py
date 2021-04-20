@@ -36,6 +36,9 @@ class DatasetUtility:
         if not is_clicked:
             return "Could not click dataset menu."
 
+        # Time sleep to make sure dataset page and it's components are loaded
+        time.sleep(1)
+
         # Click on "Create New"
         is_clicked = dataset_list.dataset_listing_component.click_create_new_dataset_button()
         if not is_clicked:
@@ -169,6 +172,7 @@ class DatasetUtility:
             return "Could not select the dataset folder"
 
         # Choose the file
+        time.sleep(1)
         is_selected = jupyter_lab_page.click_file(file_details.file_name)
         if not is_selected:
             return "Could not select the file"

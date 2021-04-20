@@ -72,11 +72,13 @@ class ProjectMenuComponent(BaseComponent):
         Returns: returns the result of click action
 
         """
-        element = "//div[contains(text(), 'Publish')]"
-        btn_publish = self.get_locator(LocatorType.XPath, element)
-        if btn_publish is not None and btn_publish.element_to_be_clickable():
-            btn_publish.click()
-            return True
+        element = "//button[@class='Btn--branch Btn--action SyncBranchButtons__btn " \
+                  "SyncBranchButtons__btn--publish Tooltip-data']"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            btn_publish = self.get_locator(LocatorType.XPath, element)
+            if btn_publish is not None and btn_publish.element_to_be_clickable():
+                btn_publish.click()
+                return True
         return False
 
     def enable_private_mode(self) -> bool:

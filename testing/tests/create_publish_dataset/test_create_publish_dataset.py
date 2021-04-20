@@ -207,8 +207,25 @@ class TestCreatePublishDataset:
                                                                                hash_code, random_contents=False)
         assert is_added is not None, "Could not add file"
 
-        # Drag and drop file into file browser area is not reflecting with out page refresh
-        self.driver.refresh()
+        # A permission issue was raised for drag and drop.
+        # Solved temporarily by reloading the page with a few clicks on the page.
+        # Click 'Projects' menu
+        is_clicked = dataset_list.project_menu_component.click_projects_menu()
+        assert is_clicked, "Could not click Projects menu"
+
+        # Click dataset menu
+        is_clicked = dataset_list.dataset_menu_component.click_datasets_menu()
+        assert is_clicked, "Could not click dataset menu"
+
+        # Select dataset
+        is_clicked = dataset_list.dataset_listing_component.select_dataset(dataset_title)
+        assert is_clicked, "Could not click the dataset in dataset listing page"
+
+        # Click "Data" tab
+        is_clicked = dataset_list.dataset_menu_component.click_data_tab()
+        assert is_clicked, "Could not click Data tab"
+
+        # Drag and drop file into file browser area is not reflecting with out time sleep
         time.sleep(5)
 
         # Drag and drop text file 'file1.txt' with contents 'created'

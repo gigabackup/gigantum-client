@@ -1,4 +1,5 @@
 import random
+import time
 from client_app.pages.project_listing.project_listing_page import ProjectListingPage
 from selenium import webdriver
 from tests.constants_enums.constants_enums import ProjectConstants
@@ -208,6 +209,9 @@ class ProjectUtility:
         project_list = ProjectListingPage(driver)
         if not project_list:
             return "Could not load Project Listing Page"
+
+        # Time sleep to make sure that the publish button is loaded
+        time.sleep(1)
 
         # Click on project publish button
         is_clicked = project_list.project_menu_component.click_publish_button()
