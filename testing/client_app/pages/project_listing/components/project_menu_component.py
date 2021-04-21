@@ -248,3 +248,70 @@ class ProjectMenuComponent(BaseComponent):
         if self.check_element_absence(LocatorType.XPath, element, 40):
             return True
         return False
+
+    def check_publish_all_workflow_appear(self) -> bool:
+        """ Check for the presence of publish all workflow appear or not
+
+        Returns: returns True if the element is present
+
+        """
+        element = "//p[contains(text(), 'This Project is linked to unpublished (local-only) Datasets')]"
+        if self.check_element_presence(LocatorType.XPath, element, 40):
+            return True
+        return False
+
+    def click_continue_button(self) -> bool:
+        """ Click on the continue button on publish all workflow window
+
+        Returns: returns the result of click action
+
+        """
+        element = "//button[contains(text(), 'Continue')]"
+        if self.check_element_presence(LocatorType.XPath, element, 40):
+            continue_button = self.get_locator(LocatorType.XPath, element)
+            if continue_button is not None:
+                continue_button.click()
+                return True
+        return False
+
+    def enable_private_mode_for_all(self) -> bool:
+        """ Enable private mode for dataset in publish all workflow window
+
+        Returns: returns the result of radio button click
+
+        """
+        element = "//div[@class='PublishDatasetsModal__private']/label"
+        if self.check_element_presence(LocatorType.XPath, element, 40):
+            all_btn_publish_private = self.driver.find_elements_by_xpath(element)
+            for btn_publish_private in all_btn_publish_private:
+                if btn_publish_private is not None:
+                    btn_publish_private.click()
+                else:
+                    return False
+            return True
+        return False
+
+    def click_publish_all_button(self) -> bool:
+        """ Performs click action on publish all button on publish all workflow window
+
+        Returns: returns the result of click action
+
+        """
+        element = "//button[contains(text(), 'Publish All')]"
+        if self.check_element_presence(LocatorType.XPath, element, 20):
+            publish_button = self.get_locator(LocatorType.XPath, element)
+            if publish_button is not None:
+                publish_button.click()
+                return True
+        return False
+
+    def check_publish_all_window_closed(self) -> bool:
+        """ Check for the absence of publish all workflow window
+
+        Returns: returns True if the element is not present
+
+        """
+        element = "//div[@class='Modal__content Modal__content--large dataset']"
+        if self.check_element_absence(LocatorType.XPath, element, 80):
+            return True
+        return False
