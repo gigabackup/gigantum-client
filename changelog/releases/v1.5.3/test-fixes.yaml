@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1763"
+changelog:
+  - type: NON_USER_FACING
+    description: Fix for environment unit tests due to conda nltk package bump.
