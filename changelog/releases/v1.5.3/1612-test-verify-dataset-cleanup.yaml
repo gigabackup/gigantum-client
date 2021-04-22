@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1762"
+changelog:
+  - type: NEW
+    description: Test case that verifies the cleaning up of dataset files.

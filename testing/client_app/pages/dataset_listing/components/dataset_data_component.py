@@ -449,3 +449,14 @@ class DatasetDataComponent(BaseComponent):
         if self.check_element_presence(LocatorType.XPath, element, 30):
             return True
         return False
+
+    def verify_dataset_file_cache(self, dataset_name) -> bool:
+        """ Check whether the dataset file cache exist or not
+
+        Args:
+            dataset_name: Name of the dataset to be verified
+
+        Returns: returns the result of file verification
+
+        """
+        return DatasetHelperUtility().verify_dataset_file_cache(dataset_name)

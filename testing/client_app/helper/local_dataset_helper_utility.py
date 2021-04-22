@@ -8,6 +8,7 @@ from string import Template
 import requests
 import subprocess
 import os
+from selenium import webdriver
 
 
 class DatasetHelperUtility(object):
@@ -50,7 +51,7 @@ class DatasetHelperUtility(object):
                     shutil.rmtree(user_directory / dataset.name)
         return True
 
-    def delete_remote_dataset(self, dataset_title, driver) -> None:
+    def delete_remote_dataset(self, dataset_title: str, driver: webdriver) -> None:
         """Method to remove remote dataset if it exists in the hub.
 
         Args:
@@ -90,7 +91,7 @@ class DatasetHelperUtility(object):
             if result_data['data']['deleteDataset']['remoteDeleted'] is False:
                 raise Exception("Failed to delete remote dataset")
 
-    def get_hash_code(self, dataset_title) -> str:
+    def get_hash_code(self, dataset_title: str) -> str:
         """ Get the git hash code
 
         Args:
@@ -109,7 +110,8 @@ class DatasetHelperUtility(object):
         stdout, stderr = out.communicate()
         return str(stdout.decode("utf-8").strip("\n"))
 
-    def add_file(self, file_name, file_content, folder_name, dataset_name, hash_code_folder, sub_folder_name) -> bool:
+    def add_file(self, file_name: str, file_content: str, folder_name: str, dataset_name: str, hash_code_folder: str,
+                 sub_folder_name: str) -> bool:
         """ Add text files into the dataset folder
 
         Args:
@@ -141,8 +143,8 @@ class DatasetHelperUtility(object):
             return True
         return True
 
-    def add_binary_file_to_root(self, file_name, size_in_mb, dataset_name, hash_code_folder,
-                                random_contents=False) -> bool:
+    def add_binary_file_to_root(self, file_name: str, size_in_mb: int, dataset_name: str, hash_code_folder: str,
+                                random_contents: bool = False) -> bool:
         """ Add binary file into the dataset folder
 
         Args:
@@ -174,7 +176,7 @@ class DatasetHelperUtility(object):
             return True
         return True
 
-    def update_file_content(self, file_name, file_content, dataset_name, hash_code_folder) -> bool:
+    def update_file_content(self, file_name: str, file_content: str, dataset_name: str, hash_code_folder: str) -> bool:
         """ Update the content of file
 
         Args:
@@ -194,3 +196,23 @@ class DatasetHelperUtility(object):
             temp_file.truncate()
             temp_file.write(file_content)
         return True
+
+    def verify_dataset_file_cache(self, dataset_name: str) -> bool:
+        """Verify whether the dataset file cache is present or not
+
+        Args:
+            dataset_name: Name of the dataset to be verify
+
+        Returns: returns the result of verification
+
+        """
+        dataset_folder_names = ProjectHelperUtility().get_folder_names()
+        user_directory = dataset_folder_names.home_dir / GigantumConstants.CACHE_FOLDER.value / \
+                         GigantumConstants.DATASETS_FOLDER.value / dataset_folder_names.server_name / \
+                         dataset_folder_names.username / dataset_folder_names.username
+        datasets_cache = user_directory.glob('d-*')
+        if datasets_cache:
+            for dataset in datasets_cache:
+                if dataset.name == dataset_name:
+                    return True
+        return False
