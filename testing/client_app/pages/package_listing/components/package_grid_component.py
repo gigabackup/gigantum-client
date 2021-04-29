@@ -1,3 +1,6 @@
+import os
+import tempfile
+import time
 from framework.base.component_base import BaseComponent
 from selenium import webdriver
 from framework.factory.models_enums.page_config import ComponentModel
@@ -270,7 +273,7 @@ class PackageGridComponent(BaseComponent):
             return True
         return False
 
-    def click_modal_close_button(self):
+    def click_modal_close_button(self) -> bool:
         """Performs click action on modal close button
 
         Returns: returns the result of click action
@@ -283,7 +286,7 @@ class PackageGridComponent(BaseComponent):
             return True
         return False
 
-    def clear_docker_text_area(self):
+    def clear_docker_text_area(self) -> bool:
         """Clear docker text area
 
         Returns: returns the result of clear action
@@ -298,5 +301,155 @@ class PackageGridComponent(BaseComponent):
             return True
         return False
 
+    def input_sensitive_file(self, file_name, file_content) -> bool:
+        """ Input sensitive file
 
+        Args:
+            file_name: Name of the sensitive file
+            file_content: Content of the sensitive file
 
+        Returns: returns the result of file input
+
+        """
+        input_element = "//input[@id='add_secret']"
+        if self.check_element_presence(LocatorType.XPath, input_element, 20):
+            file_input = self.driver.find_element_by_id('add_secret')
+            if file_input:
+                temp_dir = tempfile.gettempdir()
+                with open(os.path.join(temp_dir, file_name), 'w') as temp_file:
+                    temp_file.write(file_content)
+                file_path = os.path.join(temp_dir, file_name)
+                file_input.send_keys(file_path)
+                return True
+        return False
+
+    def add_destination_directory(self, directory_name) -> bool:
+        """ Input sensitive file
+
+        Args:
+            directory_name: Name of the destination directory
+
+        Returns: returns the result of input action
+
+        """
+        input_element = "//input[@id='secret_path']"
+        if self.check_element_presence(LocatorType.XPath, input_element, 20):
+            destination_input = self.get_locator(LocatorType.XPath, input_element)
+            if destination_input is not None:
+                destination_input.send_keys(directory_name)
+                return True
+        return False
+
+    def click_sensitive_file_save_button(self) -> bool:
+        """ CLick on sensitive file save button
+
+        Returns: returns the result of click action
+
+        """
+        save_button_element = "//button[contains(text(),'Save')]"
+        if self.check_element_presence(LocatorType.XPath, save_button_element, 20):
+            save_button = self.get_locator(LocatorType.XPath, save_button_element)
+            if save_button is not None:
+                save_button.click()
+                return True
+        return False
+
+    def click_edit_sensitive_file_button(self) -> bool:
+        """ Performs click action on edit sensitive file button
+
+        Returns: returns the result of click action
+
+        """
+        edit_button_element = "//button[@class='Btn Btn--medium Btn--noMargin Btn--round Btn__edit-secondary " \
+                              "Btn__edit-secondary--medium']"
+        if self.check_element_presence(LocatorType.XPath, edit_button_element, 20):
+            edit_button = self.get_locator(LocatorType.XPath, edit_button_element)
+            if edit_button is not None:
+                edit_button.click()
+                return True
+        return False
+
+    def replace_sensitive_file(self, file_name, file_content) -> bool:
+        """ Input sensitive file
+
+        Args:
+            file_name: Name of the sensitive file
+            file_content: Content of the sensitive file
+
+        Returns: returns the result of file input
+
+        """
+        input_element = "//input[@id='update_secret']"
+        if self.check_element_presence(LocatorType.XPath, input_element, 20):
+            file_input = self.driver.find_element_by_id('update_secret')
+            if file_input:
+                temp_dir = tempfile.gettempdir()
+                with open(os.path.join(temp_dir, file_name), 'w') as temp_file:
+                    temp_file.write(file_content)
+                file_path = os.path.join(temp_dir, file_name)
+                file_input.send_keys(file_path)
+                return True
+        return False
+
+    def scroll_to_page_top(self) -> bool:
+        """Scroll to the window top
+
+        Returns: returns the result of scroll action
+
+        """
+        return self.scroll_to_window_top()
+
+    def verify_sensitive_file_is_missing(self) -> bool:
+        """ Verify sensitive file is missing or not
+
+        Returns: returns the result of verification
+
+        """
+        element = "//button[@data-selenium-id='SecretsPresent']"
+        if self.check_element_presence(LocatorType.XPath, element, 20):
+            sensitive_file_missing_element = self.get_locator(LocatorType.XPath, element)
+            if sensitive_file_missing_element is not None:
+                return True
+        return False
+
+    def click_sensitive_file_delete_button(self) -> bool:
+        """ Performs click action on sensitive file delete button
+
+        Returns: returns the result of click action
+
+        """
+        element = "//button[@class='Btn Btn--medium Btn--noMargin Btn--round Btn__delete-secondary " \
+                  "Btn__delete-secondary--medium']"
+        if self.check_element_presence(LocatorType.XPath, element, 20):
+            delete_button = self.get_locator(LocatorType.XPath, element)
+            if delete_button is not None:
+                delete_button.click()
+                return True
+        return False
+
+    def click_sensitive_file_delete_yes_button(self) -> bool:
+        """ Performs click action on sensitive file delete yes button
+
+        Returns: returns the result of click action
+
+        """
+        element = "//button[@class='Secrets__btn--round Secrets__btn--add']"
+        if self.check_element_presence(LocatorType.XPath, element, 20):
+            delete_yes_button = self.get_locator(LocatorType.XPath, element)
+            if delete_yes_button is not None:
+                delete_yes_button.click()
+                return True
+        return False
+
+    def verify_sensitive_file_is_added(self, file_name) -> bool:
+        """ Verify sensitive file is added or not
+
+        Returns: returns the result of verification
+
+        """
+        element = "//div[@class='SecretsTable__name']"
+        if self.check_element_presence(LocatorType.XPath, element, 20):
+            sensitive_file_text = self.get_locator(LocatorType.XPath, element).text
+            if sensitive_file_text is not None and sensitive_file_text == file_name:
+                return True
+        return False

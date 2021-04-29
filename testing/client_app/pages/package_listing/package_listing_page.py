@@ -330,3 +330,89 @@ class PackageListingPage(BasePage):
 
         """
         return self.package_listing_component.clear_docker_text_area()
+
+    def input_sensitive_file(self, file_name, file_content) -> bool:
+        """Add sensitive file
+
+        Returns: returns the result of input action
+
+        """
+        return self.package_listing_component.input_sensitive_file(file_name, file_content)
+
+    def add_destination_directory(self, directory_name) -> bool:
+        """Add destination directory
+
+        Returns: returns the result of input action
+        """
+        return self.package_listing_component.add_destination_directory(directory_name)
+
+    def click_sensitive_file_save_button(self) -> bool:
+        """Click sensitive file save button
+
+        Returns: returns the result of click action
+        """
+        return self.package_listing_component.click_sensitive_file_save_button()
+
+    def click_edit_sensitive_file_button(self) -> bool:
+        """Performs click action on edit sensitive file button
+
+        Returns: returns the result of click action
+        """
+        return self.package_listing_component.click_edit_sensitive_file_button()
+
+    def replace_sensitive_file(self, file_name, file_content) -> bool:
+        """Replace sensitive file
+
+        Returns: returns the result of input action
+
+        """
+        return self.package_listing_component.replace_sensitive_file(file_name, file_content)
+
+    def scroll_to_page_top(self) -> bool:
+        """Performs scroll action to window top
+
+        Returns: returns the result of scroll action
+
+        """
+        return self.package_listing_component.scroll_to_window_top()
+
+    def verify_sensitive_file_is_missing(self) -> bool:
+        """Verify sensitive file is missing or not
+
+        Returns: returns the result of verification
+
+        """
+        return self.package_listing_component.verify_sensitive_file_is_missing()
+
+    def click_environment_tab(self) -> bool:
+        """ Performs click action on environment tab """
+        element = "//li[@id='environment']"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            environment_tab = self.get_locator(LocatorType.XPath, element)
+            environment_tab.click()
+            return True
+        return False
+
+    def click_sensitive_file_delete_button(self) -> bool:
+        """ Performs click action on sensitive file delete button
+
+        Returns: returns the result of click action
+
+        """
+        return self.package_listing_component.click_sensitive_file_delete_button()
+
+    def click_sensitive_file_delete_yes_button(self) -> bool:
+        """ Performs click action on sensitive file delete button
+
+        Returns: returns the result of click action
+
+        """
+        return self.package_listing_component.click_sensitive_file_delete_yes_button()
+
+    def verify_sensitive_file_is_added(self, file_name) -> bool:
+        """ Verify sensitive file is added or not
+
+        Returns: returns the result of verification
+
+        """
+        return self.package_listing_component.verify_sensitive_file_is_added(file_name)
