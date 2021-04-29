@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 import requests
 import time
 
@@ -37,14 +37,18 @@ def start_bundled_app(labbook: LabBook, username: str, command: str, route_prefi
     proj_container.exec_command(command, user='giguser', get_results=False)
 
 
-def check_bundled_app_reachable(app_name: str, ip_address: str, port: int, prefix: str, expected_status: int = 200):
+def check_bundled_app_reachable(app_name: str, ip_address: str, port: int, prefix: str,
+                                expected_status: Optional[List[int]] = None):
     test_url = f'http://{ip_address}:{port}{prefix}'
+
+    if not expected_status:
+        expected_status = [200, 300, 301, 302, 303, 304, 307, 308]
 
     for n in range(30):
         logger.debug(f"Attempt {n + 1}: Testing if custom app `{app_name}` is up at {test_url}...")
         try:
             r = requests.get(test_url, timeout=0.5)
-            if r.status_code != expected_status:
+            if r.status_code not in expected_status:
                 logger.info(f"app status {r.status_code}")
                 time.sleep(0.5)
             else:

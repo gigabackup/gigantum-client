@@ -191,7 +191,7 @@ class StartDevTool(graphene.relay.ClientIDMutation):
             run_command = False
 
             try:
-                check_bundled_app_reachable(bundled_app['name'], labbook_ip, tool_port, suffix, 200)
+                check_bundled_app_reachable(bundled_app['name'], labbook_ip, tool_port, suffix)
             except GigantumException:
                 # If you get here, the Custom App didn't respond, so it's probably a stale route?
                 logger.warning(f'Detected stale route. Attempting to restart Custom App and clean up route table.')
@@ -215,7 +215,7 @@ class StartDevTool(graphene.relay.ClientIDMutation):
             start_bundled_app(labbook, username, bundled_app['command'], external_rt_prefix, tag=container_override_id)
 
             # Wait for the app to start
-            check_bundled_app_reachable(bundled_app['name'], labbook_ip, tool_port, external_rt_prefix, 200)
+            check_bundled_app_reachable(bundled_app['name'], labbook_ip, tool_port, external_rt_prefix)
 
         return suffix
 
