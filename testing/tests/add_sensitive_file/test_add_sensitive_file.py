@@ -181,7 +181,7 @@ class TestAddPackageUsingDockerSnippets:
         assert is_verified, "Could not verify project in server"
 
         # Click import button in server page
-        is_clicked = project_list.server_component.click_project_import_button(project_title)
+        is_clicked = project_list.server_component.click_import_button(project_title)
         assert is_clicked, "Could not click import button in server page"
 
         # Monitor container status to go through Stopped -> Building

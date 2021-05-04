@@ -30,67 +30,67 @@ class ServerComponent(BaseComponent):
             return True
         return False
 
-    def verify_title_in_server(self, title_text) -> bool:
+    def verify_title_in_server(self, title) -> bool:
         """ Verify whether the title is present in the server page or not
 
         Args:
-            title_text: Title of the current project
+            title: Title of the project or dataset
 
         Returns: returns the result of title verification
 
         """
         element = "//div[@data-selenium-id='RemotePanel']"
         if self.check_element_presence(LocatorType.XPath, element, 30):
-            title_list = self.driver.find_elements_by_xpath(element)
-            if title_list is not None:
-                for title in title_list:
-                    title_name = title.find_element_by_xpath\
-                        (".//div[@class='RemotePanel__row RemotePanel__row--text']/div[1]")
-                    if title_text == title_name.get_text().strip():
+            title_list_div = self.driver.find_elements_by_xpath(element)
+            if title_list_div is not None:
+                for title_div in title_list_div:
+                    title_name = title_div.find_element_by_xpath\
+                        (".//div[@class='RemotePanel__row RemotePanel__row--title']/h5/div[1]")
+                    if title == title_name.get_text().strip():
                         return True
         return False
 
-    def click_project_import_button(self, project_title) -> bool:
+    def click_import_button(self, title) -> bool:
         """ Performs click action on import button
 
         Args:
-            project_title: Title of the current project
+            title: Title of the current project or dataset
 
         Returns: returns the result of click action
 
         """
         element = "//div[@data-selenium-id='RemotePanel']"
         if self.check_element_presence(LocatorType.XPath, element, 30):
-            projects_list = self.driver.find_elements_by_xpath(element)
-            if projects_list is not None:
-                for project in projects_list:
-                    project_name = project.find_element_by_xpath \
-                        (".//div[@class='RemotePanel__row RemotePanel__row--text']/div[1]")
-                    if project_title == project_name.get_text().strip():
-                        import_button = project.find_element_by_xpath(".//button[contains(text(),'Import')]")
+            title_list_div = self.driver.find_elements_by_xpath(element)
+            if title_list_div is not None:
+                for title_div in title_list_div:
+                    title_text = title_div.find_element_by_xpath \
+                        (".//div[@class='RemotePanel__row RemotePanel__row--title']/h5/div[1]")
+                    if title == title_text.get_text().strip():
+                        import_button = title_div.find_element_by_xpath(".//button[contains(text(),'Import')]")
                         if import_button is not None:
                             import_button.execute_script("arguments[0].click();")
                             return True
         return False
 
-    def click_project_delete_button(self, project_title) -> bool:
-        """ Performs click action on project delete button
+    def click_delete_button(self, title) -> bool:
+        """ Performs click action on delete button
 
         Args:
-            project_title: Title of the current project
+            title: Title of the current dataset
 
         Returns: returns the result of click action
 
         """
         element = "//div[@data-selenium-id='RemotePanel']"
         if self.check_element_presence(LocatorType.XPath, element, 30):
-            projects_list = self.driver.find_elements_by_xpath(element)
-            if projects_list is not None:
-                for project in projects_list:
-                    project_name = project.find_element_by_xpath\
-                        (".//div[@class='RemotePanel__row RemotePanel__row--text']/div[1]")
-                    if project_title == project_name.get_text().strip():
-                        delete_button = project.find_element_by_xpath(".//button[contains(text(),'Delete')]")
+            title_list_div = self.driver.find_elements_by_xpath(element)
+            if title_list_div is not None:
+                for title_div in title_list_div:
+                    title_text = title_div.find_element_by_xpath\
+                        (".//div[@class='RemotePanel__row RemotePanel__row--title']/h5/div[1]")
+                    if title == title_text.get_text().strip():
+                        delete_button = title_div.find_element_by_xpath(".//button[contains(text(),'Delete')]")
                         if delete_button is not None:
                             delete_button.execute_script("arguments[0].click();")
                             return True
@@ -148,69 +148,3 @@ class ServerComponent(BaseComponent):
         """
         element = "//div[@class='Icon Icon--delete']"
         return self.check_element_absence(LocatorType.XPath, element, wait_time)
-
-    def verify_dataset_title_in_server(self, dataset_title) -> bool:
-        """ Verify whether the dataset title is present in the server page or not
-
-        Args:
-            dataset_title: Title of the dataset
-
-        Returns: returns the result of dataset verification
-
-        """
-        element = "//div[@data-selenium-id='RemotePanel']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
-            title_list = self.driver.find_elements_by_xpath(element)
-            if title_list is not None:
-                for title in title_list:
-                    title_name = title.find_element_by_xpath\
-                        (".//div[@class='RemotePanel__row RemotePanel__row--title']/h5/div[1]")
-                    if dataset_title == title_name.get_text().strip():
-                        return True
-        return False
-
-    def click_dataset_import_button(self, dataset_title) -> bool:
-        """ Performs click action on dataset import button
-
-        Args:
-            dataset_title: Title of the current dataset
-
-        Returns: returns the result of click action
-
-        """
-        element = "//div[@data-selenium-id='RemotePanel']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
-            datasets_list = self.driver.find_elements_by_xpath(element)
-            if datasets_list is not None:
-                for dataset in datasets_list:
-                    dataset_name = dataset.find_element_by_xpath \
-                        (".//div[@class='RemotePanel__row RemotePanel__row--title']/h5/div[1]")
-                    if dataset_title == dataset_name.get_text().strip():
-                        import_button = dataset.find_element_by_xpath(".//button[contains(text(),'Import')]")
-                        if import_button is not None:
-                            import_button.execute_script("arguments[0].click();")
-                            return True
-        return False
-
-    def click_dataset_delete_button(self, dataset_title) -> bool:
-        """ Performs click action on dataset delete button
-
-        Args:
-            dataset_title: Title of the current dataset
-
-        Returns: returns the result of click action
-
-        """
-        element = "//div[@data-selenium-id='RemotePanel']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
-            datasets_list = self.driver.find_elements_by_xpath(element)
-            if datasets_list is not None:
-                for dataset in datasets_list:
-                    dataset_name = dataset.find_element_by_xpath\
-                        (".//div[@class='RemotePanel__row RemotePanel__row--title']/h5/div[1]")
-                    if dataset_title == dataset_name.get_text().strip():
-                        delete_button = dataset.find_element_by_xpath(".//button[contains(text(),'Delete')]")
-                        if delete_button is not None:
-                            delete_button.execute_script("arguments[0].click();")
-                            return True
-        return False

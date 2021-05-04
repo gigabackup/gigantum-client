@@ -269,11 +269,11 @@ class TestCreatePublishDataset:
         assert is_clicked, "Could not click server tab"
 
         # Verify dataset in server page
-        is_verified = dataset_list.server_component.verify_dataset_title_in_server(dataset_title)
+        is_verified = dataset_list.server_component.verify_title_in_server(dataset_title)
         assert is_verified, "Could not verify dataset in server"
 
         # Click import button in server page
-        is_clicked = dataset_list.server_component.click_dataset_import_button(dataset_title)
+        is_clicked = dataset_list.server_component.click_import_button(dataset_title)
         assert is_clicked, "Could not click import button in server page"
 
         # Check private lock icon presence
@@ -390,11 +390,11 @@ class TestCreatePublishDataset:
         assert is_clicked, "Could not click server tab"
 
         # Verify dataset in server page
-        is_verified = dataset_list.server_component.verify_dataset_title_in_server(dataset_title)
+        is_verified = dataset_list.server_component.verify_title_in_server(dataset_title)
         assert is_verified, "Could not verify dataset in server"
 
         # Click delete button in server page
-        is_clicked = dataset_list.server_component.click_dataset_delete_button(dataset_title)
+        is_clicked = dataset_list.server_component.click_delete_button(dataset_title)
         assert is_clicked, "Could not click delete button in server page"
 
         # Get dataset title from delete dataset window in server page
@@ -414,7 +414,7 @@ class TestCreatePublishDataset:
         assert is_verified, "Could not close delete modal"
 
         # Verify dataset is not exist in server page
-        is_verified = dataset_list.server_component.verify_dataset_title_in_server(dataset_title)
+        is_verified = dataset_list.server_component.verify_title_in_server(dataset_title)
         assert not is_verified, "Dataset is still exist in the server"
 
         # wait ~5 seconds to guarantee server side deletion completes
@@ -425,5 +425,5 @@ class TestCreatePublishDataset:
         assert is_clicked, "Could not click server tab"
 
         # Verify dataset is not exist in server page
-        is_verified = dataset_list.server_component.verify_dataset_title_in_server(dataset_title)
+        is_verified = dataset_list.server_component.verify_title_in_server(dataset_title)
         assert not is_verified, "Dataset is still exist in the server page"
