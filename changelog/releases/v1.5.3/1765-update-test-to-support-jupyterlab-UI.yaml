@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1776"
+changelog:
+  - type: NEW
+    description: Test framework updated to support jupyterlab UI changes.

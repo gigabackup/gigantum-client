@@ -110,7 +110,7 @@ class DatasetUtility:
             driver: web driver instance
             files_details_list: List of tuples with file_details
         """
-        # Load Jupyter Lab page Page
+        # Load Jupyter Lab page
         jupyter_lab_page = JupyterLabPage(driver)
         if not jupyter_lab_page:
             return "Could not load Jupyter Lab Page"
@@ -121,17 +121,21 @@ class DatasetUtility:
             return "Could not click Jupyter Lab button"
 
         # Wait for new tab to open with new url
-        is_url_loaded = jupyter_lab_page.wait_for_url_in_new_tab("/lab", 1, 60)
+        is_url_loaded = jupyter_lab_page.wait_for_url_in_new_tab("/lab/tree/code", 1, 60)
         if not is_url_loaded:
             return "Could not open new window"
 
+        folder_name = dataset_folder_name = file_name = ""
         # Iterate through list of file_details
         for file_details in files_details_list:
+            folder_name = file_details.folder_name
+            dataset_folder_name = file_details.dataset_name
+            file_name = file_details.file_name
             file_content_verification_result = self.__verify_file_content(jupyter_lab_page, file_details)
             if file_content_verification_result != ProjectConstants.SUCCESS.value:
                 return file_content_verification_result
 
-        jupyter_lab_page.close_tab("/lab", 0)
+        jupyter_lab_page.close_tab(f"/lab/tree/{folder_name}/{dataset_folder_name}/{file_name}", 0)
 
         # Click on container status button to stop container
         is_clicked = jupyter_lab_page.click_container_status()
@@ -157,16 +161,19 @@ class DatasetUtility:
 
         """
         # Click folder path icon
+        time.sleep(3)
         is_clicked = jupyter_lab_page.click_folder_path_icon()
         if not is_clicked:
             return "Could not click folder path icon in Jupyter Lab"
 
         # Double click on folder
+        time.sleep(1)
         is_clicked = jupyter_lab_page.click_folder(file_details.folder_name)
         if not is_clicked:
             return "Could not select the folder"
 
         # Double click on dataset folder
+        time.sleep(1)
         is_clicked = jupyter_lab_page.click_folder(file_details.dataset_name)
         if not is_clicked:
             return "Could not select the dataset folder"

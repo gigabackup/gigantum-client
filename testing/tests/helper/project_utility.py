@@ -106,7 +106,7 @@ class ProjectUtility:
             return "Could not click Jupyter Lab button"
 
         # Wait for new tab to open with new url
-        is_url_loaded = jupyter_lab_page.wait_for_url_in_new_tab("/lab", 1, 60)
+        is_url_loaded = jupyter_lab_page.wait_for_url_in_new_tab("lab/tree/code", 1, 80)
         if not is_url_loaded:
             return "Could not open new window"
 
@@ -114,6 +114,11 @@ class ProjectUtility:
         is_clicked = jupyter_lab_page.click_python3_notebook()
         if not is_clicked:
             return "Could not click python3 under notebook"
+
+        # Get python3 notebook title
+        python3_notebook_title = jupyter_lab_page.get_python3_notebook_title()
+        if python3_notebook_title is None:
+            return "Could not get python3 notebook title"
 
         # Iterate through list of commands
         for index, command in enumerate(commands_list):
@@ -140,7 +145,7 @@ class ProjectUtility:
             if not jupyter_notebook_output:
                 return command.error_message
 
-        jupyter_lab_page.close_tab("/lab", 0)
+        jupyter_lab_page.close_tab(f"lab/tree/code/{python3_notebook_title}", 0)
 
         # Click on container status button to stop container
         is_clicked = jupyter_lab_page.click_container_status()

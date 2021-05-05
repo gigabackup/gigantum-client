@@ -35,14 +35,15 @@ class JupyterLabPage(BasePage):
     @property
     def __click_div_python3_notebook(self) -> WebElement:
         if self.__div_python3_notebook is None:
-            self.__div_python3_notebook = self.get_locator(LocatorType.CSS, ".jp-LauncherCard-icon")
+            self.__div_python3_notebook = self.get_locator(LocatorType.XPath, "//div[@class='jp-LauncherCard']"
+                                                                              "[@title='Python 3']")
         return self.__div_python3_notebook
 
     @property
     def __click_run_cell(self) -> WebElement:
         if self.__div_run_cell is None:
             self.__div_run_cell = self.get_locator(LocatorType.XPath,
-                                                   "//div[@class='lm-Widget p-Widget jp-Toolbar "
+                                                   "//div[@class='lm-Widget p-Widget jp-Toolbar jp-scrollbar-tiny "
                                                    "jp-NotebookPanel-toolbar']/div[6]")
         return self.__div_run_cell
 
@@ -190,7 +191,7 @@ class JupyterLabPage(BasePage):
 
         """
         element = "//body/div[@id='main']/div[@id='jp-main-content-panel']/div[@id='jp-main-split-panel']/" \
-                  "div[@id='jp-left-stack']/div[@id='filebrowser']/div[2]/span[1]/*[1]"
+                  "div[@id='jp-left-stack']/div[@id='filebrowser']/div[3]/span[1]/*[1]"
         if self.check_element_presence(LocatorType.XPath, element, 30):
             folder_path_icon = self.get_locator(LocatorType.XPath, element)
             folder_path_icon.click()
@@ -207,7 +208,7 @@ class JupyterLabPage(BasePage):
 
         """
         action = ActionChains(self.driver)
-        element = f"//li[@class='jp-DirListing-item']/span[contains(text(), '{folder_title}')]"
+        element = f"//li[@class='jp-DirListing-item']/span[2]/span[contains(text(), '{folder_title}')]"
         if self.check_element_presence(LocatorType.XPath, element, 30):
             folder = self.get_locator(LocatorType.XPath, element)
             if folder is not None:
@@ -225,7 +226,7 @@ class JupyterLabPage(BasePage):
 
         """
         action = ActionChains(self.driver)
-        element = f"//li[@class='jp-DirListing-item']/span[contains(text(), '{file_title}')]"
+        element = f"//li[@class='jp-DirListing-item']/span[2]/span[contains(text(), '{file_title}')]"
         if self.check_element_presence(LocatorType.XPath, element, 30):
             file = self.get_locator(LocatorType.XPath, element)
             if file is not None:
@@ -249,3 +250,14 @@ class JupyterLabPage(BasePage):
                 if file_content == file_content_element.get_text().strip():
                     return True
         return False
+
+    def get_python3_notebook_title(self) -> str:
+        """ Get python3 notebook title
+
+        Returns: returns python3 notebook title
+
+        """
+        element = "//div[contains(text(),'Untitled')]"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            notebook_title = self.driver.find_element_by_xpath(element)
+            return notebook_title.text
