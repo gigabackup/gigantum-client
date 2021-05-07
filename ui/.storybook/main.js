@@ -55,7 +55,7 @@ module.exports = {
     };
     return baseConfig;
   },
-  stories: ['../stories', '../src/js/**/*.stories.js', '../src/js/**/*.stories.jsx'],
+  stories: ['../src/js/**/*.stories.js', '../src/js/**/*.stories.jsx'],
   addons: [
     '@storybook/addon-essentials',
     '@storybook/addon-storysource',

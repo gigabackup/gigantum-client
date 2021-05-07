@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1743"
+changelog:
+  - type: NON_USER_FACING
+    description:  Upgrades storybook to 6.2.8 to fix snyk vulnerability flag.
