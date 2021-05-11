@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1782"
+changelog:
+  - type: NEW
+    description: Verify publishing project from collaborator modal.

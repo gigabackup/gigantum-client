@@ -88,3 +88,17 @@ class CollaboratorsModalComponent(BaseComponent):
             return True
         return False
 
+    def click_collaborator_publish_button(self) -> bool:
+        """ Performs click action on collaborator modal publish button
+
+        Returns: returns the result of click action
+
+        """
+        element = "//button[@class='Btn Btn--inverted NoCollaborators__button--publish']"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            publish_button = self.get_locator(LocatorType.XPath, element)
+            if publish_button is not None:
+                publish_button.click()
+                return True
+        return False
+
