@@ -76,3 +76,23 @@ snapshots['TestAuthorizationMiddleware.test_authorized_switch_servers 1'] = {
         }
     }
 }
+
+snapshots['TestAuthorizationMiddleware.test_is_ssl_error 1'] = {
+    'data': {
+        'userIdentity': None
+    },
+    'errors': [
+        {
+            'locations': [
+                {
+                    'column': 30,
+                    'line': 3
+                }
+            ],
+            'message': "('SSL verification failed during JWKS fetch. Have you configured all of the required certificates to use this server?', 401)",
+            'path': [
+                'userIdentity'
+            ]
+        }
+    ]
+}

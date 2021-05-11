@@ -1,9 +1,30 @@
 import flask
+import requests
 from lmsrvcore.auth.identity import get_identity_manager_instance, AuthenticationError, tokens_from_headers
 from gtmcore.logging import LMLogger
 from gtmcore.configuration import Configuration
 
 logger = LMLogger.get_logger()
+
+
+def _is_ssl_issue(jwks_url: str) -> bool:
+    """Helper method to verify if auth failed because of an ssl issue looking up the jwks
+
+    Args:
+        jwks_url: url to the jwks endpoint
+
+    Returns:
+        true if it is an ssl error, false if anything else happens (success or any other failure)
+    """
+    result = False
+    try:
+        requests.get(jwks_url)
+    except requests.exceptions.SSLError:
+        result = True
+    except:
+        pass
+
+    return result
 
 
 class AuthorizationMiddleware(object):
@@ -52,6 +73,12 @@ class AuthorizationMiddleware(object):
                 info.context.is_authenticated = True
             else:
                 info.context.is_authenticated = False
+                config: Configuration = flask.current_app.config['LABMGR_CONFIG']
+                auth_config = config.get_auth_configuration()
+                if _is_ssl_issue(auth_config.public_key_url):
+                    raise AuthenticationError(
+                        "SSL verification failed during JWKS fetch. Have you configured all of the "
+                        "required certificates to use this server?", 401)
                 raise AuthenticationError("User not authenticated", 401)
 
         if info.context.is_authenticated is False:

@@ -342,3 +342,46 @@ git:
         for s in servers:
             assert s[0] in ['test-gigantum-com', 'another-server']
             assert s[1] in ["Gigantum Hub Test", "Another server"]
+
+    @responses.activate
+    def test_refecth_auth_config(self, mock_config_file):
+        """Test refetching and re-setting the auth config"""
+        responses.add(responses.GET, 'https://test.gigantum.com/.well-known/auth.json',
+                      json={"audience": "api.test.gigantum.com",
+                            "issuer": "https://auth.gigantum.com/",
+                            "signing_algorithm": "RS256",
+                            "public_key_url": "https://test.gigantum.com/gigantum/auth/jwks.json",
+                            "login_url": "https://test.gigantum.com/auth/redirect?target=login",
+                            "token_url": "https://test.gigantum.com/auth/token",
+                            "logout_url": "https://test.gigantum.com/auth/redirect?target=logout",
+                            "client_id": "Z6Wl854wqCjNY0D4uJx8SyPyySyfKmAy",
+                            "login_type": "auth0"},
+                      status=200)
+
+        config_instance, working_dir = mock_config_file
+        config_instance.set_current_server("test-gigantum-com")
+
+        # Make sure cache is loaded
+        config_instance.get_server_configuration()
+        auth_config = config_instance.get_auth_configuration()
+        assert auth_config.public_key_url == "https://auth.gigantum.com/.well-known/jwks.json"
+
+        # Refetch
+        config_instance.refetch_auth_config()
+
+        # Verify
+        auth_config = config_instance.get_auth_configuration()
+        assert auth_config.public_key_url == "https://test.gigantum.com/gigantum/auth/jwks.json"
+
+        # Do it again because should be in redis now
+        auth_config = config_instance.get_auth_configuration()
+        assert auth_config.public_key_url == "https://test.gigantum.com/gigantum/auth/jwks.json"
+
+        # Explicitly check redis
+        data = config_instance._get_redis_client().hgetall(config_instance.AUTH_CONFIG_CACHE_KEY)
+        assert data['public_key_url'] == "https://test.gigantum.com/gigantum/auth/jwks.json"
+
+        # Explicity check persisted file
+        file_data = config_instance._load_current_configuration()
+        assert file_data['auth']['public_key_url'] == "https://test.gigantum.com/gigantum/auth/jwks.json"
+

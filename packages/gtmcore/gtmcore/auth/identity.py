@@ -162,8 +162,7 @@ class IdentityManager(metaclass=abc.ABCMeta):
                 auth_config = self.config.get_auth_configuration()
                 response = requests.get(auth_config.public_key_url)
             except Exception as err:
-                logger.info(type(err))
-                logger.info(err)
+                logger.error(err)
                 raise AuthenticationError(str(err), 401)
 
             if response.status_code != 200:
@@ -300,19 +299,23 @@ class IdentityManager(metaclass=abc.ABCMeta):
 
                     except Exception:
                         self.logout()
+                        self.config.refetch_auth_config()
                         raise AuthenticationError({"code": "invalid_header",
                                                    "description": "Unable to validate authentication token."}, 400)
                 else:
                     self.logout()
+                    self.config.refetch_auth_config()
                     raise AuthenticationError({"code": "invalid_claims",
                                                "description":
                                                    "incorrect claims, please check the audience and issuer"}, 401)
             except Exception:
                 self.logout()
+                self.config.refetch_auth_config()
                 raise AuthenticationError({"code": "invalid_header",
                                            "description": "Unable to parse authentication token."}, 400)
         else:
             self.logout()
+            self.config.refetch_auth_config()
             raise AuthenticationError({"code": "invalid_header", "description": "Unable to find appropriate key"}, 400)
 
     @abc.abstractmethod

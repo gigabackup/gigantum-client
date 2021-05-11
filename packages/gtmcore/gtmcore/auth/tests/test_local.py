@@ -1,6 +1,7 @@
 import pytest
 import os
 import responses
+import requests
 import time
 import mock
 from typing import Optional
