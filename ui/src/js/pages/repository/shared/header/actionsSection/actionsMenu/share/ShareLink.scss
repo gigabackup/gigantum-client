@@ -4,4 +4,15 @@
 .ShareLink {
   background: url('~Images/icons/share.svg') no-repeat 10px center;
   background-size: 20px;
+
+  &--disabled {
+    background: url('~Images/icons/share-disabled.svg') no-repeat 10px center;
+    background-size: 20px;
+
+    &:hover {
+      .ActionsMenu__btn--flat {
+        background: transparent !important;
+      }
+    }
+  }
 }

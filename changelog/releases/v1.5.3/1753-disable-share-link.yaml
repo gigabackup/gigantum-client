@@ -1,0 +1,5 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1764"
+changelog:
+  - type: FIX
+    description: Tests linking and working with an unpublished dataset.
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1753
