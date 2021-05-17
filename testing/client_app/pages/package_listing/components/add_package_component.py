@@ -207,3 +207,39 @@ class AddPackageComponent(BaseComponent):
                     menu_item.execute_script("arguments[0].click();")
                     return True
         return False
+
+    def click_cancel_build_button(self) -> bool:
+        """Performs the click action on cancel build button
+
+        Returns: returns the result of click action
+
+        """
+        cancel_build_button = self.get_locator(LocatorType.XPath, "//button[@class='Btn Btn--inverted "
+                                                                  "align-self--end']")
+        if cancel_build_button.element_to_be_clickable():
+            cancel_build_button.click()
+            return True
+        return False
+
+    def check_build_failed(self) -> bool:
+        """Check whether the build is failed or not
+
+        Returns: returns the result of build failed checking
+
+        """
+        cancel_build_button_element = "//div[@class='ProgressLoader__progress ProgressLoader__progress--failed']"
+        if self.check_element_presence(LocatorType.XPath, cancel_build_button_element, 30):
+            return True
+        return False
+
+    def click_clear_cache_and_build_button(self) -> bool:
+        """Performs the click action on cancel build button
+
+        Returns: returns the result of click action
+
+        """
+        cancel_build_button = self.get_locator(LocatorType.XPath, "//button[@class='Btn--inverted align-self--end']")
+        if cancel_build_button.element_to_be_clickable():
+            cancel_build_button.click()
+            return True
+        return False

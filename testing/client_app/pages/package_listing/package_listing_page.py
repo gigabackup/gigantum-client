@@ -1,3 +1,4 @@
+from selenium.webdriver import ActionChains
 from selenium.webdriver.remote.webelement import WebElement
 from client_app.pages.package_listing.components.package_grid_component import PackageGridComponent
 from client_app.pages.package_listing.components.add_package_component import AddPackageComponent
@@ -21,9 +22,11 @@ class PackageListingPage(BasePage):
     def __init__(self, driver) -> None:
         page_config = PageConfig()
         super(PackageListingPage, self).__init__(driver, page_config)
+        self.component_model = ComponentModel()
         self.__environment_tab = None
         self.__package_listing_component = None
         self.__add_package_component = None
+        self.__project_container_status_component = None
         self.__package_grid_model = ComponentModel(locator_type=LocatorType.XPath, locator="//div[@class='grid']")
         self.__add_package_model = ComponentModel(locator_type=LocatorType.XPath,
                                                   locator="//div[@data-selenium-id='AddPackages']")
@@ -41,6 +44,13 @@ class PackageListingPage(BasePage):
         if self.__add_package_component is None:
             self.__add_package_component = AddPackageComponent(self.driver, self.__add_package_model)
         return self.__add_package_component
+
+    @property
+    def container_status_component(self) -> ProjectContainerStatusComponent:
+        """ Returns an instance of container status component."""
+        if self.__project_container_status_component is None:
+            self.__project_container_status_component = ProjectContainerStatusComponent(self.driver)
+        return self.__project_container_status_component
 
     @property
     def __click_environment_tab(self) -> WebElement:
@@ -416,3 +426,23 @@ class PackageListingPage(BasePage):
 
         """
         return self.package_listing_component.verify_sensitive_file_is_added(file_name)
+
+    def click_cancel_build_button(self) -> bool:
+        """ Clicks cancel build button"""
+        return self.add_package_component.click_cancel_build_button()
+
+    def check_build_failed(self) -> bool:
+        """ Check whether the build is failed or not"""
+        return self.add_package_component.check_build_failed()
+
+    def click_clear_cache_and_build_button(self) -> bool:
+        """ Clicks clear cache and build button"""
+        return self.add_package_component.click_clear_cache_and_build_button()
+
+    def move_to_element(self) -> bool:
+        """Moves to a temporary element just to change the mouse focus."""
+        element = "//div[@class='TitleSection__namespace-title']"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            project_title = self.get_locator(LocatorType.XPath, element)
+            ActionChains(self.driver).move_to_element(project_title).perform()
+        return True
