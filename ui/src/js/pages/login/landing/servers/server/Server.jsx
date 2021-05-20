@@ -71,7 +71,7 @@ class Server extends Component<Props> {
             <>
               <button
                 className="Server__button-icon"
-                data-tip="Backup is in progess, and the remote server is unavailable until the backup has been complete. Backing up your data is neccesary to avoid loss of data. This process can take between 15 mins to an hour, but can take longer."
+                data-tip="Backup is in progress, and the remote server is unavailable until the backup has been complete. Backing up your data is neccesary to avoid loss of data. This process can take between 15 mins to an hour, but can take longer."
                 data-for="tooltip-server"
               />
               <ReactTooltip

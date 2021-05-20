@@ -112,7 +112,7 @@ class Footer extends Component<Props> {
 
   /**
     @param {}
-    gets upload message which tracks progess
+    gets upload message which tracks progress
   */
   _closeFooter = () => {
     const { footerActions } = this.props;
@@ -121,7 +121,7 @@ class Footer extends Component<Props> {
 
   /**
     @param {object} messageItem
-    gets upload message which tracks progess
+    gets upload message which tracks progress
   */
   _removeMessage = (messageItem) => {
     const { footerActions } = this.props;

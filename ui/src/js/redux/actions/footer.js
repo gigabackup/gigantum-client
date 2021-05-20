@@ -75,14 +75,14 @@ export const setUploadMessageSetter = (
 export const setUploadMessageUpdate = (
   uploadMessage,
   fileCount,
-  progessBarPercentage,
+  progressBarPercentage,
   uploadError,
 ) => dispatcher(
   types.UPLOAD_MESSAGE_UPDATE,
   {
     uploadMessage,
     fileCount,
-    progessBarPercentage,
+    progressBarPercentage,
     uploadError,
   },
 );
@@ -90,13 +90,13 @@ export const setUploadMessageUpdate = (
 export const setUploadMessageRemove = (
   uploadMessage,
   id,
-  progessBarPercentage,
+  progressBarPercentage,
 ) => dispatcher(
   types.UPLOAD_MESSAGE_REMOVE,
   {
     uploadMessage,
     id,
-    progessBarPercentage,
+    progressBarPercentage,
   },
 );
 

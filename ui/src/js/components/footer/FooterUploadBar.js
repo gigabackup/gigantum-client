@@ -10,7 +10,7 @@ type Props = {
   openLabbook: Function,
   parentState: {
     labbookSuccess: boolean,
-    progessBarPercentage: number,
+    progressBarPercentage: number,
     uploadError: boolean,
     uploadMessage: string,
     uploadOpen: boolean,
@@ -26,12 +26,12 @@ class FooterUploadBar extends PureComponent<Props> {
     } = this.props;
     const {
       labbookSuccess,
-      progessBarPercentage,
+      progressBarPercentage,
       uploadError,
       uploadMessage,
       uploadOpen,
     } = parentState;
-    const isNotZero = progessBarPercentage !== 0;
+    const isNotZero = progressBarPercentage !== 0;
     // declare css here
     const footerUploadClass = classNames({
       hidden: !uploadOpen,
@@ -51,7 +51,7 @@ class FooterUploadBar extends PureComponent<Props> {
 
         <div
           id="footerProgressBar"
-          style={{ width: `${progessBarPercentage}%` }}
+          style={{ width: `${progressBarPercentage}%` }}
           className={footerUploadBarClass}
         />
 
