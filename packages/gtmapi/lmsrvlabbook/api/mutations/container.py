@@ -60,18 +60,7 @@ class StartDevTool(graphene.relay.ClientIDMutation):
         else:
             raise GigantumException(f"'{dev_tool}' not currently supported as a Dev Tool")
 
-        # Don't include the port in the path if running on 80
-        apparent_proxy_port = labbook.client_config.config['proxy']["apparent_proxy_port"]
-        if apparent_proxy_port == 80:
-            # Running on 80, don't need the port
-            path = suffix
-        elif labbook.client_config.is_hub_client:
-            # Running in hub, don't prepend a port
-            path = suffix
-        else:
-            path = f':{apparent_proxy_port}{suffix}'
-
-        return path
+        return suffix
 
     @classmethod
     def _start_jupyter_tool(cls, labbook: LabBook, router: ProxyRouter, username: str,
@@ -157,7 +146,11 @@ class StartDevTool(graphene.relay.ClientIDMutation):
         # All messages will come through MITM, so we don't need to monitor rserver directly
         project_container = container_for_context(username, labbook, override_image_name=container_override_id)
         fresh_rserver = start_rserver(project_container)
-        mitm_url, pr_suffix = MITMProxyOperations.configure_mitmroute(project_container, router, fresh_rserver)
+        external_url = labbook.client_config.config['proxy']['external_url']
+        mitm_url, pr_suffix = MITMProxyOperations.configure_mitmroute(project_container,
+                                                                      router,
+                                                                      external_url,
+                                                                      fresh_rserver)
 
         # Ensure monitor is running
         start_labbook_monitor(labbook, username, "rstudio",

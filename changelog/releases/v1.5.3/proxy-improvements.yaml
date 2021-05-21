@@ -1,0 +1,9 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1785"
+changelog:
+  - type: FIX
+    description: "Fixed issue with RStudio proxy when running the Client as a service"
+  - type: IMPROVEMENT
+    description: "'proxy.apparent_port' removed from config in favor of 'proxy.external_url' when configuring the Client as a service"
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1749
+  - type: IMPROVEMENT
+    description: "HTTP->HTTPS redirect now supported when running the Client as a service with HTTPS configured"

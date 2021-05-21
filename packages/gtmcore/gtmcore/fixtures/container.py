@@ -97,7 +97,7 @@ def build_lb_image_for_rstudio(mock_config_with_repo):
         lb_container.build_image()
         lb_container.start_project_container()
 
-        yield lb_container, ib, username
+        yield lb_container, ib, username, lb
 
         lb_container.stop_container()
     finally:

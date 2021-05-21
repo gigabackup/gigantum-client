@@ -8,7 +8,7 @@ from gtmcore.exceptions import GigantumException
 
 logger = LMLogger.get_logger()
 # Current tag for gigantum/mitmproxy_proxy image
-CURRENT_MITMPROXY_TAG = '2020-04-24'
+CURRENT_MITMPROXY_TAG = '2021-05-19'
 
 
 class MITMProxyOperations(object):
@@ -16,13 +16,26 @@ class MITMProxyOperations(object):
     # It is also used as the tag in sidecar container names
     namespace_key = 'mitmproxy'
 
+    @staticmethod
+    def get_proxy_path(parent_image_tag: str) -> str:
+        """
+
+        Args:
+            parent_image_tag: the image tag of the container this mitm container is proxying
+
+        Returns:
+            path to the parent service (here, it's RStudio server)
+        """
+        return f'/rserver/{parent_image_tag}/'
+
     @classmethod
-    def configure_mitmroute(cls, devtool_container: ContainerOperations, router: ProxyRouter,
-                            new_rserver_session: bool,_retry: Optional[bool] = False) -> Tuple[str, str]:
+    def configure_mitmroute(cls, devtool_container: ContainerOperations, router: ProxyRouter, external_url: str,
+                            new_rserver_session: bool, _retry: Optional[bool] = False) -> Tuple[str, str]:
         """Ensure mitm is configured and proxied for labbook
 
         Args:
             devtool_container: the specific target running a dev tool
+            external_url: The external URL for this client (default is http://localhost:10000)
             new_rserver_session: is this for a freshly-launched rserver?
             router: The link to the configurable-proxy-router wrapper
             _retry: (internal use only) is this a recursive call after clean-up?
@@ -33,11 +46,11 @@ class MITMProxyOperations(object):
         if not devtool_container.image_tag:
             raise ValueError('Problem building image tag from username + project info')
 
-        mitm_endpoint = cls.start_mitm_proxy(devtool_container, new_rserver_session)
+        mitm_endpoint = cls.start_mitm_proxy(devtool_container, new_rserver_session, external_url)
 
         # Note that the use of rserver is not intrinsically meaningful - we could make this more generic
         # if mitmproxy supports multiple dev tools
-        proxy_path = f'/rserver/{devtool_container.image_tag}/'
+        proxy_path = cls.get_proxy_path(devtool_container.image_tag)
 
         # existing route to MITM or not?
         matched_routes = router.get_matching_routes(mitm_endpoint, proxy_path)
@@ -142,12 +155,14 @@ class MITMProxyOperations(object):
         return f"{cls.namespace_key}:{labbook_container.image_tag}"
 
     @classmethod
-    def start_mitm_proxy(cls, primary_container: ContainerOperations, new_rserver_session: bool) -> str:
+    def start_mitm_proxy(cls, primary_container: ContainerOperations, new_rserver_session: bool,
+                         external_url: str) -> str:
         """Launch a proxy container between client and labbook.
 
         Args:
             primary_container: the proxy target running a dev tool
             new_rserver_session: create a new mitmproxy, don't re-use
+            external_url: is the external URL the client is running at (default is http://localhost:10000)
 
         Returns:
             str that contains the proxy endpoint as http://{ip}:{port}
@@ -169,7 +184,10 @@ class MITMProxyOperations(object):
             mitm_container.stop_container()
 
         # UID is obtained inside the container based on labmanager_share_vol (mounted at /mnt/share)
-        env_var = [f"LBENDPOINT={devtool_endpoint}", f"LOGFILE_NAME={cls.get_mitmlogfile_path(primary_container)}"]
+        env_var = [f"LBENDPOINT={devtool_endpoint}",
+                   f"LOGFILE_NAME={cls.get_mitmlogfile_path(primary_container)}",
+                   f"EXTERNAL_URL={external_url}",
+                   f"PROXY_PATH={cls.get_proxy_path(primary_container.image_tag)}"]
         volumes_dict = {
             'labmanager_share_vol': {'bind': '/mnt/share', 'mode': 'rw'}
         }

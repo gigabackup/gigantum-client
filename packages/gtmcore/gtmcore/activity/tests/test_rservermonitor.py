@@ -89,7 +89,7 @@ class TestRStudioServerMonitor:
 class TestMITMproxy:
 
     def test_start_mitm_proxy(self, build_lb_image_for_rstudio):
-        lb_container, ib, username = build_lb_image_for_rstudio
+        lb_container, ib, username, lb = build_lb_image_for_rstudio
 
         mitm_container = SidecarContainerOperations(lb_container, MITMProxyOperations.namespace_key)
 
@@ -107,7 +107,8 @@ class TestMITMproxy:
 
         assert mitm_container.query_container() == 'created'
 
-        MITMProxyOperations.start_mitm_proxy(lb_container, new_rserver_session=True)
+        external_url = lb.client_config.config['proxy']['external_url']
+        MITMProxyOperations.start_mitm_proxy(lb_container, new_rserver_session=True, external_url=external_url)
 
         assert mitm_container.query_container() == 'running'
 
