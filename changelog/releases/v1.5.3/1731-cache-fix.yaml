@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1787"
+changelog:
+  - type: FIX
+    description: /api/servers route is now explicitly not cached if this request reaches the UI to fix an edge case at startup
