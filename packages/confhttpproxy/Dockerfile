@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 
 RUN apt-get update
 RUN apt-get -y install curl gnupg gnupg1 gnupg2 python3-pip
-RUN curl -sL https://deb.nodesource.com/setup_8.x | bash
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash
 RUN apt-get -y install nodejs
 RUN npm install -g configurable-http-proxy
 
@@ -13,7 +13,7 @@ COPY . /app
 COPY requirements.txt /app/requirements.txt
 RUN pip3 install -r requirements.txt
 
-EXPOSE 80
-EXPOSE 7999
+EXPOSE 8080
+EXPOSE 8088
 
 CMD tail -f /dev/null

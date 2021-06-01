@@ -193,7 +193,7 @@ class DatasetDataComponent(BaseComponent):
         """
         element = "//p[contains(text(), 'Download complete!')]"
         download_complete_pop_up = self.get_locator(LocatorType.XPath, element)
-        if download_complete_pop_up.invisibility_of_element_located(900):
+        if download_complete_pop_up.invisibility_of_element_located(120):
             return True
         return False
 

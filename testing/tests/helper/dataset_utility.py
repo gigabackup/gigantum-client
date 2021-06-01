@@ -150,7 +150,7 @@ class DatasetUtility:
 
         return ProjectConstants.SUCCESS.value
 
-    def __verify_file_content(self, jupyter_lab_page, file_details):
+    def __verify_file_content(self, jupyter_lab_page, file_details) -> str:
         """ Verify file content
 
         Args:
@@ -192,7 +192,7 @@ class DatasetUtility:
 
         return ProjectConstants.SUCCESS.value
 
-    def publish_dataset(self, driver: webdriver):
+    def publish_dataset(self, driver: webdriver) -> str:
         """Logical separation of publish dataset functionality
 
         Args:
@@ -223,5 +223,52 @@ class DatasetUtility:
         is_checked = dataset_list.project_menu_component.check_private_lock_icon_presence()
         if not is_checked:
             return "Could not found private lock icon presence"
+
+        return ProjectConstants.SUCCESS.value
+
+    def add_collaborator(self, driver: webdriver, collaborator_name, collaborator_permission) -> str:
+        """Logical separation of add collaborator functionality
+
+        Args:
+            driver: The page with UI elements
+            collaborator_name: name of the collaborator
+            collaborator_permission: Collaborator permission
+
+        """
+        # Load dataset Listing Page
+        dataset_list = DatasetListingPage(driver)
+        if not dataset_list:
+            return "Could not load Dataset Listing Page"
+
+        # Click on Collaborators button
+        is_clicked = dataset_list.project_menu_component.click_collaborators_button()
+        if not is_clicked:
+            return "Could not click Collaborators button"
+
+        # Input collaborator name into input area
+        is_typed = dataset_list.collaborator_modal_component.add_collaborator(collaborator_name)
+        if not is_typed:
+            return "Could not type collaborator into input area"
+
+        # Select Read permission for collaborator
+        is_selected = dataset_list.collaborator_modal_component.select_collaborator_permission(collaborator_permission)
+        if not is_selected:
+            return "Could not select Read permission from drop down"
+
+        # Click on add collaborator button
+        is_clicked = dataset_list.collaborator_modal_component.click_add_collaborator_button()
+        if not is_clicked:
+            return "Could not click on add collaborators button"
+
+        # Verify collaborator is listed
+        is_verified = dataset_list.collaborator_modal_component.verify_collaborator_is_listed(
+            collaborator_name)
+        if not is_verified:
+            return "Collaborator is not listed in the modal"
+
+        # Click on collaborator modal close button
+        is_clicked = dataset_list.collaborator_modal_component.click_collaborator_modal_close()
+        if not is_clicked:
+            return "Could not close collaborator modal"
 
         return ProjectConstants.SUCCESS.value

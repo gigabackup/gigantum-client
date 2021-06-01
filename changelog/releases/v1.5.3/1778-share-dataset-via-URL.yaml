@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1790"
+changelog:
+  - type: NEW
+    description: Test to import datasets by link and collaborating.

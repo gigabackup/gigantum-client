@@ -172,10 +172,10 @@ class ProjectMenuComponent(BaseComponent):
         Returns: returns the result of click action
 
         """
-        element = "//button[contains(text(), 'Collaborators')]"
+        element = "//button[@class='Collaborators__btn Btn--flat Btn--no-underline']"
         btn_collaborators = self.get_locator(LocatorType.XPath, element)
-        if btn_collaborators is not None:
-            btn_collaborators.click()
+        if btn_collaborators is not None and btn_collaborators.element_to_be_clickable():
+            btn_collaborators.execute_script("arguments[0].click();")
             return True
         return False
 
@@ -199,7 +199,8 @@ class ProjectMenuComponent(BaseComponent):
         """
         element = "//p[@class='FooterMessage__title FooterMessage__title--collapsed' and " \
                   "text()='Upload complete!']"
-        if self.check_element_absence(LocatorType.XPath, element, 40):
+        upload_complete_pop_up = self.get_locator(LocatorType.XPath, element)
+        if upload_complete_pop_up.invisibility_of_element_located(120):
             return True
         return False
 
@@ -221,7 +222,8 @@ class ProjectMenuComponent(BaseComponent):
 
         """
         element = "//p[contains(text(), 'Sync complete')]"
-        if self.check_element_absence(LocatorType.XPath, element, 30):
+        sync_complete_pop_up = self.get_locator(LocatorType.XPath, element)
+        if sync_complete_pop_up.invisibility_of_element_located(120):
             return True
         return False
 
@@ -315,3 +317,14 @@ class ProjectMenuComponent(BaseComponent):
         if self.check_element_absence(LocatorType.XPath, element, 80):
             return True
         return False
+
+    def get_import_url(self) -> str:
+        """Get import url
+
+        Returns: returns import url
+
+        """
+        import_url_input = self.get_locator(LocatorType.XPath, "//input[@class='ActionsMenu__input']")
+        if import_url_input is not None:
+            import_url = import_url_input.getAttribute('value')
+            return import_url

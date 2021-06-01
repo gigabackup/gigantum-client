@@ -1,5 +1,8 @@
 import random
 import time
+
+from client_app.pages.landing.landing_page import LandingPage
+from client_app.pages.login.login_factory import LoginFactory
 from client_app.pages.project_listing.project_listing_page import ProjectListingPage
 from selenium import webdriver
 from tests.constants_enums.constants_enums import ProjectConstants
@@ -204,7 +207,7 @@ class ProjectUtility:
 
         return ProjectConstants.SUCCESS.value
 
-    def publish_project(self, driver: webdriver):
+    def publish_project(self, driver: webdriver) -> str:
         """Logical separation of publish project functionality
 
         Args:
@@ -247,5 +250,48 @@ class ProjectUtility:
         is_checked = project_list.project_menu_component.check_private_lock_icon_presence()
         if not is_checked:
             return "Could not found private lock icon presence"
+
+        return ProjectConstants.SUCCESS.value
+
+    def switch_user(self, driver: webdriver, user_credentials, server_details) -> str:
+        """Logical separation of switch user in gigantum client
+
+        Args:
+            driver: webdriver instance
+            user_credentials: Includes username and password
+            server_details: Details of the current server
+
+        """
+        # Load Project Listing Page
+        project_list = ProjectListingPage(driver)
+        if not project_list:
+            return "Could not load Project Listing Page"
+
+        # Click on profile menu
+        is_clicked = project_list.project_listing_component.profile_menu_click()
+        if not is_clicked:
+            return "Could not click profile menu button"
+
+        # Click on logout button
+        is_clicked = project_list.project_listing_component.log_out()
+        assert is_clicked, "Could not click logout button"
+
+        # Load Landing Page
+        landing_page = LandingPage(driver, False)
+        if not landing_page:
+            return "Could not load Landing page"
+
+        # Click server button
+        landing_page.landing_component.click_server(server_details.server_name)
+
+        # Load Login page
+        login_page = LoginFactory().load_login_page(server_details.login_type, driver)
+        if not login_page:
+            return "Could not return login page"
+
+        # Load Project Listing page
+        project_list = login_page.login(user_credentials.user_name, user_credentials.password)
+        if project_list.project_listing_component.get_project_title() != "Projects":
+            return "Could not load Project Listing page"
 
         return ProjectConstants.SUCCESS.value
