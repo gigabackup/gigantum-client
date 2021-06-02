@@ -15,7 +15,7 @@ from tests.test_fixtures import server_data_fixture
 import time
 
 
-@pytest.mark.ImportDatasetsByLinkAndCollaborating
+@pytest.mark.importDatasetsByLinkAndCollaborating
 class TestImportDatasetsByLinkAndCollaborating:
     """Includes test methods for basic dataset creation and importing datasets by link and collaborating"""
 

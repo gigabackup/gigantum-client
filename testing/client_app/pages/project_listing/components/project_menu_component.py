@@ -328,3 +328,14 @@ class ProjectMenuComponent(BaseComponent):
         if import_url_input is not None:
             import_url = import_url_input.getAttribute('value')
             return import_url
+
+    def check_private_lock_icon_absence(self) -> bool:
+        """ Performs checking for lock icon absence
+
+        Returns: returns the result of checking
+
+        """
+        element = "//div[@class='TitleSection__private Tooltip-data Tooltip-data--small']"
+        if self.check_element_presence(LocatorType.XPath, element, 10):
+            return True
+        return False

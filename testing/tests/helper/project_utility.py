@@ -253,6 +253,74 @@ class ProjectUtility:
 
         return ProjectConstants.SUCCESS.value
 
+    def delete_project_from_server(self, driver: webdriver, project_title):
+        """Logical separation of delete project functionality
+
+        Args:
+            driver: webdriver instance
+            project_title: Title of the project to be delete
+
+        """
+        # Load Project Listing Page
+        project_list = ProjectListingPage(driver)
+        if not project_list:
+            return "Could not load Project Listing Page"
+
+        # Click server tab
+        is_clicked = project_list.server_component.click_server_tab()
+        if not is_clicked:
+            return "Could not click server tab"
+
+        # Verify project in server page
+        is_verified = project_list.server_component.verify_title_in_server(project_title)
+        if not is_verified:
+            return "Could not verify project in server"
+
+        # Click delete button in server page
+        is_clicked = project_list.server_component.click_delete_button(project_title)
+        if not is_clicked:
+            return "Could not click delete button in server page"
+
+        # Get project title from delete project window in server page
+        project_name = project_list.server_component.get_title()
+        if project_name is None:
+            return "Could not get project title in server page"
+
+        # Input project title in delete window on server page
+        is_typed = project_list.server_component.input_title(project_name)
+        if not is_typed:
+            return "Could not type project title in delete window on server page"
+
+        # Click delete project button in delete window on server page
+        is_clicked = project_list.server_component.click_delete_button_on_window()
+        if not is_clicked:
+            return "Could not click delete project button in delete window on server page"
+
+        # Verify delete modal close
+        is_verified = project_list.server_component.verify_delete_modal_closed(30)
+        if not is_verified:
+            return "Could not close delete modal"
+
+        # Verify project is not exist in server page
+        is_listed = project_list.server_component.verify_title_in_server(project_title)
+        if is_listed:
+            return "Project is still exist in the server"
+
+        # wait ~5 seconds to guarantee server side deletion completes
+        time.sleep(5)
+
+        # Refresh the server page
+        is_clicked = project_list.server_component.click_server_tab()
+        if not is_clicked:
+            return "Could not click server tab"
+
+        # Verify project is not exist in server page
+        is_listed = project_list.server_component.verify_title_in_server(project_title)
+        if is_listed:
+            return "Project is still exist in the server"
+
+        return ProjectConstants.SUCCESS.value
+
     def switch_user(self, driver: webdriver, user_credentials, server_details) -> str:
         """Logical separation of switch user in gigantum client
 
@@ -260,7 +328,6 @@ class ProjectUtility:
             driver: webdriver instance
             user_credentials: Includes username and password
             server_details: Details of the current server
-
         """
         # Load Project Listing Page
         project_list = ProjectListingPage(driver)
