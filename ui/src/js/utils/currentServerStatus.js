@@ -60,6 +60,8 @@ const pollForServerAvalability = (callback, count = 1) => {
       response.data && response.data.currentServer
       && !response.data.currentServer.backupInProgress
     ) {
+      // reset ignoreBackupModal when backupMode has been disabled
+      sessionStorage.setItem('ignoreBackupModal', false);
       callback(response.data.currentServer, null);
     } else {
       setTimeout(() => {

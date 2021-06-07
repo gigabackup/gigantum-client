@@ -10,6 +10,7 @@ import classNames from 'classnames';
 import { connect } from 'react-redux';
 // store
 import store from 'JS/redux/store';
+import { setErrorMessage } from 'JS/redux/actions/footer';
 import { setContainerMenuWarningMessage } from 'JS/redux/actions/labbook/environment/environment';
 import {
   setMergeMode,
@@ -21,6 +22,7 @@ import { setCallbackRoute } from 'JS/redux/actions/routes';
 // utils
 import BranchMutations from 'Pages/repository/shared/utils/BranchMutations';
 // mutations
+import FetchLabbookEdgeMutation from 'Mutations/repository/fetch/FetchLabbookEdgeMutation';
 import LabbookContainerStatusMutation from 'Mutations/repository/labbook/LabbookContainerStatusMutation';
 import LabbookLookupMutation from 'Mutations/repository/labbook/LabbookLookupMutation';
 // components
@@ -210,8 +212,21 @@ class Labbook extends Component<Props> {
       || nextProps.globalIsUploading
       || isPublishing
       || nextProps.isExporting;
+
+    if (!nextProps.backupInProgress && state.backupInProgress) {
+      FetchLabbookEdgeMutation(
+        nextProps.labbook.owner,
+        nextProps.labbook.name,
+        (error) => {
+          if (error) {
+            setErrorMessage(nextProps.labbook.owner, nextProps.labbook.name, 'Failed to refetch Labbook data. Please refresh the page.');
+          }
+        },
+      );
+    }
     return {
       ...state,
+      backupInProgress: nextProps.backupInProgress,
       deletedBranches: newDeletedBranches,
       branches: mergedBranches,
       canManageCollaborators,

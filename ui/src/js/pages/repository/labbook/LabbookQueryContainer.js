@@ -1,6 +1,8 @@
 // vendor
 import React, { Component } from 'react';
 import { QueryRenderer, graphql } from 'react-relay';
+// context
+import ServerContext from 'Pages/ServerContext';
 // environment
 import environment from 'JS/createRelayEnvironment';
 // store
@@ -58,18 +60,25 @@ class LabbookQueryContainer extends Component {
               return (<div>{props.errors[0].message}</div>);
             }
             return (
-              <Labbook
-                key={parentProps.labbookName}
-                auth={parentProps.auth}
-                labbookName={props.labbook.name}
-                query={props.query}
-                labbook={props.labbook}
-                owner={props.labbook.owner}
-                history={parentProps.history}
-                diskLow={props.diskLow}
-                sectionType="labbook"
-                {...parentProps}
-              />
+              <ServerContext.Consumer>
+                {
+                  value => (
+                    <Labbook
+                      key={parentProps.labbookName}
+                      auth={parentProps.auth}
+                      labbookName={props.labbook.name}
+                      query={props.query}
+                      labbook={props.labbook}
+                      owner={props.labbook.owner}
+                      history={parentProps.history}
+                      diskLow={props.diskLow}
+                      sectionType="labbook"
+                      {...parentProps}
+                      backupInProgress={value.currentServer.backupInProgress}
+                    />
+                  )
+                }
+              </ServerContext.Consumer>
             );
           }
 
