@@ -1,9 +1,8 @@
+from client_app.constant_enums.constants_enums import GigantumConstants
 from framework.base.component_base import BaseComponent
 from framework.factory.models_enums.constants_enums import LocatorType
 from selenium import webdriver
 from framework.factory.models_enums.page_config import ComponentModel
-from client_app.helper.local_project_helper_utility import ProjectHelperUtility
-from collections import namedtuple
 
 
 class LandingComponent(BaseComponent):
@@ -25,7 +24,7 @@ class LandingComponent(BaseComponent):
 
         """
         element = f"//button[contains(text(), '{server_name}')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             server_button = self.get_locator(LocatorType.XPath, element)
             server_button.click()
             return True

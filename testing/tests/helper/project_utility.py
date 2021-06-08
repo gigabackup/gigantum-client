@@ -253,7 +253,7 @@ class ProjectUtility:
 
         return ProjectConstants.SUCCESS.value
 
-    def delete_project_from_server(self, driver: webdriver, project_title):
+    def delete_project_from_server(self, driver: webdriver, project_title) -> str:
         """Logical separation of delete project functionality
 
         Args:
@@ -360,5 +360,57 @@ class ProjectUtility:
         project_list = login_page.login(user_credentials.user_name, user_credentials.password)
         if project_list.project_listing_component.get_project_title() != "Projects":
             return "Could not load Project Listing page"
+
+        return ProjectConstants.SUCCESS.value
+
+    def import_project(self, driver: webdriver, project_title) -> str:
+        """ Import project from server
+
+        Args:
+            driver: webdriver instance
+            project_title: Title of the current project
+        """
+        # Load Project Listing Page
+        project_list = ProjectListingPage(driver)
+        if not project_list:
+            return "Could not load Project Listing Page"
+
+        # Click server tab
+        is_clicked = project_list.server_component.click_server_tab()
+        if not is_clicked:
+            return "Could not click server tab"
+
+        # Verify project in server page
+        is_verified = project_list.server_component.verify_title_in_server(project_title)
+        if not is_verified:
+            return "Could not verify project in server"
+
+        # Click import button in server page
+        is_clicked = project_list.server_component.click_import_button(project_title)
+        if not is_clicked:
+            return "Could not click import button in server page"
+
+        # Monitor container status to go through Stopped -> Building
+        is_status_changed = project_list.monitor_container_status("Building", 5)
+        if not is_status_changed:
+            # DMK Note: In some cases the build finishes so fast it is at the Stopped state already.
+            # This extra case verifies that it is indeed Stopped and not bouncing.
+            is_stopped = project_list.monitor_container_status("Stopped", 1)
+            if is_stopped:
+                time.sleep(2)
+                is_stopped = project_list.monitor_container_status("Stopped", 1)
+                if not is_stopped:
+                    return "Could not get Building status and verify container was already ready"
+            else:
+                if not is_stopped:
+                    return "Could not get Building status and verify container was already ready"
+        else:
+            if not is_status_changed:
+                return "Could not get Building status"
+
+        # Monitor container status to go through Building -> Stopped
+        is_status_changed = project_list.monitor_container_status("Stopped", 60)
+        if not is_status_changed:
+            return "Could not get Stopped status"
 
         return ProjectConstants.SUCCESS.value

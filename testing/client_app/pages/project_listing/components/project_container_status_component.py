@@ -1,3 +1,4 @@
+from client_app.constant_enums.constants_enums import GigantumConstants
 from framework.base.component_base import BaseComponent
 from selenium import webdriver
 from framework.factory.models_enums.page_config import ComponentModel
@@ -29,7 +30,7 @@ class ProjectContainerStatusComponent(BaseComponent):
             Returns the comparison result.
         """
         element = "//div[@class='ContainerStatus flex flex--row']/div"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             container_status_element = self.get_locator(LocatorType.XPath, element)
             container_status_text = container_status_element.find_element_by_xpath("div")
             compared_value = container_status_text.wait_until(CompareUtilityType.CompareText, wait_timeout, compare_text)

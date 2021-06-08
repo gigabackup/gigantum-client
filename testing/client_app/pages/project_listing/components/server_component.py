@@ -1,3 +1,4 @@
+from client_app.constant_enums.constants_enums import GigantumConstants
 from client_app.helper.local_project_helper_utility import ProjectHelperUtility
 from framework.base.component_base import BaseComponent
 from framework.factory.models_enums.constants_enums import LocatorType
@@ -40,7 +41,7 @@ class ServerComponent(BaseComponent):
 
         """
         element = "//div[@data-selenium-id='RemotePanel']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             title_list_div = self.driver.find_elements_by_xpath(element)
             if title_list_div is not None:
                 for title_div in title_list_div:
@@ -60,7 +61,7 @@ class ServerComponent(BaseComponent):
 
         """
         element = "//div[@data-selenium-id='RemotePanel']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             title_list_div = self.driver.find_elements_by_xpath(element)
             if title_list_div is not None:
                 for title_div in title_list_div:
@@ -83,7 +84,7 @@ class ServerComponent(BaseComponent):
 
         """
         element = "//div[@data-selenium-id='RemotePanel']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             title_list_div = self.driver.find_elements_by_xpath(element)
             if title_list_div is not None:
                 for title_div in title_list_div:
@@ -103,7 +104,7 @@ class ServerComponent(BaseComponent):
 
         """
         element = "//div[@class='Modal__sub-container']/div[1]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             div_text = self.get_locator(LocatorType.XPath, element)
             title = div_text.find_element_by_xpath(".//b")
             return title.get_text().strip()
@@ -130,7 +131,7 @@ class ServerComponent(BaseComponent):
 
         """
         element = "//button[@data-selenium-id='ButtonLoader']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             btn_delete_project = self.get_locator(LocatorType.XPath, element)
             if btn_delete_project is not None and btn_delete_project.element_to_be_clickable():
                 btn_delete_project.execute_script("arguments[0].click();")

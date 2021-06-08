@@ -1,3 +1,4 @@
+from client_app.constant_enums.constants_enums import GigantumConstants
 from framework.base.component_base import BaseComponent
 from framework.factory.models_enums.constants_enums import LocatorType
 from selenium import webdriver
@@ -56,7 +57,7 @@ class DatasetDataComponent(BaseComponent):
 
         """
         element = "//button[contains(text(), 'New Folder')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             new_folder_button = self.get_locator(LocatorType.XPath, element)
             if new_folder_button is not None and new_folder_button.element_to_be_clickable():
                 new_folder_button.execute_script("arguments[0].click();")
@@ -73,7 +74,7 @@ class DatasetDataComponent(BaseComponent):
 
         """
         element = "//input[@placeholder='Enter Folder Name']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             folder_name_input = self.get_locator(LocatorType.XPath, element)
             folder_name_input.send_keys(folder_name)
             return True
@@ -86,7 +87,7 @@ class DatasetDataComponent(BaseComponent):
 
         """
         element = "//div[@class='FooterUploadBar--status']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             return True
         return False
 
@@ -97,7 +98,7 @@ class DatasetDataComponent(BaseComponent):
 
         """
         element = "//div[@class='FooterUploadBar--status']"
-        if self.check_element_absence(LocatorType.XPath, element, 30):
+        if self.check_element_absence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             return True
         return False
 
@@ -108,7 +109,7 @@ class DatasetDataComponent(BaseComponent):
 
         """
         element = "//button[@class='File__btn--round File__btn--add']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             new_folder_add_button = self.get_locator(LocatorType.XPath, element)
             if new_folder_add_button is not None and new_folder_add_button.is_enabled():
                 new_folder_add_button.execute_script("arguments[0].click();")
@@ -122,7 +123,7 @@ class DatasetDataComponent(BaseComponent):
 
         """
         element = "//button[contains(text(), 'Download All')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             download_all_file_button = self.get_locator(LocatorType.XPath, element)
             if download_all_file_button is not None and download_all_file_button.is_enabled():
                 return True
@@ -138,7 +139,7 @@ class DatasetDataComponent(BaseComponent):
 
         """
         element = "//div[@class='File']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             file_div_list = self.driver.find_elements_by_xpath(element)
             for file_div in file_div_list:
                 file_title_div = file_div.find_element_by_xpath(".//div[@class='File__text']/div")
@@ -155,7 +156,7 @@ class DatasetDataComponent(BaseComponent):
 
         """
         element = "//button[contains(text(), 'Download All')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             download_all_button = self.get_locator(LocatorType.XPath, element)
             if download_all_button is not None and download_all_button.is_enabled():
                 download_all_button.click()
@@ -181,7 +182,7 @@ class DatasetDataComponent(BaseComponent):
 
         """
         element = "//p[contains(text(), 'Download complete!')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             return True
         return False
 
@@ -207,7 +208,7 @@ class DatasetDataComponent(BaseComponent):
 
         """
         element = "//div[@class='Folder']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             folder_div_list = self.driver.find_elements_by_xpath(element)
             for folder_div in folder_div_list:
                 folder_title = folder_div.find_element_by_xpath(".//div[@class='Folder__name']/div[1]").text
@@ -229,13 +230,14 @@ class DatasetDataComponent(BaseComponent):
 
         """
         element = "//div[@class='File']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             file_div_list = self.driver.find_elements_by_xpath(element)
             for file_div in file_div_list:
                 file_title_div = file_div.find_element_by_xpath(".//div[@class='File__text']/div")
                 if file_name == file_title_div.get_text().strip():
                     file_download_button_element = ".//button[contains(text(), 'Downloaded')]"
-                    if self.check_element_presence(LocatorType.XPath, file_download_button_element, 30):
+                    if self.check_element_presence(LocatorType.XPath, file_download_button_element,
+                                                   GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
                         return True
         return False
 
@@ -249,7 +251,7 @@ class DatasetDataComponent(BaseComponent):
 
         """
         element = "//div[@class='Folder']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             folder_div_list = self.driver.find_elements_by_xpath(element)
             for folder_div in folder_div_list:
                 folder_title = folder_div.find_element_by_xpath(".//div[@class='Folder__name']/div[1]").text
@@ -270,7 +272,7 @@ class DatasetDataComponent(BaseComponent):
 
         """
         element = "//div[@class='Folder']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             folder_div_list = self.driver.find_elements_by_xpath(element)
             for folder_div in folder_div_list:
                 folder_title = folder_div.find_element_by_xpath(".//div[@class='Folder__name']/div[1]").text
@@ -323,7 +325,7 @@ class DatasetDataComponent(BaseComponent):
 
         """
         element = "//div[@class='Folder']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             folder_div_list = self.driver.find_elements_by_xpath(element)
             for folder_div in folder_div_list:
                 folder_title = folder_div.find_element_by_xpath(".//div[@class='Folder__name']/div[1]").text
@@ -345,7 +347,7 @@ class DatasetDataComponent(BaseComponent):
 
         """
         element = "//div[@class='Folder']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             folder_div_list = self.driver.find_elements_by_xpath(element)
             for folder_div in folder_div_list:
                 folder_title = folder_div.find_element_by_xpath(".//div[@class='Folder__name']/div[1]").text
@@ -363,7 +365,7 @@ class DatasetDataComponent(BaseComponent):
 
         """
         element = "//div[@class='Folder']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             folder_div_list = self.driver.find_elements_by_xpath(element)
             for folder_div in folder_div_list:
                 folder_title = folder_div.find_element_by_xpath(".//div[@class='Folder__name']/div[1]").text
@@ -385,7 +387,7 @@ class DatasetDataComponent(BaseComponent):
 
         """
         element = "//div[@class='Folder']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             folder_div_list = self.driver.find_elements_by_xpath(element)
             for folder_div in folder_div_list:
                 folder_title = folder_div.find_element_by_xpath(".//div[@class='Folder__name']/div[1]").text
@@ -446,7 +448,7 @@ class DatasetDataComponent(BaseComponent):
 
         """
         element = "//h4[contains(text(), 'Files')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             return True
         return False
 

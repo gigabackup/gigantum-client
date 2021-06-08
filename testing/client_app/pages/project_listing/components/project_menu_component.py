@@ -1,3 +1,4 @@
+from client_app.constant_enums.constants_enums import GigantumConstants
 from framework.base.component_base import BaseComponent
 from framework.factory.models_enums.constants_enums import LocatorType
 from selenium import webdriver
@@ -34,7 +35,7 @@ class ProjectMenuComponent(BaseComponent):
 
         """
         element = "//li[@id='code']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             code_data_tab = self.get_locator(LocatorType.XPath, element)
             code_data_tab.click()
             return True
@@ -47,7 +48,7 @@ class ProjectMenuComponent(BaseComponent):
 
         """
         element = "//li[@id='inputData']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             input_data_tab = self.get_locator(LocatorType.XPath, element)
             input_data_tab.click()
             return True
@@ -60,7 +61,7 @@ class ProjectMenuComponent(BaseComponent):
 
         """
         element = "//li[@id='outputData']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             output_data_tab = self.get_locator(LocatorType.XPath, element)
             output_data_tab.click()
             return True
@@ -74,7 +75,7 @@ class ProjectMenuComponent(BaseComponent):
         """
         element = "//button[@class='Btn--branch Btn--action SyncBranchButtons__btn " \
                   "SyncBranchButtons__btn--publish Tooltip-data']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             btn_publish = self.get_locator(LocatorType.XPath, element)
             if btn_publish is not None and btn_publish.element_to_be_clickable():
                 btn_publish.click()
@@ -101,10 +102,24 @@ class ProjectMenuComponent(BaseComponent):
 
         """
         element = "//button[contains(text(), 'Publish')]"
-        if self.check_element_presence(LocatorType.XPath, element, 20):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             publish_button = self.get_locator(LocatorType.XPath, element)
             if publish_button is not None:
                 publish_button.click()
+                return True
+        return False
+
+    def click_publish_all_and_sync_button(self) -> bool:
+        """ Performs click action on Publish All And Sync button on project publish window
+
+        Returns: returns the result of click action
+
+        """
+        element = "//button[contains(text(), 'Publish All')]"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            publish_sync_button = self.get_locator(LocatorType.XPath, element)
+            if publish_sync_button is not None:
+                publish_sync_button.click()
                 return True
         return False
 
@@ -211,7 +226,7 @@ class ProjectMenuComponent(BaseComponent):
 
         """
         element = "//p[contains(text(), 'Sync complete')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             return True
         return False
 
@@ -300,7 +315,7 @@ class ProjectMenuComponent(BaseComponent):
 
         """
         element = "//button[contains(text(), 'Publish All')]"
-        if self.check_element_presence(LocatorType.XPath, element, 20):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             publish_button = self.get_locator(LocatorType.XPath, element)
             if publish_button is not None:
                 publish_button.click()
@@ -328,6 +343,20 @@ class ProjectMenuComponent(BaseComponent):
         if import_url_input is not None:
             import_url = import_url_input.getAttribute('value')
             return import_url
+
+    def click_pull_button(self) -> bool:
+        """ Performs click action on pull button
+
+        Returns: returns the result of click action
+
+        """
+        element = "//div[contains(text(), 'Pull')]"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            pull_button = self.get_locator(LocatorType.XPath, element)
+            if pull_button is not None and pull_button.element_to_be_clickable():
+                pull_button.click()
+                return True
+        return False
 
     def check_private_lock_icon_absence(self) -> bool:
         """ Performs checking for lock icon absence

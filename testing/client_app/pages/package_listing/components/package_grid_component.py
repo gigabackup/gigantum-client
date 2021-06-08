@@ -1,6 +1,6 @@
 import os
 import tempfile
-import time
+from client_app.constant_enums.constants_enums import GigantumConstants
 from framework.base.component_base import BaseComponent
 from selenium import webdriver
 from framework.factory.models_enums.page_config import ComponentModel
@@ -175,7 +175,7 @@ class PackageGridComponent(BaseComponent):
 
         """
         element = "//button[contains(text(),'Advanced Configuration Settings')]"
-        if self.check_element_presence(LocatorType.XPath, element, 20):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             configuration_button = self.get_locator(LocatorType.XPath, element)
             configuration_button.execute_script("arguments[0].click();")
             return True
@@ -188,7 +188,7 @@ class PackageGridComponent(BaseComponent):
 
         """
         element = "//button/span[contains(text(),'Edit Dockerfile')]"
-        if self.check_element_presence(LocatorType.XPath, element, 20):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             dockerfile_button = self.get_locator(LocatorType.XPath, element)
             dockerfile_button.execute_script("arguments[0].click();")
             return True
@@ -204,7 +204,7 @@ class PackageGridComponent(BaseComponent):
 
         """
         element = f"//textarea[@placeholder='Enter dockerfile commands here']"
-        if self.check_element_presence(LocatorType.XPath, element, 20):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             docker_text_area = self.get_locator(LocatorType.XPath, element)
             docker_text_area.execute_script("arguments[0].click();")
             docker_text_area.send_keys(command)
@@ -218,7 +218,7 @@ class PackageGridComponent(BaseComponent):
 
         """
         element = "//button[contains(text(),'Save')]"
-        if self.check_element_presence(LocatorType.XPath, element, 20):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             save_button = self.get_locator(LocatorType.XPath, element)
             if save_button.element_to_be_clickable():
                 save_button.execute_script("arguments[0].click();")
@@ -232,7 +232,7 @@ class PackageGridComponent(BaseComponent):
 
         """
         element = "//button[contains(text(),'Advanced Configuration Settings')]"
-        if self.check_element_presence(LocatorType.XPath, element, 20):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             save_button = self.get_locator(LocatorType.XPath, element)
             self.driver.execute_script("arguments[0].scrollIntoView(true);", save_button)
             return True
@@ -245,7 +245,8 @@ class PackageGridComponent(BaseComponent):
 
         """
         element = "//div[@class='ContainerStatus__container-state Rebuild Tooltip-data']"
-        check_element = self.check_element_presence(LocatorType.XPath, element, 20)
+        check_element = self.check_element_presence(LocatorType.XPath, element,
+                                                    GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value)
         if check_element:
             return True
         return False
@@ -280,7 +281,8 @@ class PackageGridComponent(BaseComponent):
 
         """
         modal_close_button_element = "//button[@class='Btn Btn--flat Modal__close padding--small ']"
-        if self.check_element_presence(LocatorType.XPath, modal_close_button_element, 20):
+        if self.check_element_presence(LocatorType.XPath, modal_close_button_element,
+                                       GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             modal_close_button = self.get_locator(LocatorType.XPath, modal_close_button_element)
             modal_close_button.execute_script("arguments[0].click();")
             return True
@@ -293,7 +295,7 @@ class PackageGridComponent(BaseComponent):
 
         """
         element = f"//textarea[@placeholder='Enter dockerfile commands here']"
-        if self.check_element_presence(LocatorType.XPath, element, 20):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             docker_text_area = self.get_locator(LocatorType.XPath, element)
             docker_text_area.execute_script("arguments[0].click();")
             docker_text_area.clear_text()
@@ -312,7 +314,7 @@ class PackageGridComponent(BaseComponent):
 
         """
         input_element = "//input[@id='add_secret']"
-        if self.check_element_presence(LocatorType.XPath, input_element, 20):
+        if self.check_element_presence(LocatorType.XPath, input_element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             file_input = self.driver.find_element_by_id('add_secret')
             if file_input:
                 temp_dir = tempfile.gettempdir()
@@ -333,7 +335,7 @@ class PackageGridComponent(BaseComponent):
 
         """
         input_element = "//input[@id='secret_path']"
-        if self.check_element_presence(LocatorType.XPath, input_element, 20):
+        if self.check_element_presence(LocatorType.XPath, input_element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             destination_input = self.get_locator(LocatorType.XPath, input_element)
             if destination_input is not None:
                 destination_input.send_keys(directory_name)
@@ -347,7 +349,8 @@ class PackageGridComponent(BaseComponent):
 
         """
         save_button_element = "//button[contains(text(),'Save')]"
-        if self.check_element_presence(LocatorType.XPath, save_button_element, 20):
+        if self.check_element_presence(LocatorType.XPath, save_button_element,
+                                       GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             save_button = self.get_locator(LocatorType.XPath, save_button_element)
             if save_button is not None:
                 save_button.click()
@@ -362,7 +365,8 @@ class PackageGridComponent(BaseComponent):
         """
         edit_button_element = "//button[@class='Btn Btn--medium Btn--noMargin Btn--round Btn__edit-secondary " \
                               "Btn__edit-secondary--medium']"
-        if self.check_element_presence(LocatorType.XPath, edit_button_element, 20):
+        if self.check_element_presence(LocatorType.XPath, edit_button_element,
+                                       GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             edit_button = self.get_locator(LocatorType.XPath, edit_button_element)
             if edit_button is not None:
                 edit_button.click()
@@ -380,7 +384,7 @@ class PackageGridComponent(BaseComponent):
 
         """
         input_element = "//input[@id='update_secret']"
-        if self.check_element_presence(LocatorType.XPath, input_element, 20):
+        if self.check_element_presence(LocatorType.XPath, input_element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             file_input = self.driver.find_element_by_id('update_secret')
             if file_input:
                 temp_dir = tempfile.gettempdir()
@@ -406,7 +410,7 @@ class PackageGridComponent(BaseComponent):
 
         """
         element = "//button[@data-selenium-id='SecretsPresent']"
-        if self.check_element_presence(LocatorType.XPath, element, 20):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             sensitive_file_missing_element = self.get_locator(LocatorType.XPath, element)
             if sensitive_file_missing_element is not None:
                 return True
@@ -420,7 +424,7 @@ class PackageGridComponent(BaseComponent):
         """
         element = "//button[@class='Btn Btn--medium Btn--noMargin Btn--round Btn__delete-secondary " \
                   "Btn__delete-secondary--medium']"
-        if self.check_element_presence(LocatorType.XPath, element, 20):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             delete_button = self.get_locator(LocatorType.XPath, element)
             if delete_button is not None:
                 delete_button.click()
@@ -434,7 +438,7 @@ class PackageGridComponent(BaseComponent):
 
         """
         element = "//button[@class='Secrets__btn--round Secrets__btn--add']"
-        if self.check_element_presence(LocatorType.XPath, element, 20):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             delete_yes_button = self.get_locator(LocatorType.XPath, element)
             if delete_yes_button is not None:
                 delete_yes_button.click()
@@ -448,7 +452,7 @@ class PackageGridComponent(BaseComponent):
 
         """
         element = "//div[@class='SecretsTable__name']"
-        if self.check_element_presence(LocatorType.XPath, element, 20):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             sensitive_file_text = self.get_locator(LocatorType.XPath, element).text
             if sensitive_file_text is not None and sensitive_file_text == file_name:
                 return True

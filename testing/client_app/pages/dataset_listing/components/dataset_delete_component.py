@@ -1,3 +1,4 @@
+from client_app.constant_enums.constants_enums import GigantumConstants
 from framework.base.component_base import BaseComponent
 from framework.factory.models_enums.constants_enums import LocatorType
 from selenium import webdriver
@@ -22,7 +23,7 @@ class DatasetDeleteComponent(BaseComponent):
 
         """
         element = "//div[@class='Modal__sub-container']/div[1]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             div_text = self.get_locator(LocatorType.XPath, element)
             project_title = div_text.find_element_by_xpath(".//b")
             return project_title.get_text().strip()
@@ -49,7 +50,7 @@ class DatasetDeleteComponent(BaseComponent):
 
         """
         element = "//button[@data-selenium-id='ButtonLoader']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             btn_delete_project = self.get_locator(LocatorType.XPath, element)
             if btn_delete_project is not None and btn_delete_project.element_to_be_clickable():
                 btn_delete_project.execute_script("arguments[0].click();")

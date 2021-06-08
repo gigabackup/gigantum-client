@@ -108,6 +108,3 @@ class DatasetListingPage(BasePage):
         if self._collaborator_modal_component is None:
             self._collaborator_modal_component = CollaboratorsModalComponent(self.driver, self.component_model)
         return self._collaborator_modal_component
-
-
-

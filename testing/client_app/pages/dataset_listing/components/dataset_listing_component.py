@@ -1,3 +1,4 @@
+from client_app.constant_enums.constants_enums import GigantumConstants
 from framework.base.component_base import BaseComponent
 from framework.factory.models_enums.constants_enums import LocatorType
 from selenium import webdriver
@@ -27,14 +28,14 @@ class DatasetListingComponent(BaseComponent):
 
         """
         element = "//h2[contains(text(), 'Add Dataset')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             return True
         return False
 
     def click_create_new_dataset_button(self) -> bool:
         """Click action on create new dataset"""
         element = "//button[contains(text(), 'Create New')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             create_button = self.get_locator(LocatorType.XPath, element)
             if create_button is not None and create_button.element_to_be_clickable():
                 create_button.execute_script("arguments[0].click();")
@@ -78,7 +79,7 @@ class DatasetListingComponent(BaseComponent):
 
         """
         element = "//a[@class='Card Card--225 Card--text column-4-span-3 flex flex--column justify--space-between']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             datasets_list = self.driver.find_elements_by_xpath(element)
             if datasets_list is not None:
                 for dataset in datasets_list:
@@ -98,7 +99,7 @@ class DatasetListingComponent(BaseComponent):
 
         """
         element = "//a[@class='Card Card--225 Card--text column-4-span-3 flex flex--column justify--space-between']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             datasets_list = self.driver.find_elements_by_xpath(element)
             if datasets_list is not None:
                 for dataset in datasets_list:
@@ -114,7 +115,7 @@ class DatasetListingComponent(BaseComponent):
 
         """
         element = "//button[contains(text(), 'Import Existing')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             import_existing_button = self.get_locator(LocatorType.XPath, element)
             if import_existing_button is not None and import_existing_button.element_to_be_clickable():
                 import_existing_button.execute_script("arguments[0].click();")
@@ -158,7 +159,7 @@ class DatasetListingComponent(BaseComponent):
         """
         element = "//p[@class='FooterMessage__title FooterMessage__title--collapsed' and contains(text(), " \
                   "'ERROR: Could not import remote Dataset')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             return True
         return False
 
@@ -170,7 +171,7 @@ class DatasetListingComponent(BaseComponent):
         """
         element = "//p[@class='FooterMessage__title FooterMessage__title--collapsed' and contains(text(), " \
                   "'Successfully imported remote Dataset')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             return True
         return False
 
@@ -182,7 +183,7 @@ class DatasetListingComponent(BaseComponent):
         """
         element = "//p[@class='FooterMessage__title FooterMessage__title--collapsed' and contains(text(), " \
                   "'You do not have adequate permissions to modify this dataset')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             return True
         return False
 

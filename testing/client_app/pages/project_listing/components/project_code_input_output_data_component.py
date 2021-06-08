@@ -1,3 +1,4 @@
+from client_app.constant_enums.constants_enums import GigantumConstants
 from framework.base.component_base import BaseComponent
 from framework.factory.models_enums.constants_enums import LocatorType
 from selenium import webdriver
@@ -114,13 +115,13 @@ class ProjectCodeInputOutputDataComponent(BaseComponent):
 
         """
         element = "//button[contains(text(), 'Link Dataset')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             link_dataset_button = self.get_locator(LocatorType.XPath, element)
             link_dataset_button.execute_script("arguments[0].click();")
             return True
         return False
 
-    def select_dataset(self, dataset_title):
+    def select_dataset(self, dataset_title: str):
         """ Select dataset from the link dataset window
 
         Args:
@@ -130,7 +131,7 @@ class ProjectCodeInputOutputDataComponent(BaseComponent):
 
         """
         element = "//div[@class='LinkModal__wrapper']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             dataset_div_list = self.driver.find_elements_by_xpath(element)
             for dataset_div in dataset_div_list:
                 dataset_title_element = dataset_div.find_element_by_xpath(".//h6[@class='LinkCard__header']/b")
@@ -146,7 +147,7 @@ class ProjectCodeInputOutputDataComponent(BaseComponent):
 
         """
         element = "//button[@class='Btn ButtonLoader Btn Btn--last']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             dataset_link_button = self.get_locator(LocatorType.XPath, element)
             dataset_link_button.execute_script("arguments[0].click();")
             return True
@@ -159,7 +160,7 @@ class ProjectCodeInputOutputDataComponent(BaseComponent):
 
         """
         element = "//h4[@class='LinkModal__header-text' and text()='Link Dataset']"
-        if self.check_element_absence(LocatorType.XPath, element, 40):
+        if self.check_element_absence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             return True
         return False
 
@@ -170,7 +171,7 @@ class ProjectCodeInputOutputDataComponent(BaseComponent):
 
         """
         element = "//button[contains(text(), 'Download All')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             download_all_button = self.get_locator(LocatorType.XPath, element)
             download_all_button.execute_script("arguments[0].click();")
             return True
@@ -183,7 +184,7 @@ class ProjectCodeInputOutputDataComponent(BaseComponent):
 
         """
         element = "//p[contains(text(), 'Download complete!')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             return True
         return False
 
@@ -194,7 +195,36 @@ class ProjectCodeInputOutputDataComponent(BaseComponent):
 
         """
         element = "//button[contains(text(), 'Downloaded')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             return True
         return False
 
+    def verify_dataset_is_present(self, dataset_name: str) -> bool:
+        """ Verify dataset is present on input data tab
+
+        Args:
+            dataset_name: Name of the dataset
+
+        Returns: returns the result of verification
+
+        """
+        element = f"//div[@class='DatasetCard Card']/div/div[2]/div[2]/a[contains(text(), {dataset_name})]"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            return True
+        return False
+
+    def click_dataset_name(self, dataset_name: str) -> bool:
+        """ Performs click action on dataset name on input data tab
+
+        Args:
+            dataset_name: Name of the dataset
+
+        Returns: returns the result of click action
+
+        """
+        element = f"//div[@class='DatasetCard Card']/div/div[2]/div[2]/a[contains(text(), {dataset_name})]"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            dataset_title_element = self.get_locator(LocatorType.XPath, element)
+            dataset_title_element.click()
+            return True
+        return False

@@ -11,7 +11,7 @@ from tests.helper.project_utility import ProjectUtility
 
 
 class DatasetUtility:
-    def create_dataset(self, driver: webdriver) -> str:
+    def create_dataset(self, driver: webdriver, is_guide: bool = True) -> str:
         """Logical separation of create dataset functionality"""
         # Create a dataset
 
@@ -21,10 +21,11 @@ class DatasetUtility:
             return "Could not load Project Listing Page"
 
         # Closes the guide
-        project_utility = ProjectUtility()
-        guide_close_msg = project_utility.close_guide(project_list)
-        if guide_close_msg != ProjectConstants.SUCCESS.value:
-            return guide_close_msg
+        if is_guide:
+            project_utility = ProjectUtility()
+            guide_close_msg = project_utility.close_guide(project_list)
+            if guide_close_msg != ProjectConstants.SUCCESS.value:
+                return guide_close_msg
 
         # Load dataset Listing Page
         dataset_list = DatasetListingPage(driver)
@@ -161,7 +162,7 @@ class DatasetUtility:
 
         """
         # Click folder path icon
-        time.sleep(3)
+        time.sleep(4)
         is_clicked = jupyter_lab_page.click_folder_path_icon()
         if not is_clicked:
             return "Could not click folder path icon in Jupyter Lab"
@@ -226,7 +227,47 @@ class DatasetUtility:
 
         return ProjectConstants.SUCCESS.value
 
-    def add_collaborator(self, driver: webdriver, collaborator_name, collaborator_permission) -> str:
+    def link_dataset(self, driver: webdriver, dataset_title: str) -> str:
+        """Logical separation of link dataset functionality
+
+        Args:
+            driver: The page with UI elements
+            dataset_title: Title of the dataset
+
+        """
+        # Load dataset Listing Page
+        dataset_list = DatasetListingPage(driver)
+        if not dataset_list:
+            return "Could not load Dataset Listing Page"
+
+        # Click on Input Data tab
+        is_clicked = dataset_list.project_menu_component.click_input_data_tab()
+        if not is_clicked:
+            return "Could not click on Input Data tab"
+
+        # Click on link dataset button
+        is_clicked = dataset_list.code_input_output_data_component.click_link_dataset_button()
+        if not is_clicked:
+            return "Could not click on link dataset button"
+
+        # Select dataset from link dataset window
+        is_selected = dataset_list.code_input_output_data_component.select_dataset(dataset_title)
+        if not is_selected:
+            return "Could not select dataset from dataset link window"
+
+        # Click on link dataset button on link dataset window
+        is_clicked = dataset_list.code_input_output_data_component.click_link_dataset_button_on_link_dataset_window()
+        if not is_clicked:
+            return "Could not click on link dataset button on link dataset window"
+
+        # Check link dataset window closed
+        is_closed = dataset_list.code_input_output_data_component.check_link_dataset_window_closed()
+        if not is_closed:
+            return "Could not close link dataset window"
+
+        return ProjectConstants.SUCCESS.value
+
+    def add_collaborator(self, driver: webdriver, collaborator_name: str, collaborator_permission: str) -> str:
         """Logical separation of add collaborator functionality
 
         Args:
