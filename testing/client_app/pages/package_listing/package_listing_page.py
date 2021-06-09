@@ -2,12 +2,16 @@ from selenium.webdriver import ActionChains
 from selenium.webdriver.remote.webelement import WebElement
 from client_app.pages.package_listing.components.package_grid_component import PackageGridComponent
 from client_app.pages.package_listing.components.add_package_component import AddPackageComponent
+from client_app.pages.project_listing.components.project_listing_component import ProjectListingComponent
 from framework.base.page_base import BasePage
 from framework.factory.models_enums.constants_enums import LocatorType
 from framework.factory.models_enums.page_config import PageConfig
 from framework.factory.models_enums.page_config import ComponentModel
 from client_app.pages.project_listing.components.project_container_status_component \
     import ProjectContainerStatusComponent
+from client_app.pages.project_listing.components.project_menu_component import ProjectMenuComponent
+from client_app.pages.project_listing.components.project_code_input_output_data_component import \
+    ProjectCodeInputOutputDataComponent
 
 
 class PackageListingPage(BasePage):
@@ -26,7 +30,10 @@ class PackageListingPage(BasePage):
         self.__environment_tab = None
         self.__package_listing_component = None
         self.__add_package_component = None
+        self.__project_menu_component = None
+        self._code_input_output_component = None
         self.__project_container_status_component = None
+        self.__project_listing_component = None
         self.__package_grid_model = ComponentModel(locator_type=LocatorType.XPath, locator="//div[@class='grid']")
         self.__add_package_model = ComponentModel(locator_type=LocatorType.XPath,
                                                   locator="//div[@data-selenium-id='AddPackages']")
@@ -51,6 +58,27 @@ class PackageListingPage(BasePage):
         if self.__project_container_status_component is None:
             self.__project_container_status_component = ProjectContainerStatusComponent(self.driver)
         return self.__project_container_status_component
+
+    @property
+    def project_menu_component(self) -> ProjectMenuComponent:
+        """ Returns an instance of project menu component."""
+        if self.__project_menu_component is None:
+            self.__project_menu_component = ProjectMenuComponent(self.driver, self.component_model)
+        return self.__project_menu_component
+
+    @property
+    def code_input_output_component(self) -> ProjectCodeInputOutputDataComponent:
+        """ Returns an instance of Code data, Input data and Output data window component."""
+        if self._code_input_output_component is None:
+            self._code_input_output_component = ProjectCodeInputOutputDataComponent(self.driver, self.component_model)
+        return self._code_input_output_component
+
+    @property
+    def project_listing_component(self) -> ProjectListingComponent:
+        """Returns instance of project listing component."""
+        if self.__project_listing_component is None:
+            self.__project_listing_component = ProjectListingComponent(self.driver, self.component_model)
+        return self.__project_listing_component
 
     @property
     def __click_environment_tab(self) -> WebElement:

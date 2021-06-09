@@ -228,3 +228,42 @@ class ProjectCodeInputOutputDataComponent(BaseComponent):
             dataset_title_element.click()
             return True
         return False
+
+    def click_file_delete(self, file_name: str) -> bool:
+        """ Performs click action on file delete button
+
+        Args:
+            file_name: Name of the file to be delete
+
+        Returns: returns the result of click action
+
+        """
+        element = "//div[@class='File']"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            file_div_list = self.driver.find_elements_by_xpath(element)
+            for file_div in file_div_list:
+                file_title_div = file_div.find_element_by_xpath(".//div[@class='File__text']/div")
+                if file_name == file_title_div.get_text().strip():
+                    file_delete_button = file_div.find_element_by_xpath(".//button[@class='ActionsMenu__item Btn "
+                                                                        "Btn--fileBrowser Btn__delete-secondary "
+                                                                        "Btn--round']")
+                    file_delete_button.click()
+                    tick_button = file_div.find_element_by_xpath(".//button[@class='File__btn--round File__btn--add']")
+                    if tick_button is not None:
+                        tick_button.click()
+                        return True
+        return False
+
+    def verify_file_is_present(self, file_name: str) -> bool:
+        """ Verify file is present in the code tab window
+
+        Args:
+            file_name: Name of the file to be verify
+
+        Returns: returns the result of verification
+
+        """
+        element = f"//div[@class='File']/div/div[1]/div[2]/div[contains(text(), '{file_name}')]"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            return True
+        return False

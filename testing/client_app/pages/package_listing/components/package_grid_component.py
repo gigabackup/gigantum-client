@@ -111,7 +111,7 @@ class PackageGridComponent(BaseComponent):
         Returns: returns the result of delete operation
 
         """
-        package_list = self.ui_element.find_elements_by_xpath("//div[@data-selenium-id='PackageRow']")
+        package_list = self.driver.find_elements_by_xpath("//div[@data-selenium-id='PackageRow']")
         if package_list is not None:
             for package in package_list:
                 selected_package = package.text.split('\n')

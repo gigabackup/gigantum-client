@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1800"
+changelog:
+  - type: NEW
+    description: Verify deleting files and packages properly managed across users and syncs.
