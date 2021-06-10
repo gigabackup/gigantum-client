@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1801"
+changelog:
+  - type: NEW
+    description: The client version will now be visible in the sidebar of the application
