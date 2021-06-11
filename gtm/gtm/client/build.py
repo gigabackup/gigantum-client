@@ -4,6 +4,7 @@ import re
 import glob
 import datetime
 import sys
+import subprocess
 
 from docker.errors import ImageNotFound, NotFound, APIError
 import yaml
@@ -156,13 +157,16 @@ class ClientBuilder(object):
         except requests.exceptions.ChunkedEncodingError:
             pass
 
-    def build_image(self, no_cache: bool = False, build_args: dict = None, docker_args: dict = None) -> None:
+    def build_image(self, no_cache: bool = False, build_args: dict = None, docker_args: dict = None,
+                    publish: bool = False, multi_arch: bool = False, edge=False) -> str:
         """Method to build the Gigantum Client Docker Image
 
         Args:
             no_cache: Flag indicating if the docker cache should be ignored
             build_args: Variables to prepare files for build
             docker_args: Variables passed to docker during the build process
+            publish: Push to repository if True. If False, build and load into Docker so it appears in `docker images`
+            multi_arch: If True make a multi-arch build
 
         build_args items:
             supervisor_file: The path to the target supervisor file to move into build dir
@@ -189,7 +193,11 @@ class ClientBuilder(object):
         if os.path.exists(build_dir) is False:
             os.makedirs(build_dir)
 
+        if edge:
+            self.image_name = "{}-edge".format(self.image_name)
+
         named_image = "{}:{}".format(self.image_name, self.get_image_tag())
+        named_image_latest = "{}:latest".format(self.image_name)
         if self.image_exists(named_image):
             # Image found. Make sure container isn't running.
             self.prune_container(named_image)
@@ -243,10 +251,10 @@ priority=10"""
                 dest.write(f"""{supervisor_data}\n\n{honeycomb_block}""")
 
         # Image Labels
-        labels = {'com.gigantum.app': 'client',
-                  'com.gigantum.revision': get_current_commit_hash(),
-                  'com.gigantum.version': release_version,
-                  'com.gigantum.maintainer.email': 'support@gigantum.com'}
+        labels = ['--label=com.gigantum.app=client',
+                  f'--label=com.gigantum.revision={get_current_commit_hash()}',
+                  f'--label=com.gigantum.version={release_version}',
+                  '--label=com.gigantum.maintainer.email=support@gigantum.com']
 
         # Delete .pyc files in case dev tools used on something not ubuntu before building
         self._remove_pyc(os.path.join(client_root_dir, "packages"))
@@ -262,73 +270,58 @@ priority=10"""
             # This is a relative path from the *build context* (which is Linux)
             dockerfile_path = os.path.relpath(dockerfile_path, client_root_dir).replace('\\', '/')
 
-        build_lines = self.docker_client.api.build(path=client_root_dir, dockerfile=dockerfile_path, tag=named_image,
-                                                   labels=labels, nocache=no_cache, pull=True, rm=True, decode=True,
-                                                   buildargs=docker_args)
-        for line in build_lines:
-            print(next(iter(line.values())), end='')
+        # Make sure a builder exists for buildx
+        self._verify_or_create_builder()
 
-        # Tag with `latest` for auto-detection of image on launch
-        # TODO: Rename container to gigantum/client
-        self.docker_client.api.tag(named_image, self.image_name, 'latest')
+        cmd = ["docker", "buildx", "build",
+               "--builder", "gtm-builder",
+               "--pull",
+               "--file", dockerfile_path,
+               "--tag", named_image,
+               "--tag", named_image_latest,
+               ]
+        cmd.extend(labels)
 
-    def publish(self, image_tag: str = None) -> None:
-        """Method to push image to the logged in image repository server (e.g hub.docker.com)
+        for arg in docker_args:
+            cmd.append(f"--build-arg={arg}={docker_args[arg]}")
 
-        Args:
-            image_tag(str): full image tag to publish
+        if publish:
+            cmd.append("--push")
+        else:
+            cmd.append("--load")
+
+        if no_cache:
+            cmd.append("--no-cache")
+
+        cmd.append("--platform")
+        if multi_arch:
+            cmd.append("linux/arm64/v8,linux/amd64")
+            # cmd.append("linux/arm64/v8")
+        else:
+            cmd.append("linux/amd64")
+
+        cmd.append(client_root_dir)
+        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        while True:
+            output = process.stdout.readline().decode()
+            if output == '' and process.poll() is not None:
+                break
+            if output:
+                print(output.rstrip())
+
+        if process.returncode != 0:
+            raise Exception("Failed to build.")
+
+    @staticmethod
+    def _verify_or_create_builder() -> None:
+        """Method to create a docker builder if one does not exist yet
+
+        Returns:
+            None
         """
-        # If no tag provided, use current repo hash
-        if not image_tag:
-            image_tag = self.get_image_tag()
-
-        last_msg = ""
-        for ln in self.docker_client.api.push(self.image_name, tag=image_tag, stream=True, decode=True):
-            if 'status' in ln:
-                if last_msg != ln.get('status'):
-                    print(f"\n{ln.get('status')}", end='', flush=True)
-                    last_msg = ln.get('status')
-                else:
-                    print(".", end='', flush=True)
-
-            elif 'error' in ln:
-                sys.stderr.write(f"\n{ln.get('error')}\n")
-                sys.stderr.flush()
-            else:
-                print(ln)
-
-        self.docker_client.images.push(self.image_name, tag='latest')
-
-    def publish_edge(self, image_tag: str = None) -> None:
-        """Method to push image to the logged in image repository server (e.g hub.docker.com)
-
-        Args:
-            image_tag(str): full image tag to publish
-        """
-        # If no tag provided, use current repo hash
-        if not image_tag:
-            image_tag = self.get_image_tag()
-
-        # Re-tag current labmanager build as edge locally
-        self.docker_client.images.get(f'{self.image_name}:latest').tag(f'{self.image_name}-edge:{image_tag}')
-        self.docker_client.images.get(f'{self.image_name}-edge:{image_tag}').tag(f'{self.image_name}-edge:latest')
-
-        last_msg = ""
-        for ln in self.docker_client.api.push(f'{self.image_name}-edge', tag=image_tag, stream=True, decode=True):
-            if 'status' in ln:
-                if last_msg != ln.get('status'):
-                    print(f"\n{ln.get('status')}", end='', flush=True)
-                    last_msg = ln.get('status')
-                else:
-                    print(".", end='', flush=True)
-
-            elif 'error' in ln:
-                sys.stderr.write(f"\n{ln.get('error')}\n")
-                sys.stderr.flush()
-            else:
-                print(ln)
-
-        self.docker_client.images.push(f'{self.image_name}-edge', tag='latest')
+        result = subprocess.run(["docker", "buildx", "ls"], capture_output=True, check=True)
+        if "gtm-builder" not in result.stdout.decode():
+            subprocess.run(["docker", "buildx", "create", "--name", "gtm-builder"], check=True)
 
     def cleanup(self, image_name) -> None:
         """Method to clean up old images

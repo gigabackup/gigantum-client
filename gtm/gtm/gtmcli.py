@@ -58,7 +58,7 @@ def client_actions(args):
         if args.override_name:
             builder.image_name = args.override_name
 
-    if args.action == "build":
+    if args.action == "build" or args.action == "publish":
         build_args = {"build_dir": os.path.join("build", "client"),
                       "supervisor_file": os.path.join("resources", "client", "supervisord.conf"),
                       "config_override_file": os.path.join("resources", "client",
@@ -74,32 +74,16 @@ def client_actions(args):
                        "UI_BUILD_SCRIPT": "resources/docker/ui_build_script.sh"}
 
         builder.write_empty_testing_requirements_file()
-        builder.build_image(no_cache=args.no_cache, build_args=build_args, docker_args=docker_args)
+        builder.build_image(no_cache=args.no_cache, build_args=build_args, docker_args=docker_args,
+                            multi_arch=args.multi_arch,
+                            publish=True if args.action == "publish" else False,
+                            edge=args.edge)
 
         # Print Name of image
-        print("\n\n*** Built Gigantum Client Image: {}\n".format(builder.image_name))
-
-    elif args.action == "publish":
-        image_tag = None
-        builder.publish(image_tag=image_tag)
-
-        # Print Name of image
-        if not image_tag:
-            image_tag = "latest"
-        print("\n\n*** Published Gigantum Client Image: gigantum/labmanager:{}\n".format(image_tag))
-
-    elif args.action == "publish-edge":
-        image_tag = None
-        if "override_name" in args:
-            if args.override_name:
-                image_tag = args.override_name
-
-        builder.publish_edge(image_tag=image_tag)
-
-        # Print Name of image
-        if not image_tag:
-            image_tag = "latest"
-        print("\n\n*** Published Gigantum Client Edge Image: gigantum/labmanager-edge:{}\n".format(image_tag))
+        if args.action == "publish":
+            print("\n\n*** Published Gigantum Client Image: {}\n".format(builder.image_name))
+        else:
+            print("\n\n*** Built Gigantum Client Image: {}\n".format(builder.image_name))
 
     elif args.action == "prune":
         builder.cleanup("gigantum/labmanager")
@@ -384,6 +368,14 @@ def main():
                         default=False,
                         action='store_true',
                         help="Boolean indicating if docker cache should be ignored")
+    parser.add_argument("--multi-arch",
+                        default=False,
+                        action='store_true',
+                        help="Boolean indicating if the container should be built for multiple architectures")
+    parser.add_argument("--edge", "-e",
+                        default=False,
+                        action='store_true',
+                        help="Boolean indicating if the container should be tagged as an edge build")
     parser.add_argument("--stage", "-s",
                         default="dev",
                         metavar="<hub stage>",

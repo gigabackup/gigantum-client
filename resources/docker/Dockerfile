@@ -1,5 +1,5 @@
 # FRONTEND BUILD CONTAINER
-FROM ubuntu:20.04 as ui-builder
+FROM --platform=linux/amd64 ubuntu:20.04 as ui-builder
 
 # Install system level dependencies
 RUN apt-get -y update && apt-get -y install git curl gosu
@@ -59,11 +59,13 @@ COPY $HONEYTAIL_INSTALLER /tmp/honeytail.sh
 # Super instruction to install all dependencies that need apt and clean up to minimize layer size
 RUN apt-get -y update && \
     # Install all apt packages
-    apt-get -y --no-install-recommends install nginx supervisor wget openssl python3 python3-pip python3-distutils \
+    apt-get -y --no-install-recommends install nginx supervisor wget openssl python3 ca-certificates python3-distutils \
       gcc g++ gosu redis-server libjpeg-dev python3-setuptools python3-dev libdpkg-perl zip unzip libsnappy-dev \
       curl make autoconf dh-autoreconf libcurl4-openssl-dev libexpat1-dev libz-dev \
-      libssl-dev libffi-dev python3-dev cargo && \
-    python3 -m pip install --upgrade pip && \
+      libssl-dev libffi-dev python3-dev cargo cmake ninja-build && \
+    curl -L --retry 5 https://bootstrap.pypa.io/get-pip.py -o /tmp/get-pip.py && \
+    python3 /tmp/get-pip.py && \
+    rm /tmp/get-pip.py && \
     # Install Git from source to use OpenSSL for better enterprise network support.
     mkdir /tmp/gitbuild && cd /tmp/gitbuild && \
     # Get the latest git tarball
@@ -78,7 +80,8 @@ RUN apt-get -y update && \
     cd /tmp && rm -rf ./gitbuild && \
     # Get the latest git LFS binary
     mkdir /tmp/lfs_install && cd /tmp/lfs_install && \
-    git_lfs_tarball_url="https://www.github.com$(curl 'https://github.com/git-lfs/git-lfs/releases' | grep -o "/git-lfs/git-lfs/releases/download/v2..*/git-lfs-linux-amd64-v2..*.tar.gz" | sort -r | head -1 | tr -d '\n')" && \
+    git_lfs_tarball_path=$(curl 'https://github.com/git-lfs/git-lfs/releases' | grep -o "/git-lfs/git-lfs/releases/download/v2..*/git-lfs-linux-$(dpkg --print-architecture)-v2..*.tar.gz" | sort -r | head -1 | tr -d '\n') && \
+    git_lfs_tarball_url="https://www.github.com${git_lfs_tarball_path}" && \
     curl -L --retry 5 "${git_lfs_tarball_url}" --output "git-lfs.tar.gz" && \
     tar -xf "git-lfs.tar.gz" && \
     # Configure Git-LFS
@@ -94,6 +97,8 @@ RUN apt-get -y update && \
     # Install client package dependencies
     pip3 install wheel && \
     # Install package deps, note testing requirements will essentially be a noop in production
+    pip3 install scikit-build && \
+    pip3 install ninja && \
     pip3 install -r /opt/gtmcore/requirements.txt -r /opt/gtmapi/requirements.txt -r /opt/requirements-testing.txt && \
     # Install confhttpproxy after other requirements to avoid version thrashing
     cd /opt/confhttpproxy && pip3 install . && \
@@ -101,8 +106,9 @@ RUN apt-get -y update && \
     # Configure Honeytail (If running in a cluster, will be a noop otherwise)
     chmod u+x /tmp/honeytail.sh && /tmp/honeytail.sh && \
     # Cleanup!
+    pip3 uninstall -y scikit-build ninja-build && \
     apt-get -qq -y remove gcc g++ wget curl gnupg gnupg1 gnupg2 make autoconf dh-autoreconf \
-                          libssl-dev libffi-dev cargo && \
+                          libssl-dev libffi-dev cargo cmake ninja-build && \
     apt-get -qq -y autoremove && \
     apt-get -qq -y autoclean && \
     apt-get clean && \
