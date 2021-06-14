@@ -135,14 +135,14 @@ class Sidebar extends Component<Props> {
           {
             authenticated && (<User {...this.props} />)
           }
-          <div className="SideBar__version">
+          <div className="SideBar__version flex flex-1 justify--center align-items--end">
             <a
               className="SideBar__link"
               href={getApiURL('ping')}
               rel="noreferrer"
               target="_blank"
             >
-              {`Version: ${version}`}
+              {`v${version}`}
             </a>
           </div>
         </div>
