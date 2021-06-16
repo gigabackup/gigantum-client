@@ -1,4 +1,8 @@
 import random
+import time
+
+from client_app.pages.landing.landing_page import LandingPage
+from client_app.pages.login.login_factory import LoginFactory
 from client_app.pages.project_listing.project_listing_page import ProjectListingPage
 from selenium import webdriver
 from tests.constants_enums.constants_enums import ProjectConstants
@@ -105,7 +109,7 @@ class ProjectUtility:
             return "Could not click Jupyter Lab button"
 
         # Wait for new tab to open with new url
-        is_url_loaded = jupyter_lab_page.wait_for_url_in_new_tab("/lab", 1, 60)
+        is_url_loaded = jupyter_lab_page.wait_for_url_in_new_tab("lab/tree/code", 1, 80)
         if not is_url_loaded:
             return "Could not open new window"
 
@@ -113,6 +117,11 @@ class ProjectUtility:
         is_clicked = jupyter_lab_page.click_python3_notebook()
         if not is_clicked:
             return "Could not click python3 under notebook"
+
+        # Get python3 notebook title
+        python3_notebook_title = jupyter_lab_page.get_python3_notebook_title()
+        if python3_notebook_title is None:
+            return "Could not get python3 notebook title"
 
         # Iterate through list of commands
         for index, command in enumerate(commands_list):
@@ -139,7 +148,7 @@ class ProjectUtility:
             if not jupyter_notebook_output:
                 return command.error_message
 
-        jupyter_lab_page.close_tab("/lab", 0)
+        jupyter_lab_page.close_tab(f"lab/tree/code/{python3_notebook_title}", 0)
 
         # Click on container status button to stop container
         is_clicked = jupyter_lab_page.click_container_status()
@@ -198,7 +207,7 @@ class ProjectUtility:
 
         return ProjectConstants.SUCCESS.value
 
-    def publish_project(self, driver: webdriver):
+    def publish_project(self, driver: webdriver) -> str:
         """Logical separation of publish project functionality
 
         Args:
@@ -208,6 +217,9 @@ class ProjectUtility:
         project_list = ProjectListingPage(driver)
         if not project_list:
             return "Could not load Project Listing Page"
+
+        # Time sleep to make sure that the publish button is loaded
+        time.sleep(1)
 
         # Click on project publish button
         is_clicked = project_list.project_menu_component.click_publish_button()
@@ -238,5 +250,167 @@ class ProjectUtility:
         is_checked = project_list.project_menu_component.check_private_lock_icon_presence()
         if not is_checked:
             return "Could not found private lock icon presence"
+
+        return ProjectConstants.SUCCESS.value
+
+    def delete_project_from_server(self, driver: webdriver, project_title) -> str:
+        """Logical separation of delete project functionality
+
+        Args:
+            driver: webdriver instance
+            project_title: Title of the project to be delete
+
+        """
+        # Load Project Listing Page
+        project_list = ProjectListingPage(driver)
+        if not project_list:
+            return "Could not load Project Listing Page"
+
+        # Click server tab
+        is_clicked = project_list.server_component.click_server_tab()
+        if not is_clicked:
+            return "Could not click server tab"
+
+        # Verify project in server page
+        is_verified = project_list.server_component.verify_title_in_server(project_title)
+        if not is_verified:
+            return "Could not verify project in server"
+
+        # Click delete button in server page
+        is_clicked = project_list.server_component.click_delete_button(project_title)
+        if not is_clicked:
+            return "Could not click delete button in server page"
+
+        # Get project title from delete project window in server page
+        project_name = project_list.server_component.get_title()
+        if project_name is None:
+            return "Could not get project title in server page"
+
+        # Input project title in delete window on server page
+        is_typed = project_list.server_component.input_title(project_name)
+        if not is_typed:
+            return "Could not type project title in delete window on server page"
+
+        # Click delete project button in delete window on server page
+        is_clicked = project_list.server_component.click_delete_button_on_window()
+        if not is_clicked:
+            return "Could not click delete project button in delete window on server page"
+
+        # Verify delete modal close
+        is_verified = project_list.server_component.verify_delete_modal_closed(30)
+        if not is_verified:
+            return "Could not close delete modal"
+
+        # Verify project is not exist in server page
+        is_listed = project_list.server_component.verify_title_in_server(project_title)
+        if is_listed:
+            return "Project is still exist in the server"
+
+        # wait ~5 seconds to guarantee server side deletion completes
+        time.sleep(5)
+
+        # Refresh the server page
+        is_clicked = project_list.server_component.click_server_tab()
+        if not is_clicked:
+            return "Could not click server tab"
+
+        # Verify project is not exist in server page
+        is_listed = project_list.server_component.verify_title_in_server(project_title)
+        if is_listed:
+            return "Project is still exist in the server"
+
+        return ProjectConstants.SUCCESS.value
+
+    def switch_user(self, driver: webdriver, user_credentials, server_details) -> str:
+        """Logical separation of switch user in gigantum client
+
+        Args:
+            driver: webdriver instance
+            user_credentials: Includes username and password
+            server_details: Details of the current server
+        """
+        # Load Project Listing Page
+        project_list = ProjectListingPage(driver)
+        if not project_list:
+            return "Could not load Project Listing Page"
+
+        # Click on profile menu
+        is_clicked = project_list.project_listing_component.profile_menu_click()
+        if not is_clicked:
+            return "Could not click profile menu button"
+
+        # Click on logout button
+        is_clicked = project_list.project_listing_component.log_out()
+        assert is_clicked, "Could not click logout button"
+
+        # Load Landing Page
+        landing_page = LandingPage(driver, False)
+        if not landing_page:
+            return "Could not load Landing page"
+
+        # Click server button
+        landing_page.landing_component.click_server(server_details.server_name)
+
+        # Load Login page
+        login_page = LoginFactory().load_login_page(server_details.login_type, driver)
+        if not login_page:
+            return "Could not return login page"
+
+        # Load Project Listing page
+        project_list = login_page.login(user_credentials.user_name, user_credentials.password)
+        if project_list.project_listing_component.get_project_title() != "Projects":
+            return "Could not load Project Listing page"
+
+        return ProjectConstants.SUCCESS.value
+
+    def import_project(self, driver: webdriver, project_title) -> str:
+        """ Import project from server
+
+        Args:
+            driver: webdriver instance
+            project_title: Title of the current project
+        """
+        # Load Project Listing Page
+        project_list = ProjectListingPage(driver)
+        if not project_list:
+            return "Could not load Project Listing Page"
+
+        # Click server tab
+        is_clicked = project_list.server_component.click_server_tab()
+        if not is_clicked:
+            return "Could not click server tab"
+
+        # Verify project in server page
+        is_verified = project_list.server_component.verify_title_in_server(project_title)
+        if not is_verified:
+            return "Could not verify project in server"
+
+        # Click import button in server page
+        is_clicked = project_list.server_component.click_import_button(project_title)
+        if not is_clicked:
+            return "Could not click import button in server page"
+
+        # Monitor container status to go through Stopped -> Building
+        is_status_changed = project_list.monitor_container_status("Building", 5)
+        if not is_status_changed:
+            # DMK Note: In some cases the build finishes so fast it is at the Stopped state already.
+            # This extra case verifies that it is indeed Stopped and not bouncing.
+            is_stopped = project_list.monitor_container_status("Stopped", 1)
+            if is_stopped:
+                time.sleep(2)
+                is_stopped = project_list.monitor_container_status("Stopped", 1)
+                if not is_stopped:
+                    return "Could not get Building status and verify container was already ready"
+            else:
+                if not is_stopped:
+                    return "Could not get Building status and verify container was already ready"
+        else:
+            if not is_status_changed:
+                return "Could not get Building status"
+
+        # Monitor container status to go through Building -> Stopped
+        is_status_changed = project_list.monitor_container_status("Stopped", 60)
+        if not is_status_changed:
+            return "Could not get Stopped status"
 
         return ProjectConstants.SUCCESS.value

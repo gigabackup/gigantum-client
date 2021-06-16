@@ -12,6 +12,7 @@ from client_app.pages.project_listing.components.project_code_input_output_data_
 from client_app.pages.project_listing.components.project_container_status_component import \
     ProjectContainerStatusComponent
 from client_app.pages.project_listing.components.project_listing_component import ProjectListingComponent
+from client_app.pages.project_listing.components.collaborators_modal_component import CollaboratorsModalComponent
 
 
 class DatasetListingPage(BasePage):
@@ -36,6 +37,7 @@ class DatasetListingPage(BasePage):
         self._code_input_output_data_component = None
         self._container_status_component = None
         self._project_listing_component = None
+        self._collaborator_modal_component = None
 
     @property
     def dataset_menu_component(self) -> DatasetMenuComponent:
@@ -100,5 +102,9 @@ class DatasetListingPage(BasePage):
             self._project_listing_component = ProjectListingComponent(self.driver, self.component_model)
         return self._project_listing_component
 
-
-
+    @property
+    def collaborator_modal_component(self) -> CollaboratorsModalComponent:
+        """ Returns an instance of code input output data component."""
+        if self._collaborator_modal_component is None:
+            self._collaborator_modal_component = CollaboratorsModalComponent(self.driver, self.component_model)
+        return self._collaborator_modal_component

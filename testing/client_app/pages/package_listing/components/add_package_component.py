@@ -1,3 +1,4 @@
+from client_app.constant_enums.constants_enums import GigantumConstants
 from framework.base.component_base import BaseComponent
 from selenium import webdriver
 from framework.factory.models_enums.page_config import ComponentModel
@@ -52,7 +53,8 @@ class AddPackageComponent(BaseComponent):
 
         """
         if self.check_element_presence(LocatorType.XPath, "//div[@class='PackageQueue__validCount flex "
-                                                          "justify--right align-items--center']", 30):
+                                                          "justify--right align-items--center']",
+                                       GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             div_package_details = self.ui_element.find_elements_by_xpath("//div[@class='PackageQueue__row "
                                                                          "flex align-items--center justify--right']")
             if div_package_details is not None:
@@ -104,7 +106,8 @@ class AddPackageComponent(BaseComponent):
 
         """
         if self.check_element_presence(LocatorType.XPath, "//div[@class='PackageQueue__validCount flex "
-                                                          "justify--right align-items--center']", 30):
+                                                          "justify--right align-items--center']",
+                                       GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             div_package_details = self.ui_element.find_elements_by_xpath("//div[@class='PackageQueue__row "
                                                                          "flex align-items--center justify--right']")
             if div_package_details is not None:
@@ -124,7 +127,8 @@ class AddPackageComponent(BaseComponent):
             Returns the comparison result.
         """
         if self.check_element_presence(LocatorType.XPath, "//div[@class='PackageQueue__validCount flex "
-                                                          "justify--right align-items--center']", 30):
+                                                          "justify--right align-items--center']",
+                                       GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             package_status_element = self.ui_element.find_element_by_xpath("//div[@class='PackageQueue__validCount flex"
                                                                            " justify--right align-items--center']")
             compared_value = package_status_element.wait_until(CompareUtilityType.CompareText, wait_timeout,
@@ -197,13 +201,52 @@ class AddPackageComponent(BaseComponent):
 
         """
         drop_down_element = "//div[@data-selenium-id='Dropdown']"
-        if self.check_element_presence(LocatorType.XPath, drop_down_element, 20):
+        if self.check_element_presence(LocatorType.XPath, drop_down_element,
+                                       GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             drop_down_field = self.get_locator(LocatorType.XPath, drop_down_element)
             drop_down_field.execute_script("arguments[0].click();")
             menu_item_element = f"//li[contains(text(),'{package_manager}')]"
-            if self.check_element_presence(LocatorType.XPath, menu_item_element, 20):
+            if self.check_element_presence(LocatorType.XPath, menu_item_element,
+                                           GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
                 menu_item = self.get_locator(LocatorType.XPath, menu_item_element)
                 if menu_item is not None:
                     menu_item.execute_script("arguments[0].click();")
                     return True
+        return False
+
+    def click_cancel_build_button(self) -> bool:
+        """Performs the click action on cancel build button
+
+        Returns: returns the result of click action
+
+        """
+        cancel_build_button = self.get_locator(LocatorType.XPath, "//button[@class='Btn Btn--inverted "
+                                                                  "align-self--end']")
+        if cancel_build_button.element_to_be_clickable():
+            cancel_build_button.click()
+            return True
+        return False
+
+    def check_build_failed(self) -> bool:
+        """Check whether the build is failed or not
+
+        Returns: returns the result of build failed checking
+
+        """
+        cancel_build_button_element = "//div[@class='ProgressLoader__progress ProgressLoader__progress--failed']"
+        if self.check_element_presence(LocatorType.XPath, cancel_build_button_element,
+                                       GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            return True
+        return False
+
+    def click_clear_cache_and_build_button(self) -> bool:
+        """Performs the click action on cancel build button
+
+        Returns: returns the result of click action
+
+        """
+        cancel_build_button = self.get_locator(LocatorType.XPath, "//button[@class='Btn--inverted align-self--end']")
+        if cancel_build_button.element_to_be_clickable():
+            cancel_build_button.click()
+            return True
         return False

@@ -59,7 +59,7 @@ class TestContainerOps:
         assert len(l) == 1
 
     def test_start_rstudio(self, build_lb_image_for_rstudio):
-        lb_container, ib, username = build_lb_image_for_rstudio
+        lb_container, ib, username, _ = build_lb_image_for_rstudio
 
         assert len(lb_container.ps_search('rserver')) == 0
 

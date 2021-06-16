@@ -30,6 +30,7 @@ EXPOSE 8080
 
 # Overwrite nginx.conf it's our proxy.
 COPY nginx.conf /etc/nginx/nginx.conf
+COPY rstudio_redirect_patch.py /opt/redirect.py
 
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

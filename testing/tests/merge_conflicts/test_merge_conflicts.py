@@ -39,6 +39,9 @@ class TestMergeConflicts:
         is_success_msg = ProjectUtility().create_project(self.driver)
         assert is_success_msg == ProjectConstants.SUCCESS.value, is_success_msg
 
+        # Instance of ProjectUtility class
+        project_utility = ProjectUtility()
+
         # Load Project Listing Page
         project_list = ProjectListingPage(self.driver)
         assert project_list is not None, "Could not load Project Listing Page"
@@ -67,7 +70,8 @@ class TestMergeConflicts:
         self.publish_project(project_list, user2_credentials)
 
         # Switch user1 to user2
-        self.switch_user(project_list, user2_credentials, server_data_fixture)
+        is_success_msg = project_utility.switch_user(self.driver, user2_credentials, server_data_fixture)
+        assert is_success_msg == ProjectConstants.SUCCESS.value, is_success_msg
 
         # Import project
         self.import_project(project_list, project_title)
@@ -80,7 +84,8 @@ class TestMergeConflicts:
                                                                                     LoginUser.User1)
 
         # Switch user2 to user1
-        self.switch_user(project_list, user1_credentials, server_data_fixture)
+        is_success_msg = project_utility.switch_user(self.driver, user1_credentials, server_data_fixture)
+        assert is_success_msg == ProjectConstants.SUCCESS.value, is_success_msg
 
         # Update files and sync -> Conflict, Abort
         self.update_files_and_sync_conflict_abort(project_list, project_title)
@@ -92,46 +97,18 @@ class TestMergeConflicts:
         self.create_another_conflict(project_list, project_title)
 
         # Switch user1 to user2
-        self.switch_user(project_list, user2_credentials, server_data_fixture)
+        is_success_msg = project_utility.switch_user(self.driver, user2_credentials, server_data_fixture)
+        assert is_success_msg == ProjectConstants.SUCCESS.value, is_success_msg
 
         # Update files and sync -> Conflict, Mine
         self.update_files_and_sync_conflict_mine(project_list, project_title)
 
         # Switch user2 to user1
-        self.switch_user(project_list, user1_credentials, server_data_fixture)
+        is_success_msg = project_utility.switch_user(self.driver, user1_credentials, server_data_fixture)
+        assert is_success_msg == ProjectConstants.SUCCESS.value, is_success_msg
 
         # Sync and verify resolution
         self.sync_and_verify_resolution(project_list, project_title)
-
-    def switch_user(self, project_list,  user_credentials, server_details):
-        """Logical separation of switch user in gigantum client
-
-        Args:
-            project_list: The page with UI elements
-            user_credentials: Includes username and password
-            server_details: Details of the current server
-
-        """
-        # Click on profile menu
-        is_clicked = project_list.project_listing_component.profile_menu_click()
-        assert is_clicked, "Could not click profile menu button"
-
-        # Click on logout button
-        is_clicked = project_list.project_listing_component.log_out()
-        assert is_clicked, "Could not click logout button"
-
-        # Load Landing Page
-        landing_page = LandingPage(self.driver, False)
-
-        # Click server button
-        landing_page.landing_component.click_server(server_details.server_name)
-
-        # Load Login page
-        login_page = LoginFactory().load_login_page(server_details.login_type, self.driver)
-
-        # Load Project Listing page
-        project_list = login_page.login(user_credentials.user_name, user_credentials.password)
-        assert project_list.project_listing_component.get_project_title() == "Projects"
 
     def publish_project(self, project_list, user2_credentials):
         """Logical separation of publish project functionality
@@ -174,7 +151,7 @@ class TestMergeConflicts:
         assert is_typed, "Could not type collaborator into input area"
 
         # Select Admin permission for collaborator
-        is_selected = project_list.collaborators_modal_component.select_admin_permission()
+        is_selected = project_list.collaborators_modal_component.select_collaborator_permission('Admin')
         assert is_selected, "Could not select Admin permission from drop down"
 
         # Click on add collaborator button
@@ -206,7 +183,7 @@ class TestMergeConflicts:
         assert is_verified, "Could not verify project in server"
 
         # Click import button in server page
-        is_clicked = project_list.server_component.click_project_import_button(project_title)
+        is_clicked = project_list.server_component.click_import_button(project_title)
         assert is_clicked, "Could not click import button in server page"
 
         # Monitor container status to go through Stopped -> Building

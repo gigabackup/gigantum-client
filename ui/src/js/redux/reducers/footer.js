@@ -187,7 +187,7 @@ export default (state = {
     const message = {
       message: action.payload.currentMessage,
       id: action.payload.id,
-      progessBarPercentage: action.payload.percentage,
+      progressBarPercentage: action.payload.percentage,
     };
 
     const { uploadStack } = state;
@@ -215,7 +215,7 @@ export default (state = {
     const message = {
       message: action.payload.uploadMessage,
       id: action.payload.id,
-      progessBarPercentage: action.payload.progessBarPercentage,
+      progressBarPercentage: action.payload.progressBarPercentage,
       owner,
       name,
     };
@@ -239,7 +239,7 @@ export default (state = {
       ...state,
       uploadMessage,
       currentUploadId: action.payload.id,
-      progessBarPercentage: action.payload.progessBarPercentage,
+      progressBarPercentage: action.payload.progressBarPercentage,
       fileCount: action.payload.fileCount,
       uploadStack,
       uploadOpen: true,
@@ -250,7 +250,7 @@ export default (state = {
     const message = {
       message: action.payload.uploadMessage,
       id: action.payload.id,
-      progessBarPercentage: action.payload.progessBarPercentage,
+      progressBarPercentage: action.payload.progressBarPercentage,
     };
 
     const uploadStack = [];
@@ -266,7 +266,7 @@ export default (state = {
       uploadMessage: '',
       currentUploadId: message.id,
       uploadStack,
-      progessBarPercentage: 0,
+      progressBarPercentage: 0,
       fileCount: 0,
       totalFiles: 0,
       uploadOpen: false,
@@ -278,7 +278,7 @@ export default (state = {
     const message = {
       message: action.payload.uploadMessage,
       id: action.payload.id,
-      progessBarPercentage: 100,
+      progressBarPercentage: 100,
     };
 
     const uploadStack = [];
@@ -295,7 +295,7 @@ export default (state = {
       labbookName: action.payload.labbookName,
       currentUploadId: message.id,
       uploadStack,
-      progessBarPercentage: 100,
+      progressBarPercentage: 100,
       uploadOpen: true,
       success: true,
       labbookSuccess: true,

@@ -1,0 +1,6 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1777"
+changelog:
+  - type: FIX
+    description: Resolved an issue allowing you to create repository during backup mode. Resolved an issue causing the backup modal not to appear during backup-caused error. The repository will now refetch after backup-mode is re-disabled in order to get collaborator info.
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1746
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1747

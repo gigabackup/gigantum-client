@@ -66,7 +66,7 @@ class TestCreatePublishDataset:
         # Click "Data" tab
         is_clicked = dataset_list.dataset_menu_component.click_data_tab()
         assert is_clicked, "Could not click Data tab"
-        time.sleep(3)
+        time.sleep(5)
 
         # Drag and drop text file with contents "created"
         is_dropped = dataset_list.dataset_data_component.drag_and_drop_text_file_in_data_drop_zone('file1', 'created')
@@ -209,7 +209,7 @@ class TestCreatePublishDataset:
         assert is_verified, "Could not verify project in server"
 
         # Click import button in server page
-        is_clicked = dataset_list.server_component.click_project_import_button(project_title)
+        is_clicked = dataset_list.server_component.click_import_button(project_title)
         assert is_clicked, "Could not click import button in server page"
 
         # Monitor container status to go through Stopped -> Building

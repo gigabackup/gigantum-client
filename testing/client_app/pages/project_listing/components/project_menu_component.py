@@ -1,3 +1,4 @@
+from client_app.constant_enums.constants_enums import GigantumConstants
 from framework.base.component_base import BaseComponent
 from framework.factory.models_enums.constants_enums import LocatorType
 from selenium import webdriver
@@ -34,7 +35,7 @@ class ProjectMenuComponent(BaseComponent):
 
         """
         element = "//li[@id='code']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             code_data_tab = self.get_locator(LocatorType.XPath, element)
             code_data_tab.click()
             return True
@@ -47,7 +48,7 @@ class ProjectMenuComponent(BaseComponent):
 
         """
         element = "//li[@id='inputData']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             input_data_tab = self.get_locator(LocatorType.XPath, element)
             input_data_tab.click()
             return True
@@ -60,7 +61,7 @@ class ProjectMenuComponent(BaseComponent):
 
         """
         element = "//li[@id='outputData']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             output_data_tab = self.get_locator(LocatorType.XPath, element)
             output_data_tab.click()
             return True
@@ -72,11 +73,13 @@ class ProjectMenuComponent(BaseComponent):
         Returns: returns the result of click action
 
         """
-        element = "//div[contains(text(), 'Publish')]"
-        btn_publish = self.get_locator(LocatorType.XPath, element)
-        if btn_publish is not None and btn_publish.element_to_be_clickable():
-            btn_publish.click()
-            return True
+        element = "//button[@class='Btn--branch Btn--action SyncBranchButtons__btn " \
+                  "SyncBranchButtons__btn--publish Tooltip-data']"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            btn_publish = self.get_locator(LocatorType.XPath, element)
+            if btn_publish is not None and btn_publish.element_to_be_clickable():
+                btn_publish.click()
+                return True
         return False
 
     def enable_private_mode(self) -> bool:
@@ -99,10 +102,24 @@ class ProjectMenuComponent(BaseComponent):
 
         """
         element = "//button[contains(text(), 'Publish')]"
-        if self.check_element_presence(LocatorType.XPath, element, 20):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             publish_button = self.get_locator(LocatorType.XPath, element)
             if publish_button is not None:
                 publish_button.click()
+                return True
+        return False
+
+    def click_publish_all_and_sync_button(self) -> bool:
+        """ Performs click action on Publish All And Sync button on project publish window
+
+        Returns: returns the result of click action
+
+        """
+        element = "//button[contains(text(), 'Publish All')]"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            publish_sync_button = self.get_locator(LocatorType.XPath, element)
+            if publish_sync_button is not None:
+                publish_sync_button.click()
                 return True
         return False
 
@@ -170,10 +187,10 @@ class ProjectMenuComponent(BaseComponent):
         Returns: returns the result of click action
 
         """
-        element = "//button[contains(text(), 'Collaborators')]"
+        element = "//button[@class='Collaborators__btn Btn--flat Btn--no-underline']"
         btn_collaborators = self.get_locator(LocatorType.XPath, element)
-        if btn_collaborators is not None:
-            btn_collaborators.click()
+        if btn_collaborators is not None and btn_collaborators.element_to_be_clickable():
+            btn_collaborators.execute_script("arguments[0].click();")
             return True
         return False
 
@@ -197,7 +214,8 @@ class ProjectMenuComponent(BaseComponent):
         """
         element = "//p[@class='FooterMessage__title FooterMessage__title--collapsed' and " \
                   "text()='Upload complete!']"
-        if self.check_element_absence(LocatorType.XPath, element, 40):
+        upload_complete_pop_up = self.get_locator(LocatorType.XPath, element)
+        if upload_complete_pop_up.invisibility_of_element_located(120):
             return True
         return False
 
@@ -208,7 +226,7 @@ class ProjectMenuComponent(BaseComponent):
 
         """
         element = "//p[contains(text(), 'Sync complete')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             return True
         return False
 
@@ -219,7 +237,8 @@ class ProjectMenuComponent(BaseComponent):
 
         """
         element = "//p[contains(text(), 'Sync complete')]"
-        if self.check_element_absence(LocatorType.XPath, element, 30):
+        sync_complete_pop_up = self.get_locator(LocatorType.XPath, element)
+        if sync_complete_pop_up.invisibility_of_element_located(120):
             return True
         return False
 
@@ -244,5 +263,108 @@ class ProjectMenuComponent(BaseComponent):
         """
         element = "//button[@data-tooltip='Cannot Sync while Dataset is in use']"
         if self.check_element_absence(LocatorType.XPath, element, 40):
+            return True
+        return False
+
+    def check_publish_all_workflow_appear(self) -> bool:
+        """ Check for the presence of publish all workflow appear or not
+
+        Returns: returns True if the element is present
+
+        """
+        element = "//p[contains(text(), 'This Project is linked to unpublished (local-only) Datasets')]"
+        if self.check_element_presence(LocatorType.XPath, element, 40):
+            return True
+        return False
+
+    def click_continue_button(self) -> bool:
+        """ Click on the continue button on publish all workflow window
+
+        Returns: returns the result of click action
+
+        """
+        element = "//button[contains(text(), 'Continue')]"
+        if self.check_element_presence(LocatorType.XPath, element, 40):
+            continue_button = self.get_locator(LocatorType.XPath, element)
+            if continue_button is not None:
+                continue_button.click()
+                return True
+        return False
+
+    def enable_private_mode_for_all(self) -> bool:
+        """ Enable private mode for dataset in publish all workflow window
+
+        Returns: returns the result of radio button click
+
+        """
+        element = "//div[@class='PublishDatasetsModal__private']/label"
+        if self.check_element_presence(LocatorType.XPath, element, 40):
+            all_btn_publish_private = self.driver.find_elements_by_xpath(element)
+            for btn_publish_private in all_btn_publish_private:
+                if btn_publish_private is not None:
+                    btn_publish_private.click()
+                else:
+                    return False
+            return True
+        return False
+
+    def click_publish_all_button(self) -> bool:
+        """ Performs click action on publish all button on publish all workflow window
+
+        Returns: returns the result of click action
+
+        """
+        element = "//button[contains(text(), 'Publish All')]"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            publish_button = self.get_locator(LocatorType.XPath, element)
+            if publish_button is not None:
+                publish_button.click()
+                return True
+        return False
+
+    def check_publish_all_window_closed(self) -> bool:
+        """ Check for the absence of publish all workflow window
+
+        Returns: returns True if the element is not present
+
+        """
+        element = "//div[@class='Modal__content Modal__content--large dataset']"
+        if self.check_element_absence(LocatorType.XPath, element, 80):
+            return True
+        return False
+
+    def get_import_url(self) -> str:
+        """Get import url
+
+        Returns: returns import url
+
+        """
+        import_url_input = self.get_locator(LocatorType.XPath, "//input[@class='ActionsMenu__input']")
+        if import_url_input is not None:
+            import_url = import_url_input.getAttribute('value')
+            return import_url
+
+    def click_pull_button(self) -> bool:
+        """ Performs click action on pull button
+
+        Returns: returns the result of click action
+
+        """
+        element = "//div[contains(text(), 'Pull')]"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            pull_button = self.get_locator(LocatorType.XPath, element)
+            if pull_button is not None and pull_button.element_to_be_clickable():
+                pull_button.click()
+                return True
+        return False
+
+    def check_private_lock_icon_absence(self) -> bool:
+        """ Performs checking for lock icon absence
+
+        Returns: returns the result of checking
+
+        """
+        element = "//div[@class='TitleSection__private Tooltip-data Tooltip-data--small']"
+        if self.check_element_presence(LocatorType.XPath, element, 10):
             return True
         return False

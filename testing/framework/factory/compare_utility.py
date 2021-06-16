@@ -5,11 +5,14 @@ class CompareUtility(object):
 
     def check_element(self, *args):
         """Check for an element by it's class name"""
-        element = self.find_element_by_class_name(*args[0])
-        if element:
-            return True
-        else:
-            return False
+        try:
+            element = self.find_element_by_xpath(args[0])
+            if element:
+                return True
+            else:
+                return False
+        except:
+            pass
 
     def check_contains_text(self, *args):
         """Check whether the text is present in the element"""

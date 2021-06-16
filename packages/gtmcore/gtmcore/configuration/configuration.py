@@ -413,6 +413,45 @@ class Configuration:
 
         logger.info(f"Selected server: {server_id}")
 
+    def refetch_auth_config(self):
+        """Method to re-fetch, save, and the auth configuration for the current server.
+
+        This is useful if the auth information has changed (e.g. new JWKS endpoint)
+
+        Returns:
+            None
+        """
+        server_data = self._load_current_configuration()
+
+        url = server_data['server'].get("auth_config_url")
+        if not url:
+            # The auth_config_url wasn't persisted, so we assume gigantum hub format
+            url = server_data['server']['base_url'] + ".well-known/auth.json"
+
+        # re-fetch
+        try:
+            response = requests.get(url)
+
+            if response.status_code != 200:
+                logger.error(f"Failed to re-fetch auth configuration. No change applied: {response.status_code}")
+                return
+        except Exception as err:
+            logger.error(f"Failed to re-fetch auth configuration. No change applied. Error: {err}")
+            return
+
+        # All good, Parse and persist
+        data = response.json()
+        auth_config = dict_to_auth_config(data)
+
+        server_data_file = self.get_server_config_file(server_data['server']['id'])
+        server_data['auth'] = auth_config.to_dict()
+        with open(server_data_file, 'wt') as f:
+            json.dump(server_data, f, indent=2)
+
+        # Reload the cache
+        self._get_redis_client().delete(self.AUTH_CONFIG_CACHE_KEY)
+        self.get_auth_configuration()
+
     def add_server(self, url: str) -> str:
         """Method to discover a server's configuration and add it to the local configured servers
 

@@ -11,6 +11,7 @@ from client_app.constant_enums.constants_enums import GigantumConstants
 from collections import namedtuple
 from string import Template
 import requests
+from selenium import webdriver
 
 
 class ProjectHelperUtility(object):
@@ -72,7 +73,7 @@ class ProjectHelperUtility(object):
                         shutil.rmtree(user_directory / project.name)
         return True
 
-    def check_project_removed_from_disk(self, project_title) -> bool:
+    def check_project_removed_from_disk(self, project_title: str) -> bool:
         """  Verify whether the project is present in the disk or not
 
         Args:
@@ -93,7 +94,7 @@ class ProjectHelperUtility(object):
                         return False
         return True
 
-    def check_project_image_is_removed(self, project_title) -> bool:
+    def check_project_image_is_removed(self, project_title: str) -> bool:
         """ Verify project image is exist or not
 
         Args:
@@ -109,7 +110,7 @@ class ProjectHelperUtility(object):
                     return False
         return True
 
-    def move_file_to_untracked_folder(self, folder_name, project_title):
+    def move_file_to_untracked_folder(self, folder_name: str, project_title: str):
         """ Move file to untracked folder
 
         Args:
@@ -130,7 +131,7 @@ class ProjectHelperUtility(object):
             return True
         return False
 
-    def verify_untracked_directory_is_empty(self, project_title) -> bool:
+    def verify_untracked_directory_is_empty(self, project_title: str) -> bool:
         """ Verify untracked directories are empty or not
 
         Returns: returns the result of verification
@@ -147,7 +148,7 @@ class ProjectHelperUtility(object):
                 return False
         return True
 
-    def verify_file_content(self, folder_name, file_content, project_title, is_collaborator=False):
+    def verify_file_content(self, folder_name: str, file_content: str, project_title: str, is_collaborator: bool = False):
         """ Verify file content in the project folders
 
         Args:
@@ -191,7 +192,7 @@ class ProjectHelperUtility(object):
         project_folder_names = folder_names(username, home_dir, server_name)
         return project_folder_names
 
-    def delete_remote_project(self, project_title, driver) -> None:
+    def delete_remote_project(self, project_title: str, driver: webdriver) -> None:
         """Method to remove remote project if it exists in the hub.
 
         Args:

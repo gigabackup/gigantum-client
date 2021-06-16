@@ -11,12 +11,12 @@ from confhttpproxy import ProxyRouter, ProxyRouterException, NullRouter
 @pytest.fixture
 def config_fixture():
     yield {'api_host': 'localhost',
-           'api_port': 88}
+           'api_port': 8088}
 
 
 @pytest.fixture
 def start_proxy():
-    cmds = ['configurable-http-proxy', '--port=80', '--api-port=88',
+    cmds = ['configurable-http-proxy', '--port=8080', '--api-port=8088',
             '--no-prepend-path', '--no-include-prefix']
     proxyserver = subprocess.Popen(
             cmds, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -58,7 +58,7 @@ def test_connect_to_internal_process_via_proxy_1(config_fixture, start_proxy):
     pfx, host = pr.add("http://localhost:5555", 'test/server/1')
     assert host == 'http://localhost:5555'
     assert pfx in [p[1:] for p in pr.routes.keys()]
-    assert 'spool' in requests.get(f'http://localhost/{pfx}').text
+    assert 'spool' in requests.get(f'http://localhost:8080/{pfx}').text
 
 
 def test_connect_to_internal_process_via_proxy_2(config_fixture, start_proxy):
@@ -66,7 +66,7 @@ def test_connect_to_internal_process_via_proxy_2(config_fixture, start_proxy):
     pr = ProxyRouter.get_proxy(config_fixture)
     pfx, host = pr.add("http://localhost:6666")
     assert pfx in [p[1:] for p in pr.routes.keys()]
-    assert 'ldconfig' in requests.get(f'http://localhost/{pfx}').text
+    assert 'ldconfig' in requests.get(f'http://localhost:8080/{pfx}').text
 
 
 def test_search(config_fixture, start_proxy):

@@ -1,5 +1,6 @@
 import re
 from selenium.webdriver.remote.webelement import WebElement
+from client_app.constant_enums.constants_enums import GigantumConstants
 from framework.base.page_base import BasePage
 from framework.factory.models_enums.constants_enums import LocatorType
 from framework.factory.models_enums.page_config import PageConfig
@@ -35,14 +36,15 @@ class JupyterLabPage(BasePage):
     @property
     def __click_div_python3_notebook(self) -> WebElement:
         if self.__div_python3_notebook is None:
-            self.__div_python3_notebook = self.get_locator(LocatorType.CSS, ".jp-LauncherCard-icon")
+            self.__div_python3_notebook = self.get_locator(LocatorType.XPath, "//div[@class='jp-LauncherCard']"
+                                                                              "[@title='Python 3']")
         return self.__div_python3_notebook
 
     @property
     def __click_run_cell(self) -> WebElement:
         if self.__div_run_cell is None:
             self.__div_run_cell = self.get_locator(LocatorType.XPath,
-                                                   "//div[@class='lm-Widget p-Widget jp-Toolbar "
+                                                   "//div[@class='lm-Widget p-Widget jp-Toolbar jp-scrollbar-tiny "
                                                    "jp-NotebookPanel-toolbar']/div[6]")
         return self.__div_run_cell
 
@@ -100,7 +102,7 @@ class JupyterLabPage(BasePage):
         element = f"//body/div[@id='main']/div[@id='jp-main-content-panel']/div[@id='jp-main-split-panel']/div" \
                   f"[@id='jp-main-dock-panel']/div/div/div[{input_position}]/div[2]/div[2]/div[2]/" \
                   f"div[1]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             type_textarea_command = self.get_locator(LocatorType.XPath, element)
             type_textarea_command.click()
             agent = self.driver.capabilities['browserName']
@@ -150,7 +152,7 @@ class JupyterLabPage(BasePage):
         """
         element = f"//body/div[@id='main']/div[@id='jp-main-content-panel']/div[@id='jp-main-split-panel']" \
                   f"/div[@id='jp-main-dock-panel']/div/div/div[{output_position}]/div[3]/div[2]/div[1]/div[2]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             command_output_area = self.get_locator(LocatorType.XPath, element)
             # Wait until the 'Note:' appears in output
             command_output_area.wait_until(CompareUtilityType.CheckContainsText, 10, 'Note:')
@@ -190,8 +192,8 @@ class JupyterLabPage(BasePage):
 
         """
         element = "//body/div[@id='main']/div[@id='jp-main-content-panel']/div[@id='jp-main-split-panel']/" \
-                  "div[@id='jp-left-stack']/div[@id='filebrowser']/div[2]/span[1]/*[1]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+                  "div[@id='jp-left-stack']/div[@id='filebrowser']/div[3]/span[1]/*[1]"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             folder_path_icon = self.get_locator(LocatorType.XPath, element)
             folder_path_icon.click()
             return True
@@ -207,8 +209,8 @@ class JupyterLabPage(BasePage):
 
         """
         action = ActionChains(self.driver)
-        element = f"//li[@class='jp-DirListing-item']/span[contains(text(), '{folder_title}')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        element = f"//li[@class='jp-DirListing-item']/span[2]/span[contains(text(), '{folder_title}')]"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             folder = self.get_locator(LocatorType.XPath, element)
             if folder is not None:
                 action.double_click(folder).perform()
@@ -225,8 +227,8 @@ class JupyterLabPage(BasePage):
 
         """
         action = ActionChains(self.driver)
-        element = f"//li[@class='jp-DirListing-item']/span[contains(text(), '{file_title}')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        element = f"//li[@class='jp-DirListing-item']/span[2]/span[contains(text(), '{file_title}')]"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             file = self.get_locator(LocatorType.XPath, element)
             if file is not None:
                 action.double_click(file).perform()
@@ -243,9 +245,20 @@ class JupyterLabPage(BasePage):
 
         """
         element = "//div[@class='CodeMirror-code']/div/pre/span"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             file_content_element = self.get_locator(LocatorType.XPath, element)
             if file_content_element is not None:
                 if file_content == file_content_element.get_text().strip():
                     return True
         return False
+
+    def get_python3_notebook_title(self) -> str:
+        """ Get python3 notebook title
+
+        Returns: returns python3 notebook title
+
+        """
+        element = "//div[contains(text(),'Untitled')]"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            notebook_title = self.driver.find_element_by_xpath(element)
+            return notebook_title.text

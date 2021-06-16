@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1792"
+changelog:
+  - type: NEW
+    description: Test to verify that you can delete a project from the server and republish it.

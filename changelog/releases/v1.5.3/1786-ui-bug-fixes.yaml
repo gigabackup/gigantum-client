@@ -1,0 +1,10 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1786"
+changelog:
+  - type: FIX
+    description: Fixes issue when synching with a linked unpublished dataset, project is running modal would appear blocking tests. Also is an issue for the user as it is confusing behaviour
+  - type: FIX
+    description: Fixes progress typo in backup mode tooltip
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1735
+  - type: FIX
+    description: Fixes typo on gigantum
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1771

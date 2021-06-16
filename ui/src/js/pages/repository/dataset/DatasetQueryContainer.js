@@ -1,6 +1,8 @@
 // vendor
 import React, { Component } from 'react';
 import { QueryRenderer, graphql } from 'react-relay';
+// context
+import ServerContext from 'Pages/ServerContext';
 // environment
 import environment from 'JS/createRelayEnvironment';
 // store
@@ -51,17 +53,24 @@ class DatasetQueryContainer extends Component {
               return (<div>{props.errors[0].message}</div>);
             }
             return (
-              <Dataset
-                key={parentProps.datasetName}
-                auth={parentProps.auth}
-                datasetName={parentProps.datasetName}
-                query={props.query}
-                dataset={props.dataset}
-                owner={parentProps.owner}
-                history={parentProps.history}
-                diskLow={props.diskLow}
-                {...parentProps}
-              />
+              <ServerContext.Consumer>
+                {
+                  value => (
+                    <Dataset
+                      key={parentProps.datasetName}
+                      auth={parentProps.auth}
+                      datasetName={parentProps.datasetName}
+                      query={props.query}
+                      dataset={props.dataset}
+                      owner={parentProps.owner}
+                      history={parentProps.history}
+                      diskLow={props.diskLow}
+                      {...parentProps}
+                      backupInProgress={value.currentServer.backupInProgress}
+                    />
+                  )
+                }
+              </ServerContext.Consumer>
             );
           }
 

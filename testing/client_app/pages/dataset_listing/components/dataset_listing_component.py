@@ -1,3 +1,4 @@
+from client_app.constant_enums.constants_enums import GigantumConstants
 from framework.base.component_base import BaseComponent
 from framework.factory.models_enums.constants_enums import LocatorType
 from selenium import webdriver
@@ -27,14 +28,14 @@ class DatasetListingComponent(BaseComponent):
 
         """
         element = "//h2[contains(text(), 'Add Dataset')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             return True
         return False
 
     def click_create_new_dataset_button(self) -> bool:
         """Click action on create new dataset"""
         element = "//button[contains(text(), 'Create New')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             create_button = self.get_locator(LocatorType.XPath, element)
             if create_button is not None and create_button.element_to_be_clickable():
                 create_button.execute_script("arguments[0].click();")
@@ -78,7 +79,7 @@ class DatasetListingComponent(BaseComponent):
 
         """
         element = "//a[@class='Card Card--225 Card--text column-4-span-3 flex flex--column justify--space-between']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             datasets_list = self.driver.find_elements_by_xpath(element)
             if datasets_list is not None:
                 for dataset in datasets_list:
@@ -98,7 +99,7 @@ class DatasetListingComponent(BaseComponent):
 
         """
         element = "//a[@class='Card Card--225 Card--text column-4-span-3 flex flex--column justify--space-between']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             datasets_list = self.driver.find_elements_by_xpath(element)
             if datasets_list is not None:
                 for dataset in datasets_list:
@@ -106,3 +107,83 @@ class DatasetListingComponent(BaseComponent):
                     if dataset_title == dataset_name.get_text().strip():
                         return False
         return True
+
+    def click_import_existing_dataset_button(self) -> bool:
+        """Click action on import existing button
+
+        Returns: returns the result of click action
+
+        """
+        element = "//button[contains(text(), 'Import Existing')]"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            import_existing_button = self.get_locator(LocatorType.XPath, element)
+            if import_existing_button is not None and import_existing_button.element_to_be_clickable():
+                import_existing_button.execute_script("arguments[0].click();")
+                return True
+        return False
+
+    def type_dataset_import_url(self, import_url: str) -> bool:
+        """Input action for dataset import url
+
+        Args:
+            import_url: URL of the dataset to be import
+
+        Returns: returns the result of input action
+
+        """
+        element = "//input[@class='Import__input']"
+        dataset_title_input = self.get_locator(LocatorType.XPath, element)
+        if dataset_title_input is not None:
+            dataset_title_input.send_keys(import_url)
+            return True
+        return False
+
+    def click_import_dataset_button(self) -> bool:
+        """ Click action for import dataset button
+
+        Returns: returns the result of click action
+
+        """
+        element = "//div[@class='Import__buttonContainer']/button[@class='Btn--last']"
+        import_dataset_button = self.get_locator(LocatorType.XPath, element)
+        if import_dataset_button is not None and import_dataset_button.element_to_be_clickable():
+            import_dataset_button.execute_script("arguments[0].click();")
+            return True
+        return False
+
+    def verify_dataset_import_error(self) -> bool:
+        """ Verify whether the import error pop up is shown or not
+
+        Returns: returns the result of import error verification
+
+        """
+        element = "//p[@class='FooterMessage__title FooterMessage__title--collapsed' and contains(text(), " \
+                  "'ERROR: Could not import remote Dataset')]"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            return True
+        return False
+
+    def verify_dataset_import_success(self) -> bool:
+        """ Verify whether the import success pop up is shown or not
+
+        Returns: returns the result of import success verification
+
+        """
+        element = "//p[@class='FooterMessage__title FooterMessage__title--collapsed' and contains(text(), " \
+                  "'Successfully imported remote Dataset')]"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            return True
+        return False
+
+    def verify_dataset_permission_error(self) -> bool:
+        """ Verify whether the dataset permission error pop up is shown or not
+
+        Returns: returns the result of dataset permission error verification
+
+        """
+        element = "//p[@class='FooterMessage__title FooterMessage__title--collapsed' and contains(text(), " \
+                  "'You do not have adequate permissions to modify this dataset')]"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            return True
+        return False
+

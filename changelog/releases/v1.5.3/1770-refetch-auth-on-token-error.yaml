@@ -1,0 +1,6 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1781"
+changelog:
+  - type: NEW
+    description: On token verification error, Auth well-known data is attempted to be refetched.
+  - type: IMPROVEMENT
+    description: On token verification error, if error is due to an SSL issue a better message is provided to the UI.

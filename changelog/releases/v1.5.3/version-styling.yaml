@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1802"
+changelog:
+  - type: FIX
+    description: Made styling tweaks to the client version in the sidebar

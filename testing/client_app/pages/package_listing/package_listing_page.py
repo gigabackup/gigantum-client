@@ -1,12 +1,17 @@
+from selenium.webdriver import ActionChains
 from selenium.webdriver.remote.webelement import WebElement
 from client_app.pages.package_listing.components.package_grid_component import PackageGridComponent
 from client_app.pages.package_listing.components.add_package_component import AddPackageComponent
+from client_app.pages.project_listing.components.project_listing_component import ProjectListingComponent
 from framework.base.page_base import BasePage
 from framework.factory.models_enums.constants_enums import LocatorType
 from framework.factory.models_enums.page_config import PageConfig
 from framework.factory.models_enums.page_config import ComponentModel
 from client_app.pages.project_listing.components.project_container_status_component \
     import ProjectContainerStatusComponent
+from client_app.pages.project_listing.components.project_menu_component import ProjectMenuComponent
+from client_app.pages.project_listing.components.project_code_input_output_data_component import \
+    ProjectCodeInputOutputDataComponent
 
 
 class PackageListingPage(BasePage):
@@ -21,9 +26,14 @@ class PackageListingPage(BasePage):
     def __init__(self, driver) -> None:
         page_config = PageConfig()
         super(PackageListingPage, self).__init__(driver, page_config)
+        self.component_model = ComponentModel()
         self.__environment_tab = None
         self.__package_listing_component = None
         self.__add_package_component = None
+        self.__project_menu_component = None
+        self._code_input_output_component = None
+        self.__project_container_status_component = None
+        self.__project_listing_component = None
         self.__package_grid_model = ComponentModel(locator_type=LocatorType.XPath, locator="//div[@class='grid']")
         self.__add_package_model = ComponentModel(locator_type=LocatorType.XPath,
                                                   locator="//div[@data-selenium-id='AddPackages']")
@@ -41,6 +51,34 @@ class PackageListingPage(BasePage):
         if self.__add_package_component is None:
             self.__add_package_component = AddPackageComponent(self.driver, self.__add_package_model)
         return self.__add_package_component
+
+    @property
+    def container_status_component(self) -> ProjectContainerStatusComponent:
+        """ Returns an instance of container status component."""
+        if self.__project_container_status_component is None:
+            self.__project_container_status_component = ProjectContainerStatusComponent(self.driver)
+        return self.__project_container_status_component
+
+    @property
+    def project_menu_component(self) -> ProjectMenuComponent:
+        """ Returns an instance of project menu component."""
+        if self.__project_menu_component is None:
+            self.__project_menu_component = ProjectMenuComponent(self.driver, self.component_model)
+        return self.__project_menu_component
+
+    @property
+    def code_input_output_component(self) -> ProjectCodeInputOutputDataComponent:
+        """ Returns an instance of Code data, Input data and Output data window component."""
+        if self._code_input_output_component is None:
+            self._code_input_output_component = ProjectCodeInputOutputDataComponent(self.driver, self.component_model)
+        return self._code_input_output_component
+
+    @property
+    def project_listing_component(self) -> ProjectListingComponent:
+        """Returns instance of project listing component."""
+        if self.__project_listing_component is None:
+            self.__project_listing_component = ProjectListingComponent(self.driver, self.component_model)
+        return self.__project_listing_component
 
     @property
     def __click_environment_tab(self) -> WebElement:
@@ -330,3 +368,109 @@ class PackageListingPage(BasePage):
 
         """
         return self.package_listing_component.clear_docker_text_area()
+
+    def input_sensitive_file(self, file_name, file_content) -> bool:
+        """Add sensitive file
+
+        Returns: returns the result of input action
+
+        """
+        return self.package_listing_component.input_sensitive_file(file_name, file_content)
+
+    def add_destination_directory(self, directory_name) -> bool:
+        """Add destination directory
+
+        Returns: returns the result of input action
+        """
+        return self.package_listing_component.add_destination_directory(directory_name)
+
+    def click_sensitive_file_save_button(self) -> bool:
+        """Click sensitive file save button
+
+        Returns: returns the result of click action
+        """
+        return self.package_listing_component.click_sensitive_file_save_button()
+
+    def click_edit_sensitive_file_button(self) -> bool:
+        """Performs click action on edit sensitive file button
+
+        Returns: returns the result of click action
+        """
+        return self.package_listing_component.click_edit_sensitive_file_button()
+
+    def replace_sensitive_file(self, file_name, file_content) -> bool:
+        """Replace sensitive file
+
+        Returns: returns the result of input action
+
+        """
+        return self.package_listing_component.replace_sensitive_file(file_name, file_content)
+
+    def scroll_to_page_top(self) -> bool:
+        """Performs scroll action to window top
+
+        Returns: returns the result of scroll action
+
+        """
+        return self.package_listing_component.scroll_to_window_top()
+
+    def verify_sensitive_file_is_missing(self) -> bool:
+        """Verify sensitive file is missing or not
+
+        Returns: returns the result of verification
+
+        """
+        return self.package_listing_component.verify_sensitive_file_is_missing()
+
+    def click_environment_tab(self) -> bool:
+        """ Performs click action on environment tab """
+        element = "//li[@id='environment']"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            environment_tab = self.get_locator(LocatorType.XPath, element)
+            environment_tab.click()
+            return True
+        return False
+
+    def click_sensitive_file_delete_button(self) -> bool:
+        """ Performs click action on sensitive file delete button
+
+        Returns: returns the result of click action
+
+        """
+        return self.package_listing_component.click_sensitive_file_delete_button()
+
+    def click_sensitive_file_delete_yes_button(self) -> bool:
+        """ Performs click action on sensitive file delete button
+
+        Returns: returns the result of click action
+
+        """
+        return self.package_listing_component.click_sensitive_file_delete_yes_button()
+
+    def verify_sensitive_file_is_added(self, file_name) -> bool:
+        """ Verify sensitive file is added or not
+
+        Returns: returns the result of verification
+
+        """
+        return self.package_listing_component.verify_sensitive_file_is_added(file_name)
+
+    def click_cancel_build_button(self) -> bool:
+        """ Clicks cancel build button"""
+        return self.add_package_component.click_cancel_build_button()
+
+    def check_build_failed(self) -> bool:
+        """ Check whether the build is failed or not"""
+        return self.add_package_component.check_build_failed()
+
+    def click_clear_cache_and_build_button(self) -> bool:
+        """ Clicks clear cache and build button"""
+        return self.add_package_component.click_clear_cache_and_build_button()
+
+    def move_to_element(self) -> bool:
+        """Moves to a temporary element just to change the mouse focus."""
+        element = "//div[@class='TitleSection__namespace-title']"
+        if self.check_element_presence(LocatorType.XPath, element, 30):
+            project_title = self.get_locator(LocatorType.XPath, element)
+            ActionChains(self.driver).move_to_element(project_title).perform()
+        return True

@@ -235,7 +235,7 @@ class PublishDatasetsModal extends Component<Props> {
               if (isPublishing) {
                 this._publishLabbookMutation();
               } else {
-                handleSync(false, true, true, this._passedSuccessCall);
+                handleSync(false, true, true, this._passedSuccessCall, true);
               }
             } else {
               this.setState({ datasetsToPublish });

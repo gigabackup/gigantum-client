@@ -12,6 +12,9 @@ import Loadable from 'react-loadable';
 import store from 'JS/redux/store';
 import { setStickyState } from 'JS/redux/actions/dataset/dataset';
 import { setCallbackRoute } from 'JS/redux/actions/routes';
+import { setErrorMessage } from 'JS/redux/actions/footer';
+// mutations
+import FetchDatasetEdgeMutation from 'Mutations/repository/fetch/FetchDatasetEdgeMutation';
 // utils
 import { getFilesFromDragEvent } from 'JS/utils/html-dir-content';
 // components
@@ -119,7 +122,21 @@ class Dataset extends Component<Props> {
   */
   static getDerivedStateFromProps(nextProps, state) {
     setCallbackRoute(nextProps.location.pathname);
-    return state;
+    if (!nextProps.backupInProgress && state.backupInProgress) {
+      FetchDatasetEdgeMutation(
+        nextProps.dataset.owner,
+        nextProps.dataset.name,
+        (error) => {
+          if (error) {
+            setErrorMessage(nextProps.dataset.owner, nextProps.dataset.name, 'Failed to refetch Dataset data. Please refresh the page.');
+          }
+        },
+      );
+    }
+    return {
+      ...state,
+      backupInProgress: nextProps.backupInProgress,
+    };
   }
 
   /**

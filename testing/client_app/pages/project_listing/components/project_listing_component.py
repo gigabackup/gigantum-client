@@ -1,3 +1,4 @@
+from client_app.constant_enums.constants_enums import GigantumConstants
 from framework.base.component_base import BaseComponent
 from framework.factory.models_enums.constants_enums import LocatorType
 from selenium import webdriver
@@ -17,8 +18,11 @@ class ProjectListingComponent(BaseComponent):
 
     def get_project_title(self) -> str:
         """Returns the title of project listing page."""
-        txt_project_title = self.get_locator(LocatorType.XPath, "//h1[contains(text(),'Projects')]")
-        return txt_project_title.get_text()
+        element = "//h1[contains(text(),'Projects')]"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            txt_project_title = self.get_locator(LocatorType.XPath, element)
+            if txt_project_title is not None:
+                return txt_project_title.get_text()
 
     def profile_menu_click(self) -> bool:
         """Performs click event of profile menu item."""
@@ -46,7 +50,7 @@ class ProjectListingComponent(BaseComponent):
 
         """
         element = "//a[@class='Card Card--225 Card--text column-4-span-3 flex flex--column justify--space-between']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             projects_list = self.driver.find_elements_by_xpath(element)
             if projects_list is not None:
                 for project in projects_list:
@@ -65,7 +69,7 @@ class ProjectListingComponent(BaseComponent):
 
         """
         element = "//a[@class='Card Card--225 Card--text column-4-span-3 flex flex--column justify--space-between']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             projects_list = self.driver.find_elements_by_xpath(element)
             if projects_list is not None:
                 for project in projects_list:
@@ -74,5 +78,3 @@ class ProjectListingComponent(BaseComponent):
                         project.click()
                         return True
         return False
-
-

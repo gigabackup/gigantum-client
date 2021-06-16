@@ -12,4 +12,5 @@ class GigantumConstants(enum.Enum):
     UNTRACKED_FOLDER = 'untracked'
     CACHE_FOLDER = '.labmanager'
     DATASETS_FOLDER = 'datasets'
+    ELEMENT_PRESENCE_TIMEOUT = 30
 

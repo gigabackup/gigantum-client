@@ -205,7 +205,7 @@ class DevTools extends Component<Props> {
 
           if (response.startDevTool) {
             tabName = `${developmentTool}-${owner}-${name}`;
-            let path = `${window.location.protocol}//${window.location.hostname}${response.startDevTool.path}`;
+            let path = `${window.origin}${response.startDevTool.path}`;
             if (developmentTool === 'notebook') {
               if (path.includes('/lab/tree')) {
                 path = path.replace('/lab/tree', '/tree');
@@ -238,7 +238,7 @@ class DevTools extends Component<Props> {
         (response, error) => {
           if (response.startDevTool) {
             tabName = `${developmentTool}-${owner}-${name}`;
-            let path = `${window.location.protocol}//${window.location.hostname}${response.startDevTool.path}`;
+            let path = `${window.origin}${response.startDevTool.path}`;
             if (developmentTool === 'notebook') {
               if (path.includes('/lab/tree')) {
                 path = path.replace('/lab/tree', '/tree');

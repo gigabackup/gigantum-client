@@ -11,7 +11,7 @@ from tests.helper.project_utility import ProjectUtility
 
 
 class DatasetUtility:
-    def create_dataset(self, driver: webdriver) -> str:
+    def create_dataset(self, driver: webdriver, is_guide: bool = True) -> str:
         """Logical separation of create dataset functionality"""
         # Create a dataset
 
@@ -21,10 +21,11 @@ class DatasetUtility:
             return "Could not load Project Listing Page"
 
         # Closes the guide
-        project_utility = ProjectUtility()
-        guide_close_msg = project_utility.close_guide(project_list)
-        if guide_close_msg != ProjectConstants.SUCCESS.value:
-            return guide_close_msg
+        if is_guide:
+            project_utility = ProjectUtility()
+            guide_close_msg = project_utility.close_guide(project_list)
+            if guide_close_msg != ProjectConstants.SUCCESS.value:
+                return guide_close_msg
 
         # Load dataset Listing Page
         dataset_list = DatasetListingPage(driver)
@@ -35,6 +36,9 @@ class DatasetUtility:
         is_clicked = dataset_list.dataset_menu_component.click_datasets_menu()
         if not is_clicked:
             return "Could not click dataset menu."
+
+        # Time sleep to make sure dataset page and it's components are loaded
+        time.sleep(1)
 
         # Click on "Create New"
         is_clicked = dataset_list.dataset_listing_component.click_create_new_dataset_button()
@@ -107,7 +111,7 @@ class DatasetUtility:
             driver: web driver instance
             files_details_list: List of tuples with file_details
         """
-        # Load Jupyter Lab page Page
+        # Load Jupyter Lab page
         jupyter_lab_page = JupyterLabPage(driver)
         if not jupyter_lab_page:
             return "Could not load Jupyter Lab Page"
@@ -118,17 +122,21 @@ class DatasetUtility:
             return "Could not click Jupyter Lab button"
 
         # Wait for new tab to open with new url
-        is_url_loaded = jupyter_lab_page.wait_for_url_in_new_tab("/lab", 1, 60)
+        is_url_loaded = jupyter_lab_page.wait_for_url_in_new_tab("/lab/tree/code", 1, 60)
         if not is_url_loaded:
             return "Could not open new window"
 
+        folder_name = dataset_folder_name = file_name = ""
         # Iterate through list of file_details
         for file_details in files_details_list:
+            folder_name = file_details.folder_name
+            dataset_folder_name = file_details.dataset_name
+            file_name = file_details.file_name
             file_content_verification_result = self.__verify_file_content(jupyter_lab_page, file_details)
             if file_content_verification_result != ProjectConstants.SUCCESS.value:
                 return file_content_verification_result
 
-        jupyter_lab_page.close_tab("/lab", 0)
+        jupyter_lab_page.close_tab(f"/lab/tree/{folder_name}/{dataset_folder_name}/{file_name}", 0)
 
         # Click on container status button to stop container
         is_clicked = jupyter_lab_page.click_container_status()
@@ -143,7 +151,7 @@ class DatasetUtility:
 
         return ProjectConstants.SUCCESS.value
 
-    def __verify_file_content(self, jupyter_lab_page, file_details):
+    def __verify_file_content(self, jupyter_lab_page, file_details) -> str:
         """ Verify file content
 
         Args:
@@ -154,21 +162,25 @@ class DatasetUtility:
 
         """
         # Click folder path icon
+        time.sleep(4)
         is_clicked = jupyter_lab_page.click_folder_path_icon()
         if not is_clicked:
             return "Could not click folder path icon in Jupyter Lab"
 
         # Double click on folder
+        time.sleep(1)
         is_clicked = jupyter_lab_page.click_folder(file_details.folder_name)
         if not is_clicked:
             return "Could not select the folder"
 
         # Double click on dataset folder
+        time.sleep(1)
         is_clicked = jupyter_lab_page.click_folder(file_details.dataset_name)
         if not is_clicked:
             return "Could not select the dataset folder"
 
         # Choose the file
+        time.sleep(1)
         is_selected = jupyter_lab_page.click_file(file_details.file_name)
         if not is_selected:
             return "Could not select the file"
@@ -181,7 +193,7 @@ class DatasetUtility:
 
         return ProjectConstants.SUCCESS.value
 
-    def publish_dataset(self, driver: webdriver):
+    def publish_dataset(self, driver: webdriver) -> str:
         """Logical separation of publish dataset functionality
 
         Args:
@@ -212,5 +224,92 @@ class DatasetUtility:
         is_checked = dataset_list.project_menu_component.check_private_lock_icon_presence()
         if not is_checked:
             return "Could not found private lock icon presence"
+
+        return ProjectConstants.SUCCESS.value
+
+    def link_dataset(self, driver: webdriver, dataset_title: str) -> str:
+        """Logical separation of link dataset functionality
+
+        Args:
+            driver: The page with UI elements
+            dataset_title: Title of the dataset
+
+        """
+        # Load dataset Listing Page
+        dataset_list = DatasetListingPage(driver)
+        if not dataset_list:
+            return "Could not load Dataset Listing Page"
+
+        # Click on Input Data tab
+        is_clicked = dataset_list.project_menu_component.click_input_data_tab()
+        if not is_clicked:
+            return "Could not click on Input Data tab"
+
+        # Click on link dataset button
+        is_clicked = dataset_list.code_input_output_data_component.click_link_dataset_button()
+        if not is_clicked:
+            return "Could not click on link dataset button"
+
+        # Select dataset from link dataset window
+        is_selected = dataset_list.code_input_output_data_component.select_dataset(dataset_title)
+        if not is_selected:
+            return "Could not select dataset from dataset link window"
+
+        # Click on link dataset button on link dataset window
+        is_clicked = dataset_list.code_input_output_data_component.click_link_dataset_button_on_link_dataset_window()
+        if not is_clicked:
+            return "Could not click on link dataset button on link dataset window"
+
+        # Check link dataset window closed
+        is_closed = dataset_list.code_input_output_data_component.check_link_dataset_window_closed()
+        if not is_closed:
+            return "Could not close link dataset window"
+
+        return ProjectConstants.SUCCESS.value
+
+    def add_collaborator(self, driver: webdriver, collaborator_name: str, collaborator_permission: str) -> str:
+        """Logical separation of add collaborator functionality
+
+        Args:
+            driver: The page with UI elements
+            collaborator_name: name of the collaborator
+            collaborator_permission: Collaborator permission
+
+        """
+        # Load dataset Listing Page
+        dataset_list = DatasetListingPage(driver)
+        if not dataset_list:
+            return "Could not load Dataset Listing Page"
+
+        # Click on Collaborators button
+        is_clicked = dataset_list.project_menu_component.click_collaborators_button()
+        if not is_clicked:
+            return "Could not click Collaborators button"
+
+        # Input collaborator name into input area
+        is_typed = dataset_list.collaborator_modal_component.add_collaborator(collaborator_name)
+        if not is_typed:
+            return "Could not type collaborator into input area"
+
+        # Select Read permission for collaborator
+        is_selected = dataset_list.collaborator_modal_component.select_collaborator_permission(collaborator_permission)
+        if not is_selected:
+            return "Could not select Read permission from drop down"
+
+        # Click on add collaborator button
+        is_clicked = dataset_list.collaborator_modal_component.click_add_collaborator_button()
+        if not is_clicked:
+            return "Could not click on add collaborators button"
+
+        # Verify collaborator is listed
+        is_verified = dataset_list.collaborator_modal_component.verify_collaborator_is_listed(
+            collaborator_name)
+        if not is_verified:
+            return "Collaborator is not listed in the modal"
+
+        # Click on collaborator modal close button
+        is_clicked = dataset_list.collaborator_modal_component.click_collaborator_modal_close()
+        if not is_clicked:
+            return "Could not close collaborator modal"
 
         return ProjectConstants.SUCCESS.value

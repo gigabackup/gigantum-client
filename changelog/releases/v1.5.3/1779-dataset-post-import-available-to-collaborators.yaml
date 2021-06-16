@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1794"
+changelog:
+  - type: NEW
+    description: Verify if a dataset is linked to an existing project, after the project has already been imported by a collaborator, and then synced.

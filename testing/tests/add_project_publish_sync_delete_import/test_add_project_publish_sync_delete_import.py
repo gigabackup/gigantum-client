@@ -79,7 +79,8 @@ class TestAddProjectPublishSyncDeleteImport:
         assert is_success_msg == ProjectConstants.SUCCESS.value, is_success_msg
 
         # Delete project from server
-        self.delete_project_from_server(project_list, project_title)
+        is_success_msg = ProjectUtility().delete_project_from_server(self.driver, project_title)
+        assert is_success_msg == ProjectConstants.SUCCESS.value, is_success_msg
 
     def add_files(self, project_list, project_title):
         """Logical separation of add files in to code data, input data and output data
@@ -196,7 +197,7 @@ class TestAddProjectPublishSyncDeleteImport:
         assert is_verified, "Could not verify project in server"
 
         # Click import button in server page
-        is_clicked = project_list.server_component.click_project_import_button(project_title)
+        is_clicked = project_list.server_component.click_import_button(project_title)
         assert is_clicked, "Could not click import button in server page"
 
         # Monitor container status to go through Stopped -> Building
@@ -222,54 +223,3 @@ class TestAddProjectPublishSyncDeleteImport:
         # Verify file content in Output data directory
         is_verified = ProjectHelperUtility().verify_file_content('output', 'created', project_title)
         assert is_verified, "Could not verify the file contents in Output data directory"
-
-    def delete_project_from_server(self, project_list, project_title):
-        """ Logical separation of delete project from server
-
-        Args:
-            project_list: The page with UI elements
-            project_title: Title of the current project
-
-        """
-        # Click server tab
-        is_clicked = project_list.server_component.click_server_tab()
-        assert is_clicked, "Could not click server tab"
-
-        # Verify project in server page
-        is_verified = project_list.server_component.verify_title_in_server(project_title)
-        assert is_verified, "Could not verify project in server"
-
-        # Click delete button in server page
-        is_clicked = project_list.server_component.click_project_delete_button(project_title)
-        assert is_clicked, "Could not click delete button in server page"
-
-        # Get project title from delete project window in server page
-        project_name = project_list.server_component.get_title()
-        assert project_name is not None, "Could not get project title in server page"
-
-        # Input project title in delete window on server page
-        is_typed = project_list.server_component.input_title(project_name)
-        assert is_typed, "Could not type project title in delete window on server page"
-
-        # Click delete project button in delete window on server page
-        is_clicked = project_list.server_component.click_delete_button_on_window()
-        assert is_clicked, "Could not click delete project button in delete window on server page"
-
-        # Verify delete modal close
-        is_verified = project_list.server_component.verify_delete_modal_closed(30)
-        assert is_verified, "Could not close delete modal"
-
-        # Verify project is not exist in server page
-        is_verified = project_list.server_component.verify_title_in_server(project_title)
-        assert not is_verified, "Project is still exist in the server"
-
-        # wait ~5 seconds to guarantee server side deletion completes
-        time.sleep(5)
-
-        # Refresh the server page
-        is_clicked = project_list.server_component.click_server_tab()
-        assert is_clicked, "Could not click server tab"
-
-        # Verify project is not exist in server page
-        is_verified = project_list.server_component.verify_title_in_server(project_title)
-        assert not is_verified, "Project is still exist in the server"

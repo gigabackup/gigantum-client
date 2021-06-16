@@ -2,6 +2,7 @@
 Base call to handle UI elements and its events
 Copy from selenium GIT
 """
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -354,6 +355,14 @@ class PageFactory(object):
             except (StaleElementReferenceException, NoSuchElementException, TimeoutException) as ex:
                 return True
         return False
+
+    def scroll_to_window_top(self):
+        """Scroll to the window top
+
+        Returns: returns the result of scroll action
+
+        """
+        return self.driver.find_element_by_tag_name('body').send_keys(Keys.CONTROL + Keys.HOME)
 
 
 WebElement.click_button = PageFactory.click

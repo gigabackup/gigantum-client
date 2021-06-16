@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1768"
+changelog:
+  - type: NEW
+    description: Verifies that a user can add, remove, and update a sensitive file and that sensitive files are NOT synced.

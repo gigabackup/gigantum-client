@@ -1,3 +1,4 @@
+from client_app.constant_enums.constants_enums import GigantumConstants
 from framework.base.component_base import BaseComponent
 from framework.factory.models_enums.constants_enums import LocatorType
 from selenium import webdriver
@@ -22,7 +23,7 @@ class ProjectSyncConflictModalComponent(BaseComponent):
 
         """
         element = "//h1[contains(text(), 'Sync Conflict')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             return True
         return False
 
@@ -33,7 +34,7 @@ class ProjectSyncConflictModalComponent(BaseComponent):
 
         """
         element = "//button[contains(text(), 'Abort')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             btn_abort = self.get_locator(LocatorType.XPath, element)
             btn_abort.click()
             return True
@@ -46,7 +47,7 @@ class ProjectSyncConflictModalComponent(BaseComponent):
 
         """
         element = "//h1[contains(text(), 'Sync Conflict')]"
-        if self.check_element_absence(LocatorType.XPath, element, 30):
+        if self.check_element_absence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             return True
         return False
 
@@ -57,7 +58,7 @@ class ProjectSyncConflictModalComponent(BaseComponent):
 
         """
         element = "//button[contains(text(), 'Use Theirs')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             btn_abort = self.get_locator(LocatorType.XPath, element)
             btn_abort.click()
             return True
@@ -70,7 +71,7 @@ class ProjectSyncConflictModalComponent(BaseComponent):
 
         """
         element = "//button[contains(text(), 'Use Mine')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             btn_abort = self.get_locator(LocatorType.XPath, element)
             btn_abort.click()
             return True

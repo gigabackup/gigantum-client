@@ -1,6 +1,8 @@
 from snapshottest import snapshot
 from werkzeug.datastructures import EnvironHeaders
 import responses
+import requests
+import os
 from lmsrvcore.tests.fixtures import fixture_working_dir_with_auth_middleware
 
 
@@ -106,3 +108,25 @@ class TestAuthorizationMiddleware(object):
                                                                'HTTP_GTM_SERVER_ID': "another-server"}))
         assert 'errors' not in r
         snapshot.assert_match(r)
+
+    def test_is_ssl_error(self, fixture_working_dir_with_auth_middleware, snapshot):
+        """Test to verify that if an SSL verification fails during jwks lookup there is a reasonable message"""
+        def response_callback(resp):
+            resp.callback_processed = True
+            raise requests.exceptions.SSLError()
+
+        config, working_dir, client = fixture_working_dir_with_auth_middleware
+
+        with responses.RequestsMock(response_callback=response_callback) as m:
+            current_query = """
+                           {
+                             userIdentity{
+                               username
+                             }
+
+                           }
+                    """
+            r = client.execute(current_query, context=ContextMock({'HTTP_AUTHORIZATION': "Bearer bad_fake_token",
+                                                                   'HTTP_IDENTITY': "good_fake_id_token"}))
+            assert 'errors' in r
+            snapshot.assert_match(r)

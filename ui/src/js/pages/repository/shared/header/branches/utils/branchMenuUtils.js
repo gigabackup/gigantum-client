@@ -56,7 +56,7 @@ const getSyncTooltip = (data, currentServer) => {
   const { backupInProgress, name } = currentServer;
   const repositoryType = isDataset ? 'Dataset' : 'Project';
 
-  let syncTooltip = !hasWriteAccess ? 'Pull changes from Gignatum Hub' : `Sync changes to ${name}`;
+  let syncTooltip = !hasWriteAccess ? 'Pull changes from Gigantum Hub' : `Sync changes to ${name}`;
   syncTooltip = !defaultRemote
     ? `Click Publish to push branch to ${name}`
     : syncTooltip;

@@ -1,5 +1,6 @@
+from client_app.constant_enums.constants_enums import GigantumConstants
 from framework.base.component_base import BaseComponent
-from framework.factory.models_enums.constants_enums import LocatorType
+from framework.factory.models_enums.constants_enums import LocatorType, CompareUtilityType
 from selenium import webdriver
 from framework.factory.models_enums.page_config import ComponentModel
 
@@ -31,20 +32,24 @@ class CollaboratorsModalComponent(BaseComponent):
             return True
         return False
 
-    def select_admin_permission(self) -> bool:
-        """ Select admin permission from drop down
+    def select_collaborator_permission(self, collaborator_permission) -> bool:
+        """ Select collaborator permission from drop down
+
+        Args:
+            collaborator_permission: Collaborator permission
 
         Returns: returns the result of selection
 
         """
-        element = "//span[contains(text(), 'Read')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        element = "//span[@class='CollaboratorModal__PermissionsSelector Dropdown CollaboratorModal__" \
+                  "PermissionsSelector--add Dropdown--collapsed']"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             drop_down_element = self.get_locator(LocatorType.XPath, element)
             drop_down_element.click()
-            element = "//li/div[contains(text(), 'Admin')]"
-            if self.check_element_presence(LocatorType.XPath, element, 30):
-                admin_menu = self.get_locator(LocatorType.XPath, element)
-                admin_menu.click()
+            element = f"//li/div[contains(text(), '{collaborator_permission}')]"
+            if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+                permission_menu = self.get_locator(LocatorType.XPath, element)
+                permission_menu.click()
                 return True
         return False
 
@@ -55,7 +60,7 @@ class CollaboratorsModalComponent(BaseComponent):
 
         """
         element = "//button[@data-selenium-id='ButtonLoader']"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             btn_add_collaborator = self.get_locator(LocatorType.XPath, element)
             btn_add_collaborator.click()
             return True
@@ -71,7 +76,7 @@ class CollaboratorsModalComponent(BaseComponent):
 
         """
         element = f"//li/div[contains(text(), '{collaborator_name}')]"
-        if self.check_element_presence(LocatorType.XPath, element, 30):
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             return True
         return False
 
@@ -88,3 +93,56 @@ class CollaboratorsModalComponent(BaseComponent):
             return True
         return False
 
+    def click_collaborator_publish_button(self) -> bool:
+        """ Performs click action on collaborator modal publish button
+
+        Returns: returns the result of click action
+
+        """
+        element = "//button[@class='Btn Btn--inverted NoCollaborators__button--publish']"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            publish_button = self.get_locator(LocatorType.XPath, element)
+            if publish_button is not None:
+                publish_button.click()
+                return True
+        return False
+
+    def update_collaborator_permission(self, collaborator_name: str, collaborator_permission: str) -> bool:
+        """ Update collaborator permission
+
+        Args:
+            collaborator_name: Name of the collaborator
+            collaborator_permission: Collaborator permission
+
+        Returns: returns the result of update action
+
+        """
+        element = "//li[@data-selenium-id='CollaboratorsRowx']"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            collaborators_list = self.driver.find_elements_by_xpath(element)
+            for collaborators in collaborators_list:
+                if collaborators is not None:
+                    collaborator_title_div = collaborators.find_element_by_xpath\
+                        (".//div[@class='CollaboratorsModal__collaboratorName']")
+                    if collaborator_name == collaborator_title_div.get_text().strip():
+                        collaborator_permission_drop_down = collaborators.find_element_by_xpath\
+                            (".//div[@class='CollaboratorsModal__permissions "
+                             "CollaboratorsModal__permissions--individual CollaboratorsModal__permissions--small']")
+                        if collaborator_permission_drop_down is not None:
+                            collaborator_permission_drop_down.click()
+                            collaborator_permission_element = f".//li/div[contains(text(), '{collaborator_permission}')]"
+                            is_permissions_loaded = collaborator_permission_drop_down.wait_until\
+                                (CompareUtilityType.CheckElement, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value,
+                                 collaborator_permission_element)
+                            if is_permissions_loaded:
+                                collaborator_permission_div = collaborator_permission_drop_down.find_element_by_xpath\
+                                    (collaborator_permission_element)
+                                if collaborator_permission_div is not None:
+                                    collaborator_permission_div.click()
+                                    delete_button_xpath = ".//div[@class='ButtonLoader__icon hidden']"
+                                    is_collaborator_updated = collaborators.wait_until\
+                                        (CompareUtilityType.CheckElement, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.
+                                         value, delete_button_xpath)
+                                    if is_collaborator_updated:
+                                        return True
+        return False
