@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1803"
+changelog:
+  - type: NEW
+    description: Verify published dataset is available to collaborators.
