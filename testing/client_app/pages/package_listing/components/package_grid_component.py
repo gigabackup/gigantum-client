@@ -19,8 +19,8 @@ class PackageGridComponent(BaseComponent):
         super(PackageGridComponent, self).__init__(driver, component_data)
         self.package_body_title = self.get_locator(LocatorType.XPath, "//div[@data-selenium-id='PackageCard']"
                                                                       "/div[@data-selenium-id='PackageBody']")
-        self.add_package_button = self.get_locator(LocatorType.XPath, "//div[@data-selenium-id='PackageCard']"
-                                                                      "/button[contains(text(),'Add Package')]")
+        self.add_package_button_element = "//div[@data-selenium-id='PackageCard']/button[contains(text()," \
+                                          "'Add Package')]"
 
     def get_package_body_title(self) -> str:
         """ Locate the the text on package body
@@ -36,9 +36,12 @@ class PackageGridComponent(BaseComponent):
         Returns: returns the result of click action
 
         """
-        if self.add_package_button is not None and self.add_package_button.element_to_be_clickable():
-            self.add_package_button.execute_script("arguments[0].click();")
-            return True
+        if self.add_package_button_element is not None:
+            if self.check_element_presence(LocatorType.XPath, self.add_package_button_element,
+                                           GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+                add_package_button = self.get_locator(LocatorType.XPath, self.add_package_button_element)
+                add_package_button.execute_script("arguments[0].click();")
+                return True
         return False
 
     def verify_package_list(self, package_details_list: list) -> bool:
@@ -50,7 +53,7 @@ class PackageGridComponent(BaseComponent):
         Returns: returns the comparison result
 
         """
-        package_list = self.ui_element.find_elements_by_xpath("//div[@data-selenium-id='PackageRow']")
+        package_list = self.driver.find_elements_by_xpath("//div[@data-selenium-id='PackageRow']")
         if package_list is not None:
             # Iterate the page elements corresponding to package details
             agent = self.driver.capabilities['browserName']

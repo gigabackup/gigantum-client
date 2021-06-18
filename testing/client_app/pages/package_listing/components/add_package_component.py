@@ -15,8 +15,8 @@ class AddPackageComponent(BaseComponent):
 
     def __init__(self, driver: webdriver, component_data: ComponentModel) -> None:
         super(AddPackageComponent, self).__init__(driver, component_data)
-        self.package_title_input = self.get_locator(LocatorType.XPath, "//input[@class='AddPackageForm__input']")
-        self.add_package = self.get_locator(LocatorType.XPath, "//button[@class='Btn Btn__add']")
+        self.package_title_input_element = "//input[@class='AddPackageForm__input']"
+        self.add_package_element = "//button[@class='Btn Btn__add']"
 
     def input_package_name(self, package_name: str) -> bool:
         """Input action for package name
@@ -27,9 +27,12 @@ class AddPackageComponent(BaseComponent):
         Returns: returns the result of input action
 
         """
-        if self.package_title_input is not None:
-            self.package_title_input.send_keys(package_name)
-            return True
+        if self.package_title_input_element is not None:
+            if self.check_element_presence(LocatorType.XPath, self.package_title_input_element,
+                                           GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+                package_title_input = self.get_locator(LocatorType.XPath, self.package_title_input_element)
+                package_title_input.send_keys(package_name)
+                return True
         return False
 
     def click_add_button(self) -> bool:
@@ -38,9 +41,12 @@ class AddPackageComponent(BaseComponent):
         Returns: returns the result of click action
 
         """
-        if self.add_package is not None:
-            self.add_package.click()
-            return True
+        if self.add_package_element is not None:
+            if self.check_element_presence(LocatorType.XPath, self.add_package_element,
+                                           GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+                add_package = self.get_locator(LocatorType.XPath, self.add_package_element)
+                add_package.click()
+                return True
         return False
 
     def verify_package_and_version(self, package: tuple) -> bool:
@@ -55,7 +61,7 @@ class AddPackageComponent(BaseComponent):
         if self.check_element_presence(LocatorType.XPath, "//div[@class='PackageQueue__validCount flex "
                                                           "justify--right align-items--center']",
                                        GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
-            div_package_details = self.ui_element.find_elements_by_xpath("//div[@class='PackageQueue__row "
+            div_package_details = self.driver.find_elements_by_xpath("//div[@class='PackageQueue__row "
                                                                          "flex align-items--center justify--right']")
             if div_package_details is not None:
                 for package_detail in div_package_details:
@@ -90,10 +96,13 @@ class AddPackageComponent(BaseComponent):
         Returns: returns the result of click action
 
         """
-        install_all_button = self.get_locator(LocatorType.XPath, "//button[contains(text(),'Install All')]")
-        if install_all_button.element_to_be_clickable():
-            install_all_button.click()
-            return True
+        install_all_button_element = "//button[contains(text(),'Install All')]"
+        if self.check_element_presence(LocatorType.XPath, install_all_button_element,
+                                       GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            install_all_button = self.get_locator(LocatorType.XPath, install_all_button_element)
+            if install_all_button.element_to_be_clickable():
+                install_all_button.execute_script("arguments[0].click();")
+                return True
         return False
 
     def verify_package_list(self, package_details_list: list) -> bool:
@@ -108,7 +117,7 @@ class AddPackageComponent(BaseComponent):
         if self.check_element_presence(LocatorType.XPath, "//div[@class='PackageQueue__validCount flex "
                                                           "justify--right align-items--center']",
                                        GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
-            div_package_details = self.ui_element.find_elements_by_xpath("//div[@class='PackageQueue__row "
+            div_package_details = self.driver.find_elements_by_xpath("//div[@class='PackageQueue__row "
                                                                          "flex align-items--center justify--right']")
             if div_package_details is not None:
                 for index, packages_arg in enumerate(package_details_list):
@@ -129,8 +138,8 @@ class AddPackageComponent(BaseComponent):
         if self.check_element_presence(LocatorType.XPath, "//div[@class='PackageQueue__validCount flex "
                                                           "justify--right align-items--center']",
                                        GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
-            package_status_element = self.ui_element.find_element_by_xpath("//div[@class='PackageQueue__validCount flex"
-                                                                           " justify--right align-items--center']")
+            package_status_element = self.driver.find_element_by_xpath("//div[@class='PackageQueue__validCount flex "
+                                                                       "justify--right align-items--center']")
             compared_value = package_status_element.wait_until(CompareUtilityType.CompareText, wait_timeout,
                                                                compare_text)
             return compared_value
