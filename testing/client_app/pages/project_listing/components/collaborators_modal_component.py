@@ -138,11 +138,50 @@ class CollaboratorsModalComponent(BaseComponent):
                                 collaborator_permission_div = collaborator_permission_drop_down.find_element_by_xpath\
                                     (collaborator_permission_element)
                                 if collaborator_permission_div is not None:
-                                    collaborator_permission_div.click()
+                                    collaborator_permission_div.execute_script("arguments[0].click();")
                                     delete_button_xpath = ".//div[@class='ButtonLoader__icon hidden']"
                                     is_collaborator_updated = collaborators.wait_until\
                                         (CompareUtilityType.CheckElement, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.
                                          value, delete_button_xpath)
                                     if is_collaborator_updated:
                                         return True
+        return False
+
+    def remove_collaborator(self, collaborator_name: str) -> bool:
+        """ Remove collaborator
+
+        Args:
+            collaborator_name: Name of the collaborator
+
+        Returns: returns the result of update action
+
+        """
+        element = "//li[@data-selenium-id='CollaboratorsRowx']"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            collaborators_list = self.driver.find_elements_by_xpath(element)
+            for collaborators in collaborators_list:
+                if collaborators is not None:
+                    collaborator_title_div = collaborators.find_element_by_xpath\
+                        (".//div[@class='CollaboratorsModal__collaboratorName']")
+                    if collaborator_name == collaborator_title_div.get_text().strip():
+                        collaborator_delete_button = collaborators.find_element_by_xpath\
+                            (".//button[@class='Btn ButtonLoader ButtonLoader__collaborator Btn__delete "
+                             "Btn--round Btn--bordered']")
+                        if collaborator_delete_button is not None:
+                            collaborator_delete_button.click()
+                            return True
+        return False
+
+    def verify_collaborator_is_removed(self, collaborator_name: str) -> bool:
+        """ Verify collaborator is removed
+
+        Args:
+            collaborator_name: Name of the collaborator
+
+        Returns: returns the result of verification
+
+        """
+        element = f"//li/div[contains(text(), '{collaborator_name}')]"
+        if self.check_element_absence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            return True
         return False
