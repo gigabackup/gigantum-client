@@ -11,7 +11,7 @@
   background: white;
   min-height: 80px;
   border-bottom: 10px solid $primary;
-  @include flex(flex-start, row)
+  @include flex(flex-start, row);
 
   &--collapsed {
     height: 80px;

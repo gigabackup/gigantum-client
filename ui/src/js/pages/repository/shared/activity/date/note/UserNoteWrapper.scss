@@ -66,7 +66,7 @@
   border-bottom: 10px solid $primary;
   background: white;
 
-  @include flex(flex-start, row)
+  @include flex(flex-start, row);
 
   &--collapsed {
     height: 80px;
