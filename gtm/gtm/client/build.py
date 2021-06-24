@@ -271,9 +271,6 @@ priority=10"""
             # This is a relative path from the *build context* (which is Linux)
             dockerfile_path = os.path.relpath(dockerfile_path, client_root_dir).replace('\\', '/')
 
-        # Make sure a builder exists for buildx
-        self._verify_or_create_builder()
-
         cmd = ["docker", "buildx", "build",
                "--builder", "gtm-builder",
                "--pull",
@@ -296,6 +293,10 @@ priority=10"""
 
         cmd.append("--platform")
         if multi_arch:
+            # Make sure a builder exists for buildx
+            if not self._builder_configured():
+                raise Exception("Cannot perform multi-arch build without configuring a builder. "
+                                "Re-run `gtm dev setup` and provide a remote build host")
             cmd.append("linux/arm64/v8,linux/amd64")
         else:
             cmd.append("linux/amd64")
@@ -313,25 +314,21 @@ priority=10"""
             raise Exception("Failed to build.")
 
     @staticmethod
-    def _verify_or_create_builder() -> None:
+    def _builder_configured() -> bool:
         """Method to create a docker builder if one does not exist yet
 
         Returns:
             None
         """
-        result = subprocess.run(['docker', 'buildx', 'ls'], capture_output=True, check=True)
-        if "gtm-builder" not in result.stdout.decode():
-            builder_host = os.environ.get("REMOTE_BUILD_HOST")
-            if not builder_host:
-                raise Exception("Must set `REMOTE_BUILD_HOST` env var to setup buildx builder")
+        output = False
+        try:
+            result = subprocess.run(['docker', 'buildx', 'ls'], capture_output=True, check=True)
+            if "gtm-builder" in result.stdout.decode():
+                output = True
+        except subprocess.CalledProcessError:
+            pass
 
-            remote_builder_str = f"docker buildx create --name gtm-builder ssh://ubuntu@{builder_host}" \
-                                  "  --platform linux/arm64/v8"
-            subprocess.run(shlex.split(remote_builder_str), check=True)
-
-            local_builder_str = "docker buildx create --name gtm-builder --append --platform linux/amd64"
-            subprocess.run(shlex.split(local_builder_str), check=True)
-            print("Docker buildx builder `gtm-builder` configured.")
+        return output
 
     def cleanup(self, image_name) -> None:
         """Method to clean up old images

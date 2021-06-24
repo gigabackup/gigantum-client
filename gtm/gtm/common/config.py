@@ -2,6 +2,8 @@ import os
 import platform
 import shutil
 import sys
+import shlex
+import subprocess
 
 import yaml
 
@@ -169,6 +171,13 @@ su giguser
         gigantum_client_root = input("Path to the gigantum-client repository: ")
         gigantum_client_root = os.path.expanduser(gigantum_client_root)
 
+        # Prompt for remote build host
+        build_host = self.prompt_with_default("Remote ARM Build host:", "skip")
+        if build_host == "skip":
+            print("Warning: Multi-arch building will be disabled until you set up a remote ARM build host.")
+        else:
+            self._verify_or_create_builder(build_host)
+
         # Save our answers
         answer_fname = CONFIG_FILE
         if os.path.exists(os.path.dirname(answer_fname)) is False:
@@ -179,7 +188,8 @@ su giguser
                    'use_pycharm': use_pycharm,
                    'working_dir': working_dir,
                    'root_dir': gigantum_client_root,
-                   'uid':         uid}
+                   'uid':         uid,
+                   'remote_build_host': build_host}
         self.save_config_file(answers)
         self.user_config = self.load_config_file()
 
@@ -232,6 +242,22 @@ su giguser
                     shutil.copy(src_file, os.path.join(run_config_dir, file))
 
             print("Run configurations copied to `.idea/runConfigurations`. Restart PyCharm if running")
+
+    def _verify_or_create_builder(self, build_host: str) -> None:
+        """Method to create a docker builder if one does not exist yet
+
+        Returns:
+            None
+        """
+        result = subprocess.run(['docker', 'buildx', 'ls'], capture_output=True, check=True)
+        if "gtm-builder" not in result.stdout.decode():
+            remote_builder_str = f"docker buildx create --name gtm-builder ssh://ubuntu@{build_host}" \
+                                  "  --platform linux/arm64/v8"
+            subprocess.run(shlex.split(remote_builder_str), check=True)
+
+            local_builder_str = "docker buildx create --name gtm-builder --append --platform linux/amd64"
+            subprocess.run(shlex.split(local_builder_str), check=True)
+            print("Docker buildx builder `gtm-builder` configured.")
 
 
 def get_client_root():
