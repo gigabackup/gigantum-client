@@ -1,5 +1,5 @@
 # FRONTEND BUILD CONTAINER
-FROM --platform=linux/amd64 ubuntu:20.04 as ui-builder
+FROM ubuntu:20.04 as ui-builder
 
 # Install system level dependencies
 RUN apt-get -y update && apt-get -y install git curl gosu

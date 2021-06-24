@@ -5,6 +5,7 @@ import glob
 import datetime
 import sys
 import subprocess
+import shlex
 
 from docker.errors import ImageNotFound, NotFound, APIError
 import yaml
@@ -296,7 +297,6 @@ priority=10"""
         cmd.append("--platform")
         if multi_arch:
             cmd.append("linux/arm64/v8,linux/amd64")
-            # cmd.append("linux/arm64/v8")
         else:
             cmd.append("linux/amd64")
 
@@ -319,9 +319,19 @@ priority=10"""
         Returns:
             None
         """
-        result = subprocess.run(["docker", "buildx", "ls"], capture_output=True, check=True)
+        result = subprocess.run(['docker', 'buildx', 'ls'], capture_output=True, check=True)
         if "gtm-builder" not in result.stdout.decode():
-            subprocess.run(["docker", "buildx", "create", "--name", "gtm-builder"], check=True)
+            builder_host = os.environ.get("REMOTE_BUILD_HOST")
+            if not builder_host:
+                raise Exception("Must set `REMOTE_BUILD_HOST` env var to setup buildx builder")
+
+            remote_builder_str = f"docker buildx create --name gtm-builder ssh://ubuntu@{builder_host}" \
+                                  "  --platform linux/arm64/v8"
+            subprocess.run(shlex.split(remote_builder_str), check=True)
+
+            local_builder_str = "docker buildx create --name gtm-builder --append --platform linux/amd64"
+            subprocess.run(shlex.split(local_builder_str), check=True)
+            print("Docker buildx builder `gtm-builder` configured.")
 
     def cleanup(self, image_name) -> None:
         """Method to clean up old images
