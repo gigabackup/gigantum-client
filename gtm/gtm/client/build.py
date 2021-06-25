@@ -293,6 +293,9 @@ priority=10"""
 
         cmd.append("--platform")
         if multi_arch:
+            if not publish:
+                raise Exception("Docker currently doesn't support multi-arch builds that load the images. "
+                                "Try `gtm client publish` with the `--multi-arch` flag")
             # Make sure a builder exists for buildx
             if not self._builder_configured():
                 raise Exception("Cannot perform multi-arch build without configuring a builder. "

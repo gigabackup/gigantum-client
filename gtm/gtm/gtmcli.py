@@ -371,7 +371,9 @@ def main():
     parser.add_argument("--multi-arch",
                         default=False,
                         action='store_true',
-                        help="Boolean indicating if the container should be built for multiple architectures")
+                        help="Boolean indicating if the container should be built for multiple architectures. "
+                             "Requires a remote build instance. "
+                             "Currently only supported when publishing")
     parser.add_argument("--edge", "-e",
                         default=False,
                         action='store_true',
