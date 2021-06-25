@@ -275,8 +275,6 @@ priority=10"""
                "--builder", "gtm-builder",
                "--pull",
                "--file", dockerfile_path,
-               "--tag", named_image,
-               "--tag", named_image_latest,
                ]
         cmd.extend(labels)
 
@@ -304,17 +302,23 @@ priority=10"""
         else:
             cmd.append("linux/amd64")
 
-        cmd.append(client_root_dir)
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        while True:
-            output = process.stdout.readline().decode()
-            if output == '' and process.poll() is not None:
-                break
-            if output:
-                print(output.rstrip())
+        tag_cmd = cmd + ["--tag"] + [named_image] + [client_root_dir]
+        latest_cmd = cmd + ["--tag"] + [named_image_latest] + [client_root_dir]
+        # process = subprocess.Popen(tag_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        # while True:
+        #     output = process.stdout.readline().decode()
+        #     if output == '' and process.poll() is not None:
+        #         break
+        #     if output:
+        #         print(output.rstrip())
 
+        process = subprocess.run(tag_cmd)
         if process.returncode != 0:
             raise Exception("Failed to build.")
+
+        process = subprocess.run(latest_cmd)
+        if process.returncode != 0:
+            raise Exception("Failed to push latest tag.")
 
     @staticmethod
     def _builder_configured() -> bool:
