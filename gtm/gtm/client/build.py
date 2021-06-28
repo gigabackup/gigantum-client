@@ -302,6 +302,9 @@ priority=10"""
         else:
             cmd.append("linux/amd64")
 
+        # Run build/tag command twice. For some reason on the current version of buildkit having 2 tags
+        # doesn't work. There is discussion about this being an issue for folks, but also working for some
+        # Regardless, this "hack" of running twice works and adds little overhead.
         tag_cmd = cmd + ["--tag"] + [named_image] + [client_root_dir]
         latest_cmd = cmd + ["--tag"] + [named_image_latest] + [client_root_dir]
 
