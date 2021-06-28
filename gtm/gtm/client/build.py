@@ -303,22 +303,15 @@ priority=10"""
             cmd.append("linux/amd64")
 
         tag_cmd = cmd + ["--tag"] + [named_image] + [client_root_dir]
-        latest_cmd = cmd + ["--tag"] + [named_image_latest] + [client_root_dir]
-        # process = subprocess.Popen(tag_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        # while True:
-        #     output = process.stdout.readline().decode()
-        #     if output == '' and process.poll() is not None:
-        #         break
-        #     if output:
-        #         print(output.rstrip())
-
-        process = subprocess.run(tag_cmd)
-        if process.returncode != 0:
-            raise Exception("Failed to build.")
+        latest_cmd = cmd + ["--tag"] + [named_image_latest] + ["--tag"] + [named_image] + [client_root_dir]
 
         process = subprocess.run(latest_cmd)
         if process.returncode != 0:
-            raise Exception("Failed to push latest tag.")
+            raise Exception("Failed to build.")
+
+        # process = subprocess.run(latest_cmd)
+        # if process.returncode != 0:
+        #     raise Exception("Failed to push latest tag.")
 
     @staticmethod
     def _builder_configured() -> bool:
