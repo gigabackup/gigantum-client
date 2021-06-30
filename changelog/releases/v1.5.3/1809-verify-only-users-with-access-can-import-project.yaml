@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1815"
+changelog:
+  - type: NEW
+    description: Test to verify that only users with access to a project can import it.

@@ -347,6 +347,7 @@ class ProjectUtility:
         assert is_clicked, "Could not click logout button"
 
         # Load Landing Page
+        time.sleep(.5)
         landing_page = LandingPage(driver, False)
         if not landing_page:
             return "Could not load Landing page"
