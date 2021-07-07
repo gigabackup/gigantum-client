@@ -3,6 +3,8 @@ import classNames from 'classnames';
 import { Link } from 'react-router-dom';
 // store
 import { setCallbackRoute } from 'JS/redux/actions/routes';
+// utils
+import getApiURL from 'JS/utils/apiUrl';
 // components
 import Tooltip from 'Components/tooltip/Tooltip';
 import User from './user/User';
@@ -24,6 +26,7 @@ class Sidebar extends Component<Props> {
     super(props);
     this.state = {
       authenticated: null,
+      version: 'Loading...',
     };
   }
 
@@ -33,15 +36,29 @@ class Sidebar extends Component<Props> {
   componentDidMount() {
     const { auth } = this.props;
     const { authenticated } = this.state;
-    auth.isAuthenticated().then((response) => {
-      let isAuthenticated = response;
-      if (isAuthenticated === null) {
-        isAuthenticated = false;
-      }
-      if (isAuthenticated !== authenticated) {
-        this.setState({ authenticated: isAuthenticated });
-      }
-    });
+    const apiURL = getApiURL('ping');
+
+    Promise.all([
+      fetch(apiURL, { method: 'GET' }),
+      auth.isAuthenticated(),
+    ])
+      .then(([pingResponse, authResponse]) => {
+        if (pingResponse.status === 200 && (pingResponse.headers.get('content-type') === 'application/json')) {
+          return Promise.all([pingResponse.json(), authResponse]);
+        }
+        return [{ version: 'Error Fetching Version', authResponse }];
+      })
+      .then(([pingData, responseData]) => {
+        let isAuthenticated = responseData;
+        if (isAuthenticated === null) {
+          isAuthenticated = false;
+        }
+        if (isAuthenticated !== authenticated) {
+          this.setState({ authenticated: isAuthenticated, version: pingData.version });
+        } else {
+          this.setState({ version: pingData.version });
+        }
+      });
   }
 
   /**
@@ -54,7 +71,7 @@ class Sidebar extends Component<Props> {
   }
 
   render() {
-    const { authenticated } = this.state;
+    const { authenticated, version } = this.state;
     const { diskLow } = this.props;
     const isLabbooks = (window.location.href.indexOf('projects') > 0) || (window.location.href.indexOf('datasets') === -1);
     // declare css here
@@ -118,6 +135,16 @@ class Sidebar extends Component<Props> {
           {
             authenticated && (<User {...this.props} />)
           }
+          <div className="SideBar__version flex flex-1 justify--center align-items--end">
+            <a
+              className="SideBar__link"
+              href={getApiURL('ping')}
+              rel="noreferrer"
+              target="_blank"
+            >
+              {`v${version}`}
+            </a>
+          </div>
         </div>
       </aside>
     );

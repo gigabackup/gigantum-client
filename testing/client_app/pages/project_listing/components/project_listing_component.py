@@ -78,3 +78,60 @@ class ProjectListingComponent(BaseComponent):
                         project.click()
                         return True
         return False
+
+    def click_import_existing_project_button(self) -> bool:
+        """Click action on import existing project button
+        Returns: returns the result of click action
+        """
+        element = "//button[contains(text(), 'Import Existing')]"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            import_existing_project_button = self.get_locator(LocatorType.XPath, element)
+            if import_existing_project_button is not None and import_existing_project_button.element_to_be_clickable():
+                import_existing_project_button.click()
+                return True
+        return False
+
+    def type_project_import_url(self, import_url: str) -> bool:
+        """Input action for project import url
+        Args:
+            import_url: URL of the project to be import
+        Returns: returns the result of input action
+        """
+        element = "//input[@class='Import__input']"
+        project_title_input = self.get_locator(LocatorType.XPath, element)
+        if project_title_input is not None:
+            project_title_input.send_keys(import_url)
+            return True
+        return False
+
+    def click_import_project_button(self) -> bool:
+        """ Click action for import project button
+        Returns: returns the result of click action
+        """
+        element = "//div[@class='Import__buttonContainer']/button[@class='Btn--last']"
+        import_project_button = self.get_locator(LocatorType.XPath, element)
+        if import_project_button is not None and import_project_button.element_to_be_clickable():
+            import_project_button.execute_script("arguments[0].click();")
+            return True
+        return False
+
+    def verify_project_import_error(self) -> bool:
+        """ Verify whether the import error for project pop up is shown or not
+        Returns: returns the result of import project error verification
+        """
+        element = "//p[@class='FooterMessage__title FooterMessage__title--collapsed' and contains(text(), " \
+                  "'ERROR: Could not import remote Project')]"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            return True
+        return False
+
+    def verify_project_import_success(self) -> bool:
+        """ Verify whether the import project success pop up is shown or not
+        Returns: returns the result of import project success verification
+        """
+        element = "//p[@class='FooterMessage__title FooterMessage__title--collapsed' and contains(text(), " \
+                  "'Successfully imported remote Project')]"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            return True
+        return False
+

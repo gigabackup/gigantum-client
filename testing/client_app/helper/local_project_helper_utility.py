@@ -69,8 +69,11 @@ class ProjectHelperUtility(object):
                     except:
                         # Sometimes the delete happens while git still has a lock on the files. In windows, this can
                         # prevent the delete operation from succeeding
-                        time.sleep(3)
-                        shutil.rmtree(user_directory / project.name)
+                        try:
+                            time.sleep(3)
+                            shutil.rmtree(user_directory / project.name)
+                        except:
+                            print(f"Warning: failed clean up {project.name} locally")
         return True
 
     def check_project_removed_from_disk(self, project_title: str) -> bool:

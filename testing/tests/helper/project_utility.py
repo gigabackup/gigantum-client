@@ -123,6 +123,9 @@ class ProjectUtility:
         if python3_notebook_title is None:
             return "Could not get python3 notebook title"
 
+        # Wait a second for kernel to start on a slower laptop
+        time.sleep(2)
+
         # Iterate through list of commands
         for index, command in enumerate(commands_list):
             # Join all commands and create a command string
@@ -344,6 +347,7 @@ class ProjectUtility:
         assert is_clicked, "Could not click logout button"
 
         # Load Landing Page
+        time.sleep(.5)
         landing_page = LandingPage(driver, False)
         if not landing_page:
             return "Could not load Landing page"

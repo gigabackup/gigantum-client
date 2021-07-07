@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1813"
+changelog:
+  - type: NEW
+    description: Test to verify collaborator modifications appear in the activity feed.

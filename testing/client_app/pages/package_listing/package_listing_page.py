@@ -3,6 +3,8 @@ from selenium.webdriver.remote.webelement import WebElement
 from client_app.pages.package_listing.components.package_grid_component import PackageGridComponent
 from client_app.pages.package_listing.components.add_package_component import AddPackageComponent
 from client_app.pages.project_listing.components.project_listing_component import ProjectListingComponent
+from client_app.pages.project_listing.components.project_sync_conflict_modal_component import \
+    ProjectSyncConflictModalComponent
 from framework.base.page_base import BasePage
 from framework.factory.models_enums.constants_enums import LocatorType
 from framework.factory.models_enums.page_config import PageConfig
@@ -34,6 +36,7 @@ class PackageListingPage(BasePage):
         self._code_input_output_component = None
         self.__project_container_status_component = None
         self.__project_listing_component = None
+        self.__project_sync_conflict_modal_component = None
         self.__package_grid_model = ComponentModel(locator_type=LocatorType.XPath, locator="//div[@class='grid']")
         self.__add_package_model = ComponentModel(locator_type=LocatorType.XPath,
                                                   locator="//div[@data-selenium-id='AddPackages']")
@@ -79,6 +82,14 @@ class PackageListingPage(BasePage):
         if self.__project_listing_component is None:
             self.__project_listing_component = ProjectListingComponent(self.driver, self.component_model)
         return self.__project_listing_component
+
+    @property
+    def project_sync_conflict_modal_component(self) -> ProjectSyncConflictModalComponent:
+        """Returns instance of project listing component."""
+        if self.__project_sync_conflict_modal_component is None:
+            self.__project_sync_conflict_modal_component = ProjectSyncConflictModalComponent(self.driver,
+                                                                                             self.component_model)
+        return self.__project_sync_conflict_modal_component
 
     @property
     def __click_environment_tab(self) -> WebElement:

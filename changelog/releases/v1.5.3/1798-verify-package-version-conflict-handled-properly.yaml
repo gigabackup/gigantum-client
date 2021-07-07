@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1807"
+changelog:
+  - type: NEW
+    description: Test to verify merge conflicts with packages are handled properly.

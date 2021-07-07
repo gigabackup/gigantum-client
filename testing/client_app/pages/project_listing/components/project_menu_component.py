@@ -28,6 +28,19 @@ class ProjectMenuComponent(BaseComponent):
             title = title.get_text().split('/')[-1].strip()
             return title
 
+    def click_overview_tab(self) -> bool:
+        """ Performs click event on overview tab.
+
+        Returns: returns the result of click action
+
+        """
+        element = "//li[@id='overview']"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            overview_tab = self.get_locator(LocatorType.XPath, element)
+            overview_tab.click()
+            return True
+        return False
+
     def click_code_data_tab(self) -> bool:
         """ Performs click event on code data tab.
 
