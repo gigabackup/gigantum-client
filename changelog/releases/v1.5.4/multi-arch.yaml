@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1814"
+changelog:
+  - type: NEW
+    description: Add support for multi-arch build (amd64 & arm64)
