@@ -16,11 +16,13 @@ class ProjectCodeInputOutputDataComponent(BaseComponent):
     def __init__(self, driver: webdriver, component_data: ComponentModel) -> None:
         super(ProjectCodeInputOutputDataComponent, self).__init__(driver, component_data)
 
-    def drag_and_drop_text_file_in_code_drop_zone(self, file_content: str) -> bool:
+    def drag_and_drop_text_file_in_code_drop_zone(self, file_content: str = "sample text",
+                                                  file_name: str = "requirements.txt") -> bool:
         """Drag and drop the text file into Code data drop zone
 
         Args:
             file_content: Content of the file to be drag
+            file_name: Name of the file to be drag
 
         Returns: returns the result of drag and drop action
 
@@ -28,7 +30,7 @@ class ProjectCodeInputOutputDataComponent(BaseComponent):
         drop_box = self.get_locator(LocatorType.XPath, "//div[@class='Dropbox "
                                                        "Dropbox--fileBrowser flex flex--column align-items--center']")
         if drop_box is not None:
-            drop_box.drag_drop_file_in_drop_zone(file_content=file_content)
+            drop_box.drag_drop_file_in_drop_zone(file_content=file_content, file_name=file_name)
             return True
         return False
 
@@ -63,18 +65,20 @@ class ProjectCodeInputOutputDataComponent(BaseComponent):
             return True
         return False
 
-    def drag_and_drop_text_file_in_code_file_browser(self, file_content: str) -> bool:
+    def drag_and_drop_text_file_in_code_file_browser(self, file_content: str = "sample text",
+                                                     file_name: str = "requirements.txt") -> bool:
         """Drag and drop the text file in to code data file browser
 
         Args:
             file_content: Content of the file to be drag
+            file_name: Name of the file to be drag
 
         Returns: returns the result of drag and drop action
 
         """
         drop_box = self.get_locator(LocatorType.XPath, "//div[@class='FileBrowser']")
         if drop_box is not None:
-            drop_box.drag_drop_file_in_drop_zone(file_content=file_content)
+            drop_box.drag_drop_file_in_drop_zone(file_content=file_content, file_name=file_name)
             return True
         return False
 
@@ -265,5 +269,19 @@ class ProjectCodeInputOutputDataComponent(BaseComponent):
         """
         element = f"//div[@class='File']/div/div[1]/div[2]/div[contains(text(), '{file_name}')]"
         if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            return True
+        return False
+
+    def verify_file_is_absent(self, file_name: str) -> bool:
+        """ Verify file is absent in the code tab window
+
+        Args:
+            file_name: Name of the file to be verify
+
+        Returns: returns the result of verification
+
+        """
+        element = f"//div[@class='File']/div/div[1]/div[2]/div[contains(text(), '{file_name}')]"
+        if self.check_element_absence(LocatorType.XPath, element, 10):
             return True
         return False

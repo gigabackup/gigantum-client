@@ -16,6 +16,7 @@ from client_app.pages.project_listing.components.collaborators_modal_component i
 from client_app.pages.project_listing.components.project_sync_conflict_modal_component import \
     ProjectSyncConflictModalComponent
 from client_app.pages.project_listing.components.project_activity_component import ProjectActivityComponent
+from client_app.pages.project_listing.components.project_branch_component import ProjectBranchComponent
 
 
 class ProjectListingPage(BasePage):
@@ -55,6 +56,7 @@ class ProjectListingPage(BasePage):
         self._collaborators_modal_component = None
         self._project_sync_conflict_modal_component = None
         self._project_activity_component = None
+        self._project_branch_component = None
 
     @property
     def collaborators_modal_component(self) -> CollaboratorsModalComponent:
@@ -111,6 +113,13 @@ class ProjectListingPage(BasePage):
         if self._project_activity_component is None:
             self._project_activity_component = ProjectActivityComponent(self.driver, self.component_model)
         return self._project_activity_component
+
+    @property
+    def project_branch_component(self) -> ProjectBranchComponent:
+        """Returns instance of project branch component."""
+        if self._project_branch_component is None:
+            self._project_branch_component = ProjectBranchComponent(self.driver, self.component_model)
+        return self._project_branch_component
 
     @property
     def __create_button(self) -> WebElement:

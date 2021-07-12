@@ -16,9 +16,9 @@ $ pip3 install -r requirements.txt
 
 ## Usage
 
-#### Starting the Gigantum Client under test
+<!-- #### Starting the Gigantum Client under test
 
-Before running the test harness, ensure the Gigantum Client is installed and running
+Before running the test harness, ensure the Gigantum Client is installed and running -->
 
 ```
 # Ensure you are in the root of the gigantum-client repository.
@@ -28,16 +28,16 @@ $ gtm client start
 $ gtm client stop
 ```
 
-#### Setting up configuration 
+#### Setting up configuration
   Move to "configuration" directory\
   Open configuration.yaml\
   Update below settings based on test
-     
+
   `chrome_driver_version: ""`\
   `test_environment: dev`\
   `browsers: ["chrome", "firefox", "edge"]`\
   `incognito: True`
-  
+
   If you need to test in a specific version of chrome, you can specify the driver version in `chrome_driver_version`. Setting this to an empty string `""` will use the latest driver version.  
 
 #### Setting up user credentials
@@ -54,7 +54,7 @@ $ gtm client stop
    Open `pytest.ini`\
    Configure `markers` based on your test\
    Configure `report` file name
-   
+
 #### Setting up Safari
 Safari requires some additional configuration to enable automation.
 

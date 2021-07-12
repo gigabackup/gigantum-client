@@ -418,3 +418,46 @@ class ProjectUtility:
             return "Could not get Stopped status"
 
         return ProjectConstants.SUCCESS.value
+
+    def create_branch(self, driver: webdriver, branch_title: str, branch_description: str) -> str:
+        """Logical separation of create branch functionality
+
+        Args:
+            driver: webdriver instance
+            branch_title: Title of the new branch
+            branch_description: Description of the new branch
+
+        """
+        # Create a branch
+        # Load Project Listing Page
+        project_list = ProjectListingPage(driver)
+        if not project_list:
+            return "Could not load Project Listing Page"
+
+        # Click on create branch "+" icon
+        is_clicked = project_list.project_branch_component.click_create_branch_icon()
+        if not is_clicked:
+            return "Could not click create branch '+' icon"
+
+        # Input branch title
+        is_branch_title_typed = project_list.project_branch_component.input_branch_name(branch_title)
+        if not is_branch_title_typed:
+            return "Could not type branch title"
+
+        # Input branch description
+        is_branch_desc_typed = project_list.project_branch_component.input_branch_description(branch_description)
+        if not is_branch_desc_typed:
+            return "Could not type branch description"
+
+        # Click create branch button
+        is_clicked = project_list.project_branch_component.click_create_branch_button()
+        if not is_clicked:
+            return "Could not click create branch button"
+
+        # Verify create branch window is closed
+        is_verified = project_list.project_branch_component.verify_create_branch_window_closed()
+        if not is_verified:
+            return "Could not verify create branch window is closed"
+
+        return ProjectConstants.SUCCESS.value
+
