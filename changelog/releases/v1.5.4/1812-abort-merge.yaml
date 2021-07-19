@@ -1,0 +1,9 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1823"
+changelog:
+  - type: FIX
+    description: Fixes abort button not working on merge conflict
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1812
+  - type: FIX
+    description: Fixes create branch modal disappearing when clicked from swtich menu.
+  - type: FIX
+    description: Fixes tooltip on switch menu when a project is building.

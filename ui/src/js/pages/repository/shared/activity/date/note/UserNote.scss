@@ -63,13 +63,13 @@
 
 .UserNote {
   span.ReactTags__tag:first-child{
-      margin-left: 0px !important;
+    margin-left: 0px !important;
   }
 
   div.ReactTags__selected a.ReactTags__remove {
-      color: #aaa;
-      margin-left: 5px;
-      cursor: pointer;
+    color: #aaa;
+    margin-left: 5px;
+    cursor: pointer;
   }
 
   div.ReactTags__suggestions {

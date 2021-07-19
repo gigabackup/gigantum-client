@@ -1,30 +1,19 @@
 // @flow
 // vendor
-import React, { useState } from 'react';
-// components
-import CreateBranch from 'Pages/repository/shared/modals/createBranch/CreateBranch';
+import React from 'react';
+
 
 type Props = {
   filteredBranches: Array,
-  section: {
-    description: string,
-    owner: string,
-    name: string,
-  }
+  modalVisible: Boolean,
+  setModalVisible: Function
 }
 
-const NoOtherBranches = (props: Props) => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const {
-    filteredBranches,
-    section,
-  } = props;
-  const {
-    description,
-    name,
-    owner,
-  } = section;
-
+const NoOtherBranches = ({
+  filteredBranches,
+  modalVisible,
+  setModalVisible,
+}:Props) => {
   if (filteredBranches.length === 0) {
     return (
       <>
@@ -40,13 +29,6 @@ const NoOtherBranches = (props: Props) => {
           >
             Create a new branch?
           </button>
-          <CreateBranch
-            owner={owner}
-            name={name}
-            modalVisible={modalVisible}
-            description={description}
-            toggleModal={setModalVisible}
-          />
         </li>
 
       </>

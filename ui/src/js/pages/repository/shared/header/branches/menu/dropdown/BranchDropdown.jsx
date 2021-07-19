@@ -2,11 +2,14 @@
 // vendor
 import React, { Component } from 'react';
 import classNames from 'classnames';
+
 // store
 import {
   setErrorMessage,
 } from 'JS/redux/actions/footer';
 // components
+// components
+import CreateBranch from 'Pages/repository/shared/modals/createBranch/CreateBranch';
 import BranchStatus from 'Pages/repository/shared/header/branches/shared/status/BranchStatus';
 import BranchDropdownItem from './item/BranchDropdownItem';
 import NoOtherBranches from './create/NoOtherBranches';
@@ -40,7 +43,7 @@ const extractActiveBranch = (branches) => {
   Method returns swith tooltip text for a given state
   @return {String} switchTooltip
 */
-const getSwitchTooltip = (isLocked, isDataset, defaultDatasetMessage) => {
+const getSwitchTooltip = (isDataset, isLocked, defaultDatasetMessage) => {
   const switchTooltipLocked = isLocked ? 'Cannot switch branches while Project is in use' : 'Switch Branches';
   const switchTooltip = isDataset ? defaultDatasetMessage : switchTooltipLocked;
 
@@ -57,6 +60,7 @@ type Props = {
   defaultDatasetMessage: string,
   isLocked: boolean,
   section: {
+    description: string,
     name: string,
     owner: string,
   },
@@ -68,6 +72,7 @@ type Props = {
 
 class BranchDropdown extends Component<Props> {
   state = {
+    createModalVisible: false,
     switchMenuVisible: false,
     switchingBranch: false,
   }
@@ -149,6 +154,15 @@ class BranchDropdown extends Component<Props> {
     }
   }
 
+  /**
+    @param {boolean} value
+    sets state to createModalVisible
+    @return {}
+  */
+  _setCreateModalVisibile = (value) => {
+    this.setState({ createModalVisible: value });
+  }
+
   render() {
     const {
       branches,
@@ -158,14 +172,23 @@ class BranchDropdown extends Component<Props> {
       sectionType,
       toggleSidePanel,
     } = this.props;
-    const { switchingBranch, switchMenuVisible } = this.state;
+    const {
+      description,
+      name,
+      owner,
+    } = section;
+    const {
+      createModalVisible,
+      switchingBranch,
+      switchMenuVisible,
+    } = this.state;
     const {
       activeBranch,
       filteredBranches,
       branchMenuList,
       otherBranchCount,
     } = extractActiveBranch(branches);
-    const isDataset = (sectionType !== 'labbook');
+    const isDataset = (sectionType === 'dataset');
     const switchTooltip = getSwitchTooltip(
       isDataset,
       isLocked,
@@ -240,12 +263,24 @@ class BranchDropdown extends Component<Props> {
             <NoOtherBranches
               filteredBranches={filteredBranches}
               section={section}
+              setModalVisible={this._setCreateModalVisibile}
+            />
+
+            <CreateBranch
+              owner={owner}
+              name={name}
+              modalVisible={createModalVisible}
+              description={description}
+              toggleModal={this._setCreateModalVisibile}
             />
           </ul>
-          <div className="BranchDropdown__container">
+          <div
+            className="BranchDropdown__manage"
+            onClick={() => toggleSidePanel(true)}
+            role="presentation"
+          >
             <button
               type="button"
-              onClick={() => toggleSidePanel(true)}
               className="BranchDropdown__button--manage Btn--flat"
             >
               Manage Branches

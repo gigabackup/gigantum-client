@@ -40,6 +40,16 @@ const MergeModal = ({
   toggleModal,
 }: Props) => {
   const [forceMergeVisible, setForceMergeVisible] = useState(false);
+
+
+  const updateForceMerge = () => {
+    setForceMergeVisible(!forceMergeVisible);
+    toggleModal(!forceMergeVisible);
+
+    if (document.getElementById('labbook__cover')) {
+      document.getElementById('labbook__cover').classList.add('hidden');
+    }
+  };
   /**
     @param {Object} branchName
     @param {String} overrideMethod
@@ -76,7 +86,6 @@ const MergeModal = ({
           }
         });
       }
-
     });
   };
 
@@ -102,7 +111,7 @@ const MergeModal = ({
           branchName={branch.branchName}
           branchMutaions={branchMutations}
           modalVisible={forceMergeVisible}
-          toggleModal={setForceMergeVisible}
+          toggleModal={updateForceMerge}
           togglePopup={toggleModal}
           sectionType={sectionType}
         />
