@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1822"
+changelog:
+  - type: NEW
+    description: Test case to verify that a local branch can be created successfully using the create branch button in the header of a project and via the manage branches side panel

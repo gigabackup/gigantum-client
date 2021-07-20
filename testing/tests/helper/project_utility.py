@@ -419,8 +419,8 @@ class ProjectUtility:
 
         return ProjectConstants.SUCCESS.value
 
-    def create_branch(self, driver: webdriver, branch_title: str, branch_description: str) -> str:
-        """Logical separation of create branch functionality
+    def create_branch_via_header(self, driver: webdriver, branch_title: str, branch_description: str) -> str:
+        """Logical separation of create branch via header functionality
 
         Args:
             driver: webdriver instance
@@ -439,6 +439,62 @@ class ProjectUtility:
         if not is_clicked:
             return "Could not click create branch '+' icon"
 
+        # Input branch details and click create button
+        is_branch_created_msg = self.__input_branch_details_and_click_create_button(project_list, branch_title,
+                                                                                    branch_description)
+        if is_branch_created_msg != ProjectConstants.SUCCESS.value:
+            return is_branch_created_msg
+
+        return ProjectConstants.SUCCESS.value
+
+    def create_branch_via_manage_menu(self, driver: webdriver, branch_title: str, branch_description: str) -> str:
+        """Logical separation of create branch via manage menu functionality
+
+        Args:
+            driver: webdriver instance
+            branch_title: Title of the new branch
+            branch_description: Description of the new branch
+
+        """
+        # Create a branch
+        # Load Project Listing Page
+        project_list = ProjectListingPage(driver)
+        if not project_list:
+            return "Could not load Project Listing Page"
+
+        # Click on manage branches menu icon
+        is_clicked = project_list.project_branch_component.click_manage_branches_menu_icon()
+        if not is_clicked:
+            return "Could not click manage branches menu icon"
+
+        # Verify manage branch side panel is opened
+        is_verified = project_list.project_branch_component.verify_manage_branch_side_panel_is_opened()
+        if not is_verified:
+            return "Manage branch side panel is not opened"
+
+        # Click on create branch icon in manage branches menu icon
+        is_clicked = project_list.project_branch_component.click_create_branch_icon_in_manage_branches_menu()
+        if not is_clicked:
+            return "Could not click create branch icon in manage branches menu icon"
+
+        # Input branch details and click create button
+        is_branch_created_msg = self.__input_branch_details_and_click_create_button(project_list, branch_title,
+                                                                                    branch_description)
+        if is_branch_created_msg != ProjectConstants.SUCCESS.value:
+            return is_branch_created_msg
+
+        return ProjectConstants.SUCCESS.value
+
+    def __input_branch_details_and_click_create_button(self, project_list: webdriver, branch_title: str,
+                                                       branch_description: str) -> str:
+        """Logical separation of create branch via manage menu functionality
+
+        Args:
+            project_list: An instance of project list page
+            branch_title: Title of the new branch
+            branch_description: Description of the new branch
+
+        """
         # Input branch title
         is_branch_title_typed = project_list.project_branch_component.input_branch_name(branch_title)
         if not is_branch_title_typed:

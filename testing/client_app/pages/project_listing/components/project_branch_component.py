@@ -323,3 +323,45 @@ class ProjectBranchComponent(BaseComponent):
                                        GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
             return True
         return False
+
+    def click_manage_branches_menu_icon(self) -> bool:
+        """ Performs click action on manage branches menu icon.
+
+        Returns: returns the result of click action
+
+        """
+        manage_branches_menu_icon_element = "//button[@class='Btn--branch Btn--action ManageBranchButton Tooltip-data']"
+        if self.check_element_presence(LocatorType.XPath, manage_branches_menu_icon_element,
+                                       GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            manage_branches_menu_icon = self.get_locator(LocatorType.XPath, manage_branches_menu_icon_element)
+            if manage_branches_menu_icon:
+                manage_branches_menu_icon.click()
+                return True
+        return False
+
+    def click_create_branch_icon_in_manage_branches_menu(self) -> bool:
+        """ Performs click action on create branch icon in manage branches menu.
+
+        Returns: returns the result of click action
+
+        """
+        create_branch_icon_element = "//button[@class='BranchActions__btn BranchActions__btn--create']"
+        if self.check_element_presence(LocatorType.XPath, create_branch_icon_element,
+                                       GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            create_branch_icon = self.get_locator(LocatorType.XPath, create_branch_icon_element)
+            if create_branch_icon:
+                create_branch_icon.execute_script("arguments[0].click();")
+                return True
+        return False
+
+    def verify_manage_branch_side_panel_is_opened(self) -> bool:
+        """ Check for the presence of manage branch side panel
+
+        Returns: returns True if the element is present
+
+        """
+        element = "//div[@class='BranchesSidePanel']"
+        if self.check_element_presence(LocatorType.XPath, element, GigantumConstants.ELEMENT_PRESENCE_TIMEOUT.value):
+            return True
+        return False
+

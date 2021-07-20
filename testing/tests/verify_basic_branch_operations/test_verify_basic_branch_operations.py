@@ -58,7 +58,7 @@ class TestVerifyBasicBranchOperations:
         # Create new branch 'test-branch'
         branch_title = 'test-branch'
         branch_description = 'test-branch-description'
-        is_success_msg = ProjectUtility().create_branch(self.driver, branch_title, branch_description)
+        is_success_msg = ProjectUtility().create_branch_via_header(self.driver, branch_title, branch_description)
         assert is_success_msg == ProjectConstants.SUCCESS.value, is_success_msg
 
         # Verify branch name
