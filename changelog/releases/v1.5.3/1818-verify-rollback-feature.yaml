@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1827"
+changelog:
+  - type: NEW
+    description: Test case to test rollback feature in the activity feed.

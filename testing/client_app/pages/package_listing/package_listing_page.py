@@ -14,6 +14,7 @@ from client_app.pages.project_listing.components.project_container_status_compon
 from client_app.pages.project_listing.components.project_menu_component import ProjectMenuComponent
 from client_app.pages.project_listing.components.project_code_input_output_data_component import \
     ProjectCodeInputOutputDataComponent
+from client_app.pages.project_listing.components.project_activity_component import ProjectActivityComponent
 
 
 class PackageListingPage(BasePage):
@@ -37,6 +38,7 @@ class PackageListingPage(BasePage):
         self.__project_container_status_component = None
         self.__project_listing_component = None
         self.__project_sync_conflict_modal_component = None
+        self.__project_activity_component = None
         self.__package_grid_model = ComponentModel(locator_type=LocatorType.XPath, locator="//div[@class='grid']")
         self.__add_package_model = ComponentModel(locator_type=LocatorType.XPath,
                                                   locator="//div[@data-selenium-id='AddPackages']")
@@ -82,6 +84,13 @@ class PackageListingPage(BasePage):
         if self.__project_listing_component is None:
             self.__project_listing_component = ProjectListingComponent(self.driver, self.component_model)
         return self.__project_listing_component
+
+    @property
+    def project_activity_component(self) -> ProjectActivityComponent:
+        """Returns instance of project activity component."""
+        if self.__project_activity_component is None:
+            self.__project_activity_component = ProjectActivityComponent(self.driver, self.component_model)
+        return self.__project_activity_component
 
     @property
     def project_sync_conflict_modal_component(self) -> ProjectSyncConflictModalComponent:
