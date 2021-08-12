@@ -1,0 +1,5 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1830"
+changelog:
+  - type: NEW
+    description: Adds multi-gpu management to enable reserving GPUs automatically
+    issueLink: https://github.com/gigantum/gigantum-client/issues/1583

@@ -58,7 +58,7 @@ snapshots['TestEnvironmentBaseImageQueries.test_get_available_base_images 1'] = 
                         'dockerImageNamespace': 'gigantum',
                         'dockerImageRepository': 'python3-minimal',
                         'dockerImageServer': 'hub.docker.com',
-                        'dockerImageTag': '1effaaea-2018-05-23',
+                        'dockerImageTag': 'f415d5dff3-2021-04-29',
                         'icon': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
                         'id': 'QmFzZUNvbXBvbmVudDpnaWdhbnR1bV9iYXNlLWltYWdlcy10ZXN0aW5nJnF1aWNrc3RhcnQtanVweXRlcmxhYiYy',
                         'installedPackages': [
@@ -347,7 +347,7 @@ snapshots['TestEnvironmentBaseImageQueries.test_get_available_base_images_pagina
                         'dockerImageNamespace': 'gigantum',
                         'dockerImageRepository': 'python3-minimal',
                         'dockerImageServer': 'hub.docker.com',
-                        'dockerImageTag': '1effaaea-2018-05-23',
+                        'dockerImageTag': 'f415d5dff3-2021-04-29',
                         'icon': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
                         'id': 'QmFzZUNvbXBvbmVudDpnaWdhbnR1bV9iYXNlLWltYWdlcy10ZXN0aW5nJnF1aWNrc3RhcnQtanVweXRlcmxhYiYy',
                         'languages': [
@@ -580,7 +580,7 @@ snapshots['TestEnvironmentBaseImageQueries.test_get_available_base_images_pagina
                         'dockerImageNamespace': 'gigantum',
                         'dockerImageRepository': 'python3-minimal',
                         'dockerImageServer': 'hub.docker.com',
-                        'dockerImageTag': '1effaaea-2018-05-23',
+                        'dockerImageTag': 'f415d5dff3-2021-04-29',
                         'icon': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
                         'id': 'QmFzZUNvbXBvbmVudDpnaWdhbnR1bV9iYXNlLWltYWdlcy10ZXN0aW5nJnF1aWNrc3RhcnQtanVweXRlcmxhYiYy',
                         'languages': [

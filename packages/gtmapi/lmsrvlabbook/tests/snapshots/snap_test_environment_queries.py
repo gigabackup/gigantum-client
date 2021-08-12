@@ -44,7 +44,7 @@ snapshots['TestEnvironmentServiceQueries.test_get_base 2'] = {
                     'dockerImageNamespace': 'gigantum',
                     'dockerImageRepository': 'python3-minimal',
                     'dockerImageServer': 'hub.docker.com',
-                    'dockerImageTag': '1effaaea-2018-05-23',
+                    'dockerImageTag': 'f415d5dff3-2021-04-29',
                     'icon': 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
                     'id': 'QmFzZUNvbXBvbmVudDpnaWdhbnR1bV9iYXNlLWltYWdlcy10ZXN0aW5nJnF1aWNrc3RhcnQtanVweXRlcmxhYiYy',
                     'languages': [
@@ -475,7 +475,7 @@ snapshots['TestEnvironmentServiceQueries.test_package_query_with_errors_apt 1'] 
                     'description': 'command line tool for transferring data with URL syntax',
                     'id': 'UGFja2FnZUNvbXBvbmVudDphcHQmY3VybCY4LjE=',
                     'isValid': False,
-                    'latestVersion': '7.58.0-2ubuntu3.1',
+                    'latestVersion': '7.68.0-1ubuntu2.5',
                     'manager': 'apt',
                     'package': 'curl',
                     'version': '8.1'
@@ -529,12 +529,12 @@ snapshots['TestEnvironmentServiceQueries.test_package_query_no_version 2'] = {
             'checkPackages': [
                 {
                     'description': 'command line tool for transferring data with URL syntax',
-                    'id': 'UGFja2FnZUNvbXBvbmVudDphcHQmY3VybCY3LjU4LjAtMnVidW50dTMuMQ==',
+                    'id': 'UGFja2FnZUNvbXBvbmVudDphcHQmY3VybCY3LjY4LjAtMXVidW50dTIuNQ==',
                     'isValid': True,
-                    'latestVersion': '7.58.0-2ubuntu3.1',
+                    'latestVersion': '7.68.0-1ubuntu2.5',
                     'manager': 'apt',
                     'package': 'curl',
-                    'version': '7.58.0-2ubuntu3.1'
+                    'version': '7.68.0-1ubuntu2.5'
                 },
                 {
                     'description': None,

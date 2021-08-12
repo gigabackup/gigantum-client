@@ -158,7 +158,7 @@ def build_lb_image_for_env_conda(mock_config_with_repo):
                            description="Testing environment functions.")
     cm = ComponentManager(lb)
     cm.add_base(ENV_UNIT_TEST_REPO, ENV_UNIT_TEST_BASE, ENV_UNIT_TEST_REV)
-    cm.add_packages('conda3', [{'package': 'python-coveralls', 'version': '2.7.0'}])
+    cm.add_packages('conda3', [{'package': 'python-coveralls', 'version': '2.9.3'}])
 
     ib = ImageBuilder(lb)
     ib.assemble_dockerfile(write=True)

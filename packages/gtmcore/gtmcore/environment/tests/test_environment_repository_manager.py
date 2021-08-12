@@ -46,14 +46,14 @@ class TestEnvironmentRepositoryManager(object):
         assert (base_repo / "README.md").exists()
         # This will break if we change master, or if somehow we get some other HEAD that's not master
         assert run(['git', 'rev-parse', 'HEAD'], cwd=base_repo, capture_output=True).stdout.strip() == \
-                b'3aa9bde4d2e03e28571e81d1ed099674dea8c7ad'
+                b'dd217c054141c6ce9f1b28268a2673c63959c1f4'
 
         # If the repositories are already checked out, this triggers a different code-path
         erm = RepositoryManager()
         erm.update_repositories()
 
         assert run(['git', 'rev-parse', 'HEAD'], cwd=base_repo, capture_output=True).stdout.strip() == \
-               b'3aa9bde4d2e03e28571e81d1ed099674dea8c7ad'
+               b'dd217c054141c6ce9f1b28268a2673c63959c1f4'
 
     def test_index_repositories_base_image(self, mock_config_with_repo):
         """Test creating and accessing the detail version of the base image index"""

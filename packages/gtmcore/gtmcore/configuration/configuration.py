@@ -467,7 +467,10 @@ class Configuration:
             logger.info(f'Created `servers` dir for server configurations: {self.server_config_dir}')
 
         # Run primary discovery
-        discovery_service = urljoin(url, '.well-known/discover.json')
+        if "gigantum.com" in url:
+            discovery_service = urljoin(url, '.well-known/discover.json')
+        else:
+            discovery_service = urljoin(url, 'gigantum/.well-known/discover.json')
         response = requests.get(discovery_service)
 
         if response.status_code != 200:

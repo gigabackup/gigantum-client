@@ -16,10 +16,10 @@ class TestAptPackageManager(object):
         username = build_lb_image_for_env[1]
         result = mrg.list_versions("libtiff5", lb, username)
 
-        assert len(result) == 1
+        assert len(result) == 2
 
         # assert result == "4.0.9-5"
-        assert re.match(r'\d.\d.\d-\d', result[0])
+        assert re.match(r'\d.\d.\d\+git\d+-2ubuntu\d+.\d+.\d+.\d+', result[0])
 
     def test_list_installed_packages(self, build_lb_image_for_env):
         """Test list_installed_packages command

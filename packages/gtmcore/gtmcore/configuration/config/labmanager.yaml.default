@@ -32,6 +32,11 @@ container:
   # This parameter is only set when a Project is GPU enabled and being launched with nvidia docker runtime
   gpu_shared_mem: 2G
 
+  # If null, *all* available GPUs will be available in *every* GPU enabled Project that is started
+  # If an integer, each GPU enabled Project will attempt to reserve and bind to the indicated number of GPUs
+  # Currently only 1 or null is supported. Future work will allow multi-GPU management.
+  gpus_per_project: 1
+
 # Authentication Configuration
 auth:
   # Set to `browser` for multi-tenant

@@ -8,9 +8,13 @@ from typing import Optional, Callable, List, Dict
 import docker
 import docker.errors
 from docker.models.containers import Container
+from docker.types import DeviceRequest
+
 import requests
 
+from gtmcore.configuration import Configuration
 from gtmcore.container.container import ContainerOperations, _check_allowed_args, logger
+from gtmcore.container.cuda import GPUInventory
 from gtmcore.container.exceptions import ContainerBuildException, ContainerException
 
 from gtmcore.labbook import LabBook
@@ -192,29 +196,70 @@ class LocalProjectContainer(ContainerOperations):
         Returns:
             If wait_for_output is specified, the stdout of the cmd. Otherwise, or if stdout cannot be obtained, None.
         """
-        # We move a number of optional arguments into a **kwargs construct because
-        #  no default value is specified in docker-py docs
-        if volumes:
-            run_args['volumes'] = volumes
-        if environment:
-            run_args['environment'] = environment
-        if cmd:
-            run_args['command'] = cmd
-
         image_name = image_name or self.image_tag
         if not image_name:
             raise ContainerException('No default image_name is available. Please specify at init or as a parameter.')
 
         if not wait_for_output:
             container_name = container_name or image_name
-            # We use negative logic because this branch is much simpler
-            container_object = self._client.containers.run(image_name, detach=True, init=True, name=container_name,
-                                                           **run_args)
-            if container_name == image_name:
-                self._container = container_object
-            return None
+
+            config = Configuration()
+            gpu_enabled = 'runtime' in run_args
+            gpu_reservations_enabled = config.config['container'].get('gpus_per_project') == 1
+
+            if not gpu_enabled or (gpu_enabled and not gpu_reservations_enabled):
+                # Either GPUs are not enabled on this project OR GPU reservations are not enabled so we are
+                # simply using the nvidia runtime and passing everything through
+
+                # We move a number of optional arguments into a **kwargs construct because
+                #  no default value is specified in docker-py docs
+                if volumes:
+                    run_args['volumes'] = volumes
+                if environment:
+                    run_args['environment'] = environment
+                if cmd:
+                    run_args['command'] = cmd
+
+                container_object = self._client.containers.run(image_name, detach=True, init=True, name=container_name,
+                                                               **run_args)
+                if container_name == image_name:
+                    self._container = container_object
+                return None
+            else:
+                # Use low-level API to start a container with GPU reservations enabled
+                gpu_inv = GPUInventory()
+                username, owner, project_name = self.labbook.key.split("|")
+                gpu_idx = gpu_inv.reserve(username, owner, project_name)
+
+                run_args['device_requests'] = [DeviceRequest(driver="nvidia", device_ids=[str(gpu_idx)],
+                                                             capabilities=[['gpu'], ['nvidia'], ['compute'],
+                                                                           ['compat32'], ['graphics'], ['utility'],
+                                                                           ['video'], ['display']])]
+                binds = list()
+                if volumes:
+                    for v in volumes:
+                        binds.append(f"{v}:{volumes[v]['bind']}:{volumes[v]['mode']}")
+                    run_args['binds'] = binds
+
+                run_args['init'] = True
+                create_kwargs = self._client.api.create_host_config(**run_args)
+
+                resp = self._client.api.create_container(image=image_name, detach=True, name=container_name,
+                                                         volumes=volumes, environment=environment, command=cmd,
+                                                         host_config=create_kwargs)
+
+                c = self._client.containers.get(resp['Id'])
+                self._client.api.start(container=c.id)
+                self._container = c
+                return None
         else:
             t0 = time.time()
+            if volumes:
+                run_args['volumes'] = volumes
+            if environment:
+                run_args['environment'] = environment
+            if cmd:
+                run_args['command'] = cmd
             result = self._client.containers.run(image_name, detach=False, init=True, remove=True, stderr=False,
                                                  **run_args)
 
@@ -250,6 +295,13 @@ class LocalProjectContainer(ContainerOperations):
 
         if not container_name:
             self._container = None
+
+        if hasattr(self, 'labbook'):
+            # If this is a primary container and not a sidecar trying to trigger a stop, check if you need to release
+            # gpu reservations
+            gpu_inv = GPUInventory()
+            username, owner, project_name = self.labbook.key.split("|")
+            gpu_inv.release(username, owner, project_name)
 
         return True
 
