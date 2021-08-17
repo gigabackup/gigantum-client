@@ -173,7 +173,6 @@ class LocalProjectContainer(ContainerOperations):
             return True
 
     # Working with Containers
-
     def run_container(self, cmd: Optional[str] = None, image_name: Optional[str] = None, environment: List[str] = None,
                       volumes: Optional[Dict] = None, wait_for_output=False, container_name: Optional[str] = None,
                       **run_args) \
@@ -239,9 +238,17 @@ class LocalProjectContainer(ContainerOperations):
                 if volumes:
                     for v in volumes:
                         binds.append(f"{v}:{volumes[v]['bind']}:{volumes[v]['mode']}")
+
+                    if os.environ.get('NVIDIA_SMI_PATH'):
+                        binds.append(f"{os.environ.get('NVIDIA_SMI_PATH')}:/usr/local/bin/nvidia-smi:ro")
+
                     run_args['binds'] = binds
 
                 run_args['init'] = True
+
+                # TODO DMK - delete the runtime so you don't need nvidia docker....need to refactor this to be configurable.
+                del run_args['runtime']
+
                 create_kwargs = self._client.api.create_host_config(**run_args)
 
                 resp = self._client.api.create_container(image=image_name, detach=True, name=container_name,
