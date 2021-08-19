@@ -202,9 +202,16 @@ class LocalProjectContainer(ContainerOperations):
         if not wait_for_output:
             container_name = container_name or image_name
 
+            # Get information about the host's Docker and GPU support
             config = Configuration()
             gpu_enabled = 'runtime' in run_args
             gpu_reservations_enabled = config.config['container'].get('gpus_per_project') == 1
+            version_info = self._client.version()
+            api_version_parts = version_info['ApiVersion'].split('.')
+            nvidia_runtime_required = True
+            if api_version_parts:
+                if int(api_version_parts[0]) == 1 and int(api_version_parts[1]) >= 40:
+                    nvidia_runtime_required = False
 
             if not gpu_enabled or (gpu_enabled and not gpu_reservations_enabled):
                 # Either GPUs are not enabled on this project OR GPU reservations are not enabled so we are
@@ -239,16 +246,17 @@ class LocalProjectContainer(ContainerOperations):
                     for v in volumes:
                         binds.append(f"{v}:{volumes[v]['bind']}:{volumes[v]['mode']}")
 
-                    if os.environ.get('NVIDIA_SMI_PATH'):
-                        binds.append(f"{os.environ.get('NVIDIA_SMI_PATH')}:/usr/local/bin/nvidia-smi:ro")
-
+                    if not nvidia_runtime_required:
+                        # If you aren't going to use nvidia-docker2, bind mount nvidia-smi for the user
+                        if os.environ.get('NVIDIA_SMI_PATH'):
+                            binds.append(f"{os.environ.get('NVIDIA_SMI_PATH')}:/usr/local/bin/nvidia-smi:ro")
                     run_args['binds'] = binds
 
+                if not nvidia_runtime_required:
+                    # If you aren't going to use nvidia-docker2, don't include it in the run_args
+                    del run_args['runtime']
+
                 run_args['init'] = True
-
-                # TODO DMK - delete the runtime so you don't need nvidia docker....need to refactor this to be configurable.
-                del run_args['runtime']
-
                 create_kwargs = self._client.api.create_host_config(**run_args)
 
                 resp = self._client.api.create_container(image=image_name, detach=True, name=container_name,
