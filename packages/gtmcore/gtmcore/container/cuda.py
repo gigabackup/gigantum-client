@@ -115,12 +115,12 @@ class GPUInventory:
         """
         client = self._get_redis_client()
         if not num_gpus:
-            num_gpus = self._num_gpus()
+            num_gpus = self.num_gpus()
         logger.info(f"{num_gpus} GPUs detected during initialization.")
         for idx in range(num_gpus):
             client.rpush(self.GPUS_AVAILABLE_KEY, idx)
 
-    def _num_gpus(self) -> int:
+    def num_gpus(self) -> int:
         """Get the number of GPUs available on the host via the env var `NVIDIA_NUM_GPUS`, which is set by the CLI
 
         Returns:

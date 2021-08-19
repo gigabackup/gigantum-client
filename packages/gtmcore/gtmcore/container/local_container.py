@@ -201,21 +201,10 @@ class LocalProjectContainer(ContainerOperations):
 
         if not wait_for_output:
             container_name = container_name or image_name
-
-            # Get information about the host's Docker and GPU support
             config = Configuration()
-            gpu_enabled = 'runtime' in run_args
-            gpu_reservations_enabled = config.config['container'].get('gpus_per_project') == 1
-            version_info = self._client.version()
-            api_version_parts = version_info['ApiVersion'].split('.')
-            nvidia_runtime_required = True
-            if api_version_parts:
-                if int(api_version_parts[0]) == 1 and int(api_version_parts[1]) >= 40:
-                    nvidia_runtime_required = False
 
-            if not gpu_enabled or (gpu_enabled and not gpu_reservations_enabled):
-                # Either GPUs are not enabled on this project OR GPU reservations are not enabled so we are
-                # simply using the nvidia runtime and passing everything through
+            if 'runtime' not in run_args:
+                # GPUs are NOT enabled on this project. Normal run command.
 
                 # We move a number of optional arguments into a **kwargs construct because
                 #  no default value is specified in docker-py docs
@@ -232,15 +221,34 @@ class LocalProjectContainer(ContainerOperations):
                     self._container = container_object
                 return None
             else:
-                # Use low-level API to start a container with GPU reservations enabled
+                # Use low-level API to start a container with GPUs for maximum compatibility with Docker API version
+                # and nvidia-docker2/nvidia-container-toolkit
                 gpu_inv = GPUInventory()
-                username, owner, project_name = self.labbook.key.split("|")
-                gpu_idx = gpu_inv.reserve(username, owner, project_name)
+                if config.config['container'].get('gpus_per_project') is not None:
+                    logger.info("Starting container with GPU reservations enabled")
+                    # Reservation system is enabled
+                    username, owner, project_name = self.labbook.key.split("|")
+                    gpu_idx = gpu_inv.reserve(username, owner, project_name)
+                    gpu_device_ids = [str(gpu_idx)]
+                else:
+                    # Reservation system is disabled
+                    logger.info("Starting container with GPU reservations disabled")
+                    gpu_device_ids = [str(x) for x in range(gpu_inv.num_gpus())]
 
-                run_args['device_requests'] = [DeviceRequest(driver="nvidia", device_ids=[str(gpu_idx)],
+                run_args['device_requests'] = [DeviceRequest(driver="nvidia", device_ids=gpu_device_ids,
                                                              capabilities=[['gpu'], ['nvidia'], ['compute'],
                                                                            ['compat32'], ['graphics'], ['utility'],
                                                                            ['video'], ['display']])]
+
+                # Detect Docker API version to check if you need to use nvidia-docker2 or not
+                version_info = self._client.version()
+                api_version_parts = version_info['ApiVersion'].split('.')
+                nvidia_runtime_required = True
+                if api_version_parts:
+                    if int(api_version_parts[0]) == 1 and int(api_version_parts[1]) >= 40:
+                        logger.info("Docker API >= 1.40 detected. Using low-level GPU interface.")
+                        nvidia_runtime_required = False
+
                 binds = list()
                 if volumes:
                     for v in volumes:
@@ -249,6 +257,7 @@ class LocalProjectContainer(ContainerOperations):
                     if not nvidia_runtime_required:
                         # If you aren't going to use nvidia-docker2, bind mount nvidia-smi for the user
                         if os.environ.get('NVIDIA_SMI_PATH'):
+                            logger.info("nvidia-smi binary detected and mounted into Project container.")
                             binds.append(f"{os.environ.get('NVIDIA_SMI_PATH')}:/usr/local/bin/nvidia-smi:ro")
                     run_args['binds'] = binds
 
