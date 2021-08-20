@@ -19,11 +19,11 @@ class TestGPUInventory(object):
     # THIS TEST ASSUMES YOU ARE NOT RUNNING ON A GPU MACHINE
     def test_num_gpus(self, gpu_inventory):
         # Test path where GPUs are not enabled
-        assert gpu_inventory._num_gpus() == 0
+        assert gpu_inventory.num_gpus() == 0
 
         # Test path where GPUs are enabled but an error occurs
         os.environ['NVIDIA_NUM_GPUS'] = "3"
-        assert gpu_inventory._num_gpus() == 3
+        assert gpu_inventory.num_gpus() == 3
 
     def test_init(self, gpu_inventory):
         client = redis.Redis(db=gpu_inventory.REDIS_DB, decode_responses=True)

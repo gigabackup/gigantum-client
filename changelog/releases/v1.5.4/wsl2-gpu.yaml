@@ -1,0 +1,4 @@
+prLink: "https://github.com/gigantum/gigantum-client/pull/1837"
+changelog:
+  - type: NEW
+    description: Adds support for GPUs on WSL2 and hosts where nvidia-container-toolkit is installed instead of nvidia-docker2
